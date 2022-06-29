@@ -16,8 +16,11 @@ require("./startup/db")();
 require("./startup/env")();
 
 const port = process.env.PORT || 3000;
-const server = app.listen(port, () =>
-  console.log(`Listening on port ${port}...`)
-);
-
+const server = app
+  .listen(port, () => console.log(`Listening on port ${port}...`))
+  .on("error", () => {
+    process.once("SIGUSR2", () => process.kill(process.pid, "SIGUSR2"));
+    process.once("SIGINT", () => process.kill(process.pid, "SIGINT"));
+    process.once("uncaughtException", () => {});
+  });
 module.exports = server;
