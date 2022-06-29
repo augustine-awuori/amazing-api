@@ -18,4 +18,10 @@ router.post("/", [auth, admin, validatingWith(validate)], async (req, res) => {
   res.send(category);
 });
 
+router.get("/", auth, async (req, res) => {
+  const categories = await Category.find({}).sort("label");
+
+  res.send(categories);
+});
+
 module.exports = router;
