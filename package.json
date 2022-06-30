@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --watchAll --verbose --coverage --detectOpenHandles",
-    "start": "node index.js"
+    "start": "nodemon"
   },
   "keywords": [],
   "author": "",
