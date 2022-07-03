@@ -5,6 +5,7 @@ const router = express.Router();
 const { validateListing, Listing } = require("../models/listing");
 const auth = require("../middleware/auth");
 const imageResize = require("../middleware/imageResize");
+const listingMapper = require("../mappers/listings");
 const validation = require("../middleware/validate");
 const validateCategoryId = require("../middleware/validateCategoryId");
 const validateUser = require("../middleware/validateUser");
@@ -27,13 +28,14 @@ router.post(
   ],
   async (req, res) => {
     let listing = {
-      title: req.body.title,
-      price: req.body.price,
+      author: req.user,
       categoryId: req.body.categoryId,
       description: req.body.description,
-      userId: req.user._id,
+      price: req.body.price,
+      title: req.body.title,
     };
     listing.images = req.images.map((fileName) => ({ fileName }));
+
     listing = new Listing(listing);
     await listing.save();
 

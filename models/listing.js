@@ -2,6 +2,31 @@ const Joi = require("joi");
 const mongoose = require("mongoose");
 
 const schema = new mongoose.Schema({
+  author: {
+    // avatar: Object,
+    required: true,
+    type: new mongoose.Schema({
+      _id: {
+        ref: "User",
+        required: true,
+        type: mongoose.Types.ObjectId,
+      },
+      name: {
+        maxlength: 50,
+        minlength: 3,
+        required: true,
+        trim: true,
+        type: String,
+      },
+      username: {
+        maxlength: 50,
+        minlength: 4,
+        required: true,
+        trim: true,
+        type: String,
+      },
+    }),
+  },
   categoryId: {
     ref: "Category",
     required: true,
@@ -12,7 +37,7 @@ const schema = new mongoose.Schema({
     trim: true,
     type: String,
   },
-  images: Array,
+  images: [Object],
   price: {
     max: 10_000,
     min: 1,
@@ -25,11 +50,6 @@ const schema = new mongoose.Schema({
     required: true,
     trim: true,
     type: String,
-  },
-  userId: {
-    ref: "User",
-    required: true,
-    type: mongoose.Types.ObjectId,
   },
 });
 
