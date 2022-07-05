@@ -22,21 +22,21 @@ router.post(
     upload.array("images", process.env.MAX_IMAGE_COUNT),
     auth,
     validateUser,
-    validation(validateListing),
     validateCategoryId,
+    validation(validateListing),
     imageResize,
   ],
   async (req, res) => {
     let listing = {
       author: req.user,
-      categoryId: req.body.categoryId,
+      category: req.body.category,
       description: req.body.description,
       price: req.body.price,
       title: req.body.title,
     };
     listing.images = req.images.map((fileName) => ({ fileName }));
-
     listing = new Listing(listing);
+
     await listing.save();
 
     res.send(listing);

@@ -27,10 +27,23 @@ const schema = new mongoose.Schema({
       },
     }),
   },
-  categoryId: {
-    ref: "Category",
+  category: {
     required: true,
-    type: mongoose.Types.ObjectId,
+    type: new mongoose.Schema({
+      _id: {
+        ref: "Category",
+        required: true,
+        type: mongoose.Types.ObjectId,
+      },
+      label: {
+        max: 50,
+        min: 3,
+        required: true,
+        trim: true,
+        type: String,
+        unique: true,
+      },
+    }),
   },
   description: {
     maxlength: 50,
@@ -54,11 +67,26 @@ const schema = new mongoose.Schema({
 });
 
 const Listing = mongoose.model("Listing", schema);
+async function createIndex() {
+  await Listing.collection.createIndex(
+    { "category.label": 1, "author.username": 1 },
+    { unique: true }
+  );
+}
+createIndex();
 
 const validate = (listing) =>
   Joi.object({
-    categoryId: Joi.string().required(),
-    description: Joi.string().max(50).allow(""),
+    author: Joi.object({
+      _id: Joi.any(),
+      name: Joi.string().min(3).max(50).required(),
+      username: Joi.string().min(3).max(50).required(),
+    }),
+    category: Joi.object({
+      _id: Joi.any(),
+      label: Joi.string().min(3).max(50).required(),
+    }),
+    description: Joi.string().max(200).allow(""),
     images: Joi.array().max(3),
     price: Joi.number().required().min(1).max(10_000),
     title: Joi.string().required().min(2).max(50),
