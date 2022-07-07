@@ -36,6 +36,10 @@ router.post(
     };
     listing.images = req.images.map((fileName) => ({ fileName }));
     listing = new Listing(listing);
+    listing.count =
+      (await Listing.find({
+        author: { _id: req.user._id },
+      }).count()) + 1;
 
     await listing.save();
 

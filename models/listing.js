@@ -45,6 +45,7 @@ const schema = new mongoose.Schema({
       },
     }),
   },
+  count: { type: Number, default: 0 },
   description: {
     maxlength: 50,
     trim: true,
@@ -67,13 +68,6 @@ const schema = new mongoose.Schema({
 });
 
 const Listing = mongoose.model("Listing", schema);
-async function createIndex() {
-  await Listing.collection.createIndex(
-    { "category.label": 1, "author.username": 1 },
-    { unique: true }
-  );
-}
-createIndex();
 
 const validate = (listing) =>
   Joi.object({
