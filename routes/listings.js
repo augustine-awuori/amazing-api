@@ -45,4 +45,12 @@ router.post(
   }
 );
 
+router.get("/", async (req, res) => {
+  const listings = await Listing.find({}).sort("_id");
+
+  const resources = listings.map(imageMapper);
+
+  res.send(resources);
+});
+
 module.exports = router;
