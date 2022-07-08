@@ -5,7 +5,8 @@ const router = express.Router();
 const { validateListing, Listing } = require("../models/listing");
 const auth = require("../middleware/auth");
 const imageResize = require("../middleware/imageResize");
-const listingMapper = require("../mappers/listings");
+const listingCounter = require("../updaters/listings");
+const imageMapper = require("../mappers/listings");
 const validation = require("../middleware/validate");
 const validateCategoryId = require("../middleware/validateCategoryId");
 const validateUser = require("../middleware/validateUser");
@@ -36,12 +37,9 @@ router.post(
     };
     listing.images = req.images.map((fileName) => ({ fileName }));
     listing = new Listing(listing);
-    listing.count =
-      (await Listing.find({
-        author: { _id: req.user._id },
-      }).count()) + 1;
 
     await listing.save();
+    listingCounter(listing);
 
     res.send(listing);
   }
