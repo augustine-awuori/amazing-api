@@ -18,7 +18,7 @@ module.exports = async (req, res, next) => {
 
     fs.unlinkSync(req.file.path);
 
-    req.avatar = { filename: req.file.filename };
+    req.avatar = { fileName: req.file.filename };
   }
 
   next();
