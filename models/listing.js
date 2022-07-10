@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 
 const schema = new mongoose.Schema({
   author: {
-    // avatar: Object,
     required: true,
     type: new mongoose.Schema({
       _id: {
@@ -11,6 +10,7 @@ const schema = new mongoose.Schema({
         required: true,
         type: mongoose.Types.ObjectId,
       },
+      avatar: Object,
       name: {
         maxlength: 50,
         minlength: 3,

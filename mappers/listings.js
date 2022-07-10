@@ -7,6 +7,7 @@ const mapper = (listing) => {
   });
 
   listing.images = listing.images.map(mapImage);
+  listing.author.avatar = mapImage(listing.author.avatar);
 
   return listing;
 };

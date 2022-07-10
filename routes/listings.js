@@ -1,7 +1,9 @@
 const multer = require("multer");
 const express = require("express");
 const router = express.Router();
+const _ = require("lodash");
 
+const { User } = require("../models/user");
 const { validateListing, Listing } = require("../models/listing");
 const auth = require("../middleware/auth");
 const imageResize = require("../middleware/imageResize");
@@ -29,7 +31,12 @@ router.post(
   ],
   async (req, res) => {
     let listing = {
-      author: req.user,
+      author: _.pick(await User.findById(req.user._id), [
+        "_id",
+        "avatar",
+        "name",
+        "username",
+      ]),
       category: req.body.category,
       description: req.body.description,
       price: req.body.price,
