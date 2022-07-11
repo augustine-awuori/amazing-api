@@ -3,13 +3,15 @@ const jwt = require("jsonwebtoken");
 module.exports = (req, res, next) => {
   const token = req.header("x-auth-token");
   if (!token)
-    return res.status(401).send({ error: "Access denied. No token provided." });
+    return res
+      .status(401)
+      .send({ error: "Access denied. Login to get access." });
 
   try {
     const payload = jwt.verify(token, process.env.JWT_PRIVATE_KEY);
     req.user = payload;
     next();
   } catch (err) {
-    res.status(400).send({ error: "Invalid token." });
+    res.status(400).send({ error: "Invalid token. User doesn't exist." });
   }
 };
