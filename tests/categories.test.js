@@ -28,18 +28,10 @@ describe(endPoint, () => {
   });
 
   describe("GET/", () => {
-    const exec = () => request(server).get(endPoint).set("x-auth-token", token);
-
-    it("should return 401 if the token is not provided", async () => {
-      token = "";
-
-      const res = await exec();
-
-      expect(res.status).toBe(401);
-    });
-
     it("should return all the categories", async () => {
-      const res = await exec();
+      const res = await request(server)
+        .get(endPoint)
+        .set("x-auth-token", token);
 
       expect(res.status).toBe(200);
       expect(res.body.length).toBe(2);
