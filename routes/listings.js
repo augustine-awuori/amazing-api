@@ -12,6 +12,7 @@ const imageMapper = require("../mappers/listings");
 const validation = require("../middleware/validate");
 const validateCategoryId = require("../middleware/validateCategoryId");
 const validateUser = require("../middleware/validateUser");
+const validateListingId = require("../middleware/validateListingId");
 
 const upload = multer({
   dest: "uploads/",
@@ -53,7 +54,7 @@ router.post(
 );
 
 router.get("/", async (req, res) => {
-  const listings = await Listing.find({}).sort("_id");
+  const listings = await Listing.find({}).sort("-_id");
 
   const resources = listings.map(imageMapper);
 
