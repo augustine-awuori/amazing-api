@@ -1,3 +1,5 @@
+const compression = require("compression");
+const serveStatic = require("serve-static");
 const express = require("express");
 const app = express();
 
@@ -7,7 +9,8 @@ const users = require("./routes/users");
 const listings = require("./routes/listings");
 
 app.use(express.json());
-app.use(express.static("public"));
+app.use(serveStatic("public", { acceptRanges: false }));
+app.use(compression());
 app.use("/api/auth", auth);
 app.use("/api/users", users);
 app.use("/api/listings", listings);
