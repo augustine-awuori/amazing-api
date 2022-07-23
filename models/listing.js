@@ -47,7 +47,7 @@ const schema = new mongoose.Schema({
   },
   count: { type: Number, default: 0 },
   description: {
-    maxlength: 50,
+    maxlength: 200,
     trim: true,
     type: String,
   },

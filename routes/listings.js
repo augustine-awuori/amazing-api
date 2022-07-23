@@ -3,16 +3,17 @@ const express = require("express");
 const router = express.Router();
 const _ = require("lodash");
 
+const { imageMapper, imageUnmapper } = require("../mappers/listings");
 const { User } = require("../models/user");
 const { validateListing, Listing } = require("../models/listing");
 const auth = require("../middleware/auth");
 const imageResize = require("../middleware/imageResize");
 const listingCounter = require("../updaters/listings");
-const imageMapper = require("../mappers/listings");
-const validation = require("../middleware/validate");
 const validateCategoryId = require("../middleware/validateCategoryId");
-const validateUser = require("../middleware/validateUser");
+const validateListingAuthor = require("../middleware/validateListingAuthor");
 const validateListingId = require("../middleware/validateListingId");
+const validateUser = require("../middleware/validateUser");
+const validation = require("../middleware/validate");
 
 const upload = multer({
   dest: "uploads/",
@@ -60,5 +61,22 @@ router.get("/", async (req, res) => {
 
   res.send(resources);
 });
+
+router.put(
+  "/:id",
+  [auth, validateListingId, validateListingAuthor, validateCategoryId],
+  async (req, res) => {
+    const { description, price, title } = req.body;
+    let listing = req.listing;
+    listing.title = title;
+    listing.price = price;
+    listing.category = req.category;
+    listing.description = description;
+
+    await listing.save();
+
+    res.send(listing);
+  }
+);
 
 module.exports = router;
