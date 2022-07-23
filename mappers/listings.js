@@ -1,6 +1,9 @@
-const mapper = (listing) => {
-  const baseUrl = "http://192.168.43.210:3000/assets/";
+const fs = require("fs");
 
+const baseUrl = "http://192.168.43.210:3000/assets/";
+const outputFolder = "public/assets/";
+
+const imageMapper = (listing) => {
   const mapImage = (image) => ({
     url: `${baseUrl}${image.fileName}_full.jpg`,
     thumbnailUrl: `${baseUrl}${image.fileName}_thumb.jpg`,
@@ -12,4 +15,11 @@ const mapper = (listing) => {
   return listing;
 };
 
-module.exports = mapper;
+const imageUnmapper = (listing) => {
+  listing.images.forEach(async (image) => {
+    fs.unlinkSync(`${outputFolder}${image.fileName}_full.jpg`);
+    fs.unlinkSync(`${outputFolder}${image.fileName}_thumb.jpg`);
+  });
+};
+
+module.exports = { imageMapper, imageUnmapper };
