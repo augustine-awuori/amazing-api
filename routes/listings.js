@@ -16,6 +16,7 @@ const validateListingAuthor = require("../middleware/validateListingAuthor");
 const validateListingId = require("../middleware/validateListingId");
 const validateUser = require("../middleware/validateUser");
 const validation = require("../middleware/validate");
+const mapCategory = require("../middleware/mapCategory");
 
 const upload = multer({
   dest: "uploads/",
@@ -77,7 +78,13 @@ router.delete("/:id", [auth, validateDeleteAuthor], async (req, res) => {
 
 router.put(
   "/:id",
-  [auth, validateListingId, validateListingAuthor, validateCategoryId],
+  [
+    auth,
+    validateListingId,
+    validateListingAuthor,
+    validateCategoryId,
+    mapCategory,
+  ],
   async (req, res) => {
     const { description, price, title } = req.body;
     let listing = req.listing;

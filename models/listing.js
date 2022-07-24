@@ -41,7 +41,6 @@ const schema = new mongoose.Schema({
         required: true,
         trim: true,
         type: String,
-        unique: true,
       },
     }),
   },

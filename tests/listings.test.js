@@ -11,9 +11,7 @@ describe(endPoint, () => {
   let category;
   let categoryLabel = "Utensils";
   let categoryId;
-  let listing;
   let server;
-  let images = [];
 
   const beforeEachFuncs = async () => {
     category = new Category({
@@ -23,23 +21,6 @@ describe(endPoint, () => {
     });
     categoryId = category._id;
     await category.save();
-
-    // user = new User({
-    //   name: "Augustine Awuori",
-    //   username: "awuoriaugustine",
-    //   password: "123456",
-    // });
-    // token = user.generateAuthToken();
-
-    // console.log("aval users", users);
-    // listing = new Listing({
-    //   author: { _id: user._id, name: user.name, username: user.username },
-    //   category,
-    //   description: "",
-    //   price: "10",
-    //   title: "iPhone X",
-    // });
-    // await listing.save();
   };
 
   const afterEachFuncs = async () => {
@@ -196,18 +177,130 @@ describe(endPoint, () => {
     });
   });
 
-  // describe("/PUT", () => {
-  //   const exec = () =>
-  //     request(server).put(endPoint).set("x-auth-token", token).send(listing);
+  describe("/PUT", () => {
+    let token;
+    let user;
+    let listing;
+    let categoryId;
+    let listingId;
+    let authorId;
+    let title;
+    let description;
 
-  //   it("should return 401 if token is not provided", async () => {
-  //     token = "";
+    beforeEach(async () => {
+      user = new User({
+        name: "Augustine Awuori",
+        username: "awuoriaugustine",
+        password: "123456",
+      });
+      authorId = user._id;
+      token = user.generateAuthToken();
+      await user.save();
 
-  //     const res = await exec();
+      category = new Category({
+        label: categoryLabel,
+        icon: "floor-lamp",
+        backgroundColor: "#fff",
+      });
+      categoryId = category._id;
+      await category.save();
 
-  //     expect(res.status).toBe(401);
-  //   });
-  // });
+      listing = new Listing({
+        author: { _id: authorId, name: user.name, username: user.username },
+        category,
+        description: "",
+        price: "10",
+        title: "iPhone X",
+      });
+      listingId = listing._id;
+      await listing.save();
+
+      title = "New Iphone";
+      description = "This is a simple description";
+    });
+
+    afterEach(() => afterEachFuncs());
+
+    const exec = () =>
+      request(server)
+        .put(`${endPoint}/${listingId}`)
+        .set("x-auth-token", token)
+        .send({
+          _id: listingId,
+          authorId,
+          title,
+          price: "1000",
+          description,
+          categoryId,
+        });
+
+    it("should return 401 if token is not provided", async () => {
+      token = "";
+
+      const res = await exec();
+
+      expect(res.status).toBe(401);
+    });
+
+    it("should return 400 if token is invalid", async () => {
+      token = "1234";
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it("should return 400 if listing doesn't exist", async () => {
+      await Listing.deleteMany({});
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it("should return 401 if the author isn't the  listing author", async () => {
+      authorId = new User().generateAuthToken();
+
+      const res = await exec();
+
+      expect(res.status).toBe(401);
+    });
+
+    it("should return 400 if the listing category doesn't exist", async () => {
+      await Category.deleteMany({});
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it("should have a price", async () => {
+      await exec();
+
+      const listing = await Listing.findOne({});
+
+      expect(listing.price).toBeTruthy();
+    });
+
+    it("should have a title", async () => {
+      await exec();
+
+      const listing = await Listing.findOne({});
+
+      expect(listing.title).toBeTruthy();
+    });
+
+    it("should save the listing with the new updates", async () => {
+      const res = await exec();
+
+      const listings = await Listing.find({});
+
+      expect(res.status).toBe(200);
+      expect(listings.length).toBe(1);
+      expect(listings[0].title).toBe(title);
+      expect(listings[0].description).toBe(description);
+    });
+  });
 
   // describe("/GET", () => {
   //   it("should return 200 if listings are retrieved", async () => {
