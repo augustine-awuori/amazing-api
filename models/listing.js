@@ -81,8 +81,8 @@ const validate = (listing) =>
       label: Joi.string().min(3).max(50).required(),
     }),
     description: Joi.string().max(200).allow(""),
-    images: Joi.array().max(3),
-    price: Joi.number().required().min(1).max(10_000),
+    images: Joi.array().min(1).max(3),
+    price: Joi.number().required().min(1).max(100_000),
     title: Joi.string().required().min(2).max(50),
   }).validate(listing);
 

@@ -9,12 +9,13 @@ const { validateListing, Listing } = require("../models/listing");
 const auth = require("../middleware/auth");
 const imageResize = require("../middleware/imageResize");
 const listingCounter = require("../updaters/listings");
+const mapListing = require("../middleware/mapListing");
 const validateCategoryId = require("../middleware/validateCategoryId");
+const validateDeleteAuthor = require("../middleware/validateDeleteAuthor");
 const validateListingAuthor = require("../middleware/validateListingAuthor");
 const validateListingId = require("../middleware/validateListingId");
 const validateUser = require("../middleware/validateUser");
 const validation = require("../middleware/validate");
-const validateDeleteAuthor = require("../middleware/validateDeleteAuthor");
 
 const upload = multer({
   dest: "uploads/",
@@ -29,6 +30,7 @@ router.post(
     auth,
     validateUser,
     validateCategoryId,
+    mapListing,
     validation(validateListing),
     imageResize,
   ],
@@ -68,6 +70,7 @@ router.delete("/:id", [auth, validateDeleteAuthor], async (req, res) => {
 
   imageUnmapper(listing);
   listing = await Listing.deleteOne({ _id: req.params.id }, { new: true });
+  listingCounter(listing);
 
   res.send(listing);
 });
