@@ -8,17 +8,17 @@ const { imageUnmapper } = require("../mappers/listings");
 const endPoint = "/api/listings";
 
 describe(endPoint, () => {
-  let category;
+  let category, server, user, userId, token, price, categoryId;
   let categoryLabel = "Utensils";
-  let categoryId;
-  let server;
+  let title = "title";
+  let description = "";
 
   async function deleteImages() {
     const listing = await Listing.findOne({});
     if (listing) imageUnmapper(listing);
   }
 
-  const beforeEachFuncs = async () => {
+  async function createCategory() {
     category = new Category({
       label: categoryLabel,
       icon: "floor-lamp",
@@ -26,7 +26,29 @@ describe(endPoint, () => {
     });
     categoryId = category._id;
     await category.save();
-  };
+  }
+
+  async function createUser() {
+    user = new User({
+      name: "Augustine Awuori",
+      username: "awuoriaugustine",
+      password: "123456",
+    });
+    token = user.generateAuthToken();
+    userId = user._id;
+    await user.save();
+  }
+
+  function createListing() {
+    return request(server)
+      .post(endPoint)
+      .set("x-auth-token", token)
+      .field("title", title)
+      .field("price", price)
+      .field("description", description)
+      .field("categoryId", categoryId.toString())
+      .attach("images", "public/test/assets/file.jpg");
+  }
 
   const afterEachFuncs = async () => {
     await Category.deleteMany({});
@@ -39,28 +61,14 @@ describe(endPoint, () => {
   });
 
   describe("/POST", () => {
-    let listingTitle;
-    let price;
-    let user;
-    let token;
-    let description;
-    let image;
-
     beforeEach(async () => {
-      listingTitle = "iPhoneX";
+      title = "iPhoneX";
       price = "200";
       description = "";
       image = "public/test/assets/file.jpg";
 
-      beforeEachFuncs();
-
-      user = new User({
-        name: "Augustine Awuori",
-        username: "awuoriaugustine",
-        password: "123456",
-      });
-      token = user.generateAuthToken();
-      await user.save();
+      createCategory();
+      createUser();
     });
 
     afterEach(async () => {
@@ -69,15 +77,7 @@ describe(endPoint, () => {
       deleteImages();
     });
 
-    const exec = () =>
-      request(server)
-        .post(endPoint)
-        .set("x-auth-token", token)
-        .field("title", listingTitle)
-        .field("price", price)
-        .field("description", description)
-        .field("categoryId", categoryId.toString())
-        .attach("images", image);
+    const exec = createListing;
 
     it("should return 401 if the token is not provided", async () => {
       token = "";
@@ -104,7 +104,7 @@ describe(endPoint, () => {
     });
 
     it("should return 400 if the category doesn't exist", async () => {
-      await Category.collection.deleteMany({});
+      categoryId = userId;
 
       const res = await exec();
 
@@ -112,7 +112,7 @@ describe(endPoint, () => {
     });
 
     it("should return 400 if the listing title is empty", async () => {
-      listingTitle = "";
+      title = "";
 
       const res = await exec();
 
@@ -120,7 +120,7 @@ describe(endPoint, () => {
     });
 
     it("should return 400 if the listing title is more than 50 chars", async () => {
-      listingTitle = new Array(52).join("a");
+      title = new Array(52).join("a");
 
       const res = await exec();
 
@@ -178,35 +178,18 @@ describe(endPoint, () => {
   });
 
   describe("/PUT", () => {
-    let token;
-    let user;
     let listing;
-    let categoryId;
     let listingId;
     let authorId;
     let title;
     let description;
 
     beforeEach(async () => {
-      user = new User({
-        name: "Augustine Awuori",
-        username: "awuoriaugustine",
-        password: "123456",
-      });
-      authorId = user._id;
-      token = user.generateAuthToken();
-      await user.save();
-
-      category = new Category({
-        label: categoryLabel,
-        icon: "floor-lamp",
-        backgroundColor: "#fff",
-      });
-      categoryId = category._id;
-      await category.save();
+      await createUser();
+      await createCategory();
 
       listing = new Listing({
-        author: { _id: authorId, name: user.name, username: user.username },
+        author: { _id: userId, name: user.name, username: user.username },
         category,
         description: "",
         price: "10",
@@ -215,6 +198,7 @@ describe(endPoint, () => {
       listingId = listing._id;
       await listing.save();
 
+      authorId = userId;
       title = "New Iphone";
       description = "This is a simple description";
     });
@@ -259,7 +243,7 @@ describe(endPoint, () => {
     });
 
     it("should return 401 if the author isn't the  listing author", async () => {
-      authorId = new User().generateAuthToken();
+      authorId = "1234";
 
       const res = await exec();
 
@@ -267,7 +251,7 @@ describe(endPoint, () => {
     });
 
     it("should return 400 if the listing category doesn't exist", async () => {
-      await Category.deleteMany({});
+      categoryId = userId;
 
       const res = await exec();
 
@@ -303,49 +287,16 @@ describe(endPoint, () => {
   });
 
   describe("/GET", () => {
-    let user;
-    let category;
-    let categoryId;
-    let token;
-    let title;
-
     beforeEach(async () => {
-      category = new Category({
-        label: categoryLabel,
-        icon: "floor-lamp",
-        backgroundColor: "#fff",
-      });
-      categoryId = category._id;
-      await category.save();
-
-      user = new User({
-        name: "Augustine Awuori",
-        username: "awuoriaugustine",
-        password: "123456",
-      });
-      authorId = user._id;
-      token = user.generateAuthToken();
-      await user.save();
-
-      title = "Listing Title";
+      await createCategory();
+      await createUser();
       await createListing();
     });
 
-    afterEach(async () => {
+    afterEach(() => {
       afterEachFuncs();
       deleteImages();
     });
-
-    function createListing() {
-      return request(server)
-        .post(endPoint)
-        .set("x-auth-token", token)
-        .field("title", title)
-        .field("price", "100")
-        .field("description", "A short description")
-        .field("categoryId", categoryId.toString())
-        .attach("images", "public/test/assets/file.jpg");
-    }
 
     const exec = () => request(server).get(endPoint);
 
