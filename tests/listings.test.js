@@ -13,6 +13,11 @@ describe(endPoint, () => {
   let categoryId;
   let server;
 
+  async function deleteImages() {
+    const listing = await Listing.findOne({});
+    if (listing) imageUnmapper(listing);
+  }
+
   const beforeEachFuncs = async () => {
     category = new Category({
       label: categoryLabel,
@@ -63,11 +68,6 @@ describe(endPoint, () => {
       await User.deleteMany({});
       deleteImages();
     });
-
-    async function deleteImages() {
-      const listing = await Listing.findOne({});
-      if (listing) imageUnmapper(listing);
-    }
 
     const exec = () =>
       request(server)
@@ -302,11 +302,63 @@ describe(endPoint, () => {
     });
   });
 
-  // describe("/GET", () => {
-  //   it("should return 200 if listings are retrieved", async () => {
-  //     const res = await request(server).get(endPoint);
+  describe("/GET", () => {
+    let user;
+    let category;
+    let categoryId;
+    let token;
+    let title;
 
-  //     expect(res.status).toBe(200);
-  //   });
-  // });
+    beforeEach(async () => {
+      category = new Category({
+        label: categoryLabel,
+        icon: "floor-lamp",
+        backgroundColor: "#fff",
+      });
+      categoryId = category._id;
+      await category.save();
+
+      user = new User({
+        name: "Augustine Awuori",
+        username: "awuoriaugustine",
+        password: "123456",
+      });
+      authorId = user._id;
+      token = user.generateAuthToken();
+      await user.save();
+
+      title = "Listing Title";
+      await createListing();
+    });
+
+    afterEach(async () => {
+      afterEachFuncs();
+      deleteImages();
+    });
+
+    function createListing() {
+      return request(server)
+        .post(endPoint)
+        .set("x-auth-token", token)
+        .field("title", title)
+        .field("price", "100")
+        .field("description", "A short description")
+        .field("categoryId", categoryId.toString())
+        .attach("images", "public/test/assets/file.jpg");
+    }
+
+    const exec = () => request(server).get(endPoint);
+
+    it("should return 200 if listings are retrieved", async () => {
+      const res = await exec();
+
+      const listings = await Listing.find({});
+
+      expect(res.status).toBe(200);
+      expect(listings.length).toBe(1);
+      expect(listings[0].category).toHaveProperty("_id");
+      expect(listings[0].category).toHaveProperty("label");
+      expect(listings[0].title).toBe(title);
+    });
+  });
 });
