@@ -14,8 +14,9 @@ describe(endPoint, () => {
   let description = "";
 
   async function deleteImages() {
-    const listing = await Listing.findOne({});
-    if (listing) imageUnmapper(listing);
+    const listings = await Listing.find({});
+    listings.forEach(imageUnmapper);
+    // if (listing) imageUnmapper(listing);
   }
 
   async function createCategory() {
@@ -74,8 +75,8 @@ describe(endPoint, () => {
     });
 
     afterEach(async () => {
-      await afterEachFuncs();
-      deleteImages();
+      afterEachFuncs();
+      await deleteImages();
     });
 
     const exec = createListing;
