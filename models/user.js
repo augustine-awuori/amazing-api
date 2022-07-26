@@ -16,10 +16,11 @@ const schema = new mongoose.Schema({
   avatar: Object,
   username: {
     type: String,
-    trim: true,
-    minlength: 4,
     maxlength: 50,
+    minlength: 4,
     required: true,
+    trim: true,
+    unique: true,
   },
   name: {
     type: String,

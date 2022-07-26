@@ -60,6 +60,8 @@ describe(endPoint, () => {
     server = require("../index");
   });
 
+  afterEach(() => afterEachFuncs());
+
   describe("/POST", () => {
     beforeEach(async () => {
       title = "iPhoneX";
@@ -72,8 +74,7 @@ describe(endPoint, () => {
     });
 
     afterEach(async () => {
-      afterEachFuncs();
-      await User.deleteMany({});
+      await afterEachFuncs();
       deleteImages();
     });
 
@@ -310,6 +311,80 @@ describe(endPoint, () => {
       expect(listings[0].category).toHaveProperty("_id");
       expect(listings[0].category).toHaveProperty("label");
       expect(listings[0].title).toBe(title);
+    });
+  });
+
+  describe("/DELETE", () => {
+    let listingId;
+
+    beforeEach(async () => {
+      await createUser();
+
+      listing = new Listing({
+        author: { _id: userId, name: user.name, username: user.username },
+        category,
+        description: "",
+        price: "10",
+        title: "iPhone X",
+      });
+      listingId = listing._id;
+      await listing.save();
+    });
+
+    afterEach(() => afterEachFuncs());
+
+    const exec = () =>
+      request(server)
+        .delete(`${endPoint}/${listingId}`)
+        .set("x-auth-token", token);
+
+    it("should return 400 if the listing doesn't exist", async () => {
+      listingId = userId;
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it("should return 401 if the token is not provided", async () => {
+      token = "";
+
+      const res = await exec();
+
+      expect(res.status).toBe(401);
+    });
+
+    it("should return 400 if the token is invalid", async () => {
+      token = "123";
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it("should return 401 if the user is not the author", async () => {
+      token = new User().generateAuthToken();
+
+      const res = await exec();
+
+      expect(res.status).toBe(401);
+    });
+
+    it("should return 401 if the user is not the author", async () => {
+      token = new User().generateAuthToken();
+
+      const res = await exec();
+
+      expect(res.status).toBe(401);
+    });
+
+    it("should return delete the  listing with the right author", async () => {
+      const res = await exec();
+
+      const listings = await Listing.find({});
+
+      expect(listings.length).toBe(0);
+      expect(res.status).toBe(200);
     });
   });
 });

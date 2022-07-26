@@ -9,14 +9,15 @@ const { validateListing, Listing } = require("../models/listing");
 const auth = require("../middleware/auth");
 const imageResize = require("../middleware/imageResize");
 const listingCounter = require("../updaters/listings");
+const mapCategory = require("../middleware/mapCategory");
 const mapListing = require("../middleware/mapListing");
 const validateCategoryId = require("../middleware/validateCategoryId");
 const validateDeleteAuthor = require("../middleware/validateDeleteAuthor");
+const validateDeleteListing = require("../middleware/validateDeleteListing");
 const validateListingAuthor = require("../middleware/validateListingAuthor");
 const validateListingId = require("../middleware/validateListingId");
 const validateUser = require("../middleware/validateUser");
 const validation = require("../middleware/validate");
-const mapCategory = require("../middleware/mapCategory");
 
 const upload = multer({
   dest: "uploads/",
@@ -66,15 +67,19 @@ router.get("/", async (req, res) => {
   res.send(resources);
 });
 
-router.delete("/:id", [auth, validateDeleteAuthor], async (req, res) => {
-  let listing = await Listing.findById(req.params.id);
+router.delete(
+  "/:id",
+  [validateDeleteListing, auth, validateDeleteAuthor],
+  async (req, res) => {
+    let listing = req.listing;
 
-  imageUnmapper(listing);
-  listing = await Listing.deleteOne({ _id: req.params.id }, { new: true });
-  listingCounter(listing);
+    imageUnmapper(listing);
+    listing = await Listing.deleteOne({ _id: req.params.id }, { new: true });
+    listingCounter(listing);
 
-  res.send(listing);
-});
+    res.send(listing);
+  }
+);
 
 router.put(
   "/:id",
