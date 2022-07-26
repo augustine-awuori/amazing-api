@@ -16,7 +16,6 @@ describe(endPoint, () => {
   async function deleteImages() {
     const listings = await Listing.find({});
     listings.forEach(imageUnmapper);
-    // if (listing) imageUnmapper(listing);
   }
 
   async function createCategory() {
@@ -317,12 +316,20 @@ describe(endPoint, () => {
 
   describe("/DELETE", () => {
     let listingId;
+    let author;
+    let token;
 
     beforeEach(async () => {
-      await createUser();
+      author = new User({
+        name: "nameis",
+        username: "username",
+        password: "password",
+      });
+      token = author.generateAuthToken();
+      await author.save();
 
       listing = new Listing({
-        author: { _id: userId, name: user.name, username: user.username },
+        author,
         category,
         description: "",
         price: "10",
@@ -379,13 +386,29 @@ describe(endPoint, () => {
       expect(res.status).toBe(401);
     });
 
-    it("should return delete the  listing with the right author", async () => {
+    it("should delete the listing with the right author", async () => {
       const res = await exec();
 
       const listings = await Listing.find({});
 
       expect(listings.length).toBe(0);
       expect(res.status).toBe(200);
+    });
+
+    it("should reduce the listing count of the author to one", async () => {
+      const anotherListing = new Listing({
+        author,
+        category,
+        description: "",
+        price: "10",
+        title: "iPhone P",
+      });
+      await anotherListing.save();
+      await exec();
+
+      const listings = await Listing.find({});
+
+      expect(listings[0].count).toBe(1);
     });
   });
 });

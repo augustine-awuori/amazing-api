@@ -53,7 +53,7 @@ router.post(
     listing = new Listing(listing);
 
     await listing.save();
-    listingCounter(listing);
+    listingCounter(listing.author);
 
     res.send(listing);
   }
@@ -69,13 +69,13 @@ router.get("/", async (req, res) => {
 
 router.delete(
   "/:id",
-  [validateDeleteListing, auth, validateDeleteAuthor],
+  [auth, validateDeleteListing, validateDeleteAuthor],
   async (req, res) => {
     let listing = req.listing;
 
     imageUnmapper(listing);
-    listing = await Listing.deleteOne({ _id: req.params.id }, { new: true });
-    listingCounter(listing);
+    await Listing.deleteOne({ _id: req.params.id });
+    await listingCounter(req.listing.author);
 
     res.send(listing);
   }

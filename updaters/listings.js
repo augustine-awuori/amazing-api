@@ -1,7 +1,14 @@
 const { Listing } = require("../models/listing");
 
-const counter = async (listing) => {
-  const authorListings = await Listing.find({ author: listing.author });
+const counter = async (author) => {
+  const authorListings = await Listing.find({
+    author: {
+      _id: author._id,
+      name: author.name,
+      username: author.username,
+      avatar: author.avatar,
+    },
+  });
 
   async function updateCount(listing) {
     listing.count = authorListings.length;
@@ -9,8 +16,6 @@ const counter = async (listing) => {
   }
 
   authorListings.forEach(updateCount);
-
-  return listing;
 };
 
 module.exports = counter;
