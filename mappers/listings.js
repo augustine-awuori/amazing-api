@@ -3,12 +3,12 @@ const fs = require("fs");
 const baseUrl = "http://192.168.43.210:3000/assets/";
 const outputFolder = "public/assets/";
 
-const imageMapper = (listing) => {
-  const mapImage = (image) => ({
-    url: `${baseUrl}${image.fileName}_full.jpg`,
-    thumbnailUrl: `${baseUrl}${image.fileName}_thumb.jpg`,
-  });
+const mapImage = (image) => ({
+  url: `${baseUrl}${image.fileName}_full.jpg`,
+  thumbnailUrl: `${baseUrl}${image.fileName}_thumb.jpg`,
+});
 
+const imageMapper = (listing) => {
   listing.images = listing.images.map(mapImage);
   if (listing.author.avatar)
     listing.author.avatar = mapImage(listing.author.avatar);
@@ -23,4 +23,6 @@ const imageUnmapper = (listing) => {
   });
 };
 
-module.exports = { imageMapper, imageUnmapper };
+const mapAvatar = (avatar) => mapImage(avatar);
+
+module.exports = { imageMapper, imageUnmapper, mapAvatar };

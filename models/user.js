@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const { postSchema } = require("./post");
 const { listingSchema } = require("./listing");
 const { messageSchema } = require("./message");
+const { mapAvatar } = require("../mappers/listings");
 
 const schema = new mongoose.Schema({
   aboutMe: {
@@ -96,6 +97,8 @@ const schema = new mongoose.Schema({
 });
 
 schema.methods.generateAuthToken = function () {
+  const mappedAvatar = this.avatar ? mapAvatar(this.avatar) : this.avatar;
+
   return jwt.sign(
     {
       _id: this._id,
@@ -103,6 +106,7 @@ schema.methods.generateAuthToken = function () {
       isVerified: this.isVerified,
       name: this.name,
       username: this.username,
+      avatar: mappedAvatar,
     },
     process.env.JWT_PRIVATE_KEY
   );
