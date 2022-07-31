@@ -104,4 +104,26 @@ router.put(
   }
 );
 
+router.patch(
+  "/:id",
+  [
+    auth,
+    validateListingId,
+    validateListingAuthor,
+    validateCategoryId,
+    mapCategory,
+  ],
+  async (req, res) => {
+    const { _id, description, price, title } = req.body;
+
+    const listing = await Listing.updateOne(
+      { _id },
+      { $set: { description, title, price } },
+      { new: true }
+    );
+
+    res.send(listing);
+  }
+);
+
 module.exports = router;
