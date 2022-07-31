@@ -55,7 +55,7 @@ router.post(
     await listing.save();
     listingCounter(listing.author);
 
-    res.send(listing);
+    res.send(imageMapper(listing));
   }
 );
 
