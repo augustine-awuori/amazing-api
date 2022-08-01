@@ -64,6 +64,12 @@ const schema = new mongoose.Schema({
     trim: true,
     type: String,
   },
+  timestamp: {
+    type: Number,
+    default: function () {
+      return this._id.getTimestamp();
+    },
+  },
 });
 
 const Listing = mongoose.model("Listing", schema);
