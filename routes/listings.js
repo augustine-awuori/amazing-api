@@ -81,29 +81,6 @@ router.delete(
   }
 );
 
-router.put(
-  "/:id",
-  [
-    auth,
-    validateListingId,
-    validateListingAuthor,
-    validateCategoryId,
-    mapCategory,
-  ],
-  async (req, res) => {
-    const { description, price, title } = req.body;
-    let listing = req.listing;
-    listing.title = title;
-    listing.price = price;
-    listing.category = req.category;
-    listing.description = description;
-
-    await listing.save();
-
-    res.send(listing);
-  }
-);
-
 router.patch(
   "/:id",
   [

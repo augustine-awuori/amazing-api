@@ -178,7 +178,7 @@ describe(endPoint, () => {
     });
   });
 
-  describe("/PUT", () => {
+  describe("/PATCH", () => {
     let listing;
     let listingId;
     let authorId;
@@ -208,7 +208,7 @@ describe(endPoint, () => {
 
     const exec = () =>
       request(server)
-        .put(`${endPoint}/${listingId}`)
+        .patch(`${endPoint}/${listingId}`)
         .set("x-auth-token", token)
         .send({
           _id: listingId,
