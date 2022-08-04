@@ -50,6 +50,7 @@ const schema = new mongoose.Schema({
     trim: true,
     type: String,
   },
+  hasExpired: { type: Boolean, default: false },
   images: [Object],
   price: {
     max: 10_000,

@@ -4,11 +4,11 @@ const router = express.Router();
 const _ = require("lodash");
 
 const { imageMapper, imageUnmapper } = require("../mappers/listings");
+const { updateAuthorListingsCount } = require("../updaters/listings");
 const { User } = require("../models/user");
 const { validateListing, Listing } = require("../models/listing");
 const auth = require("../middleware/auth");
 const imageResize = require("../middleware/imageResize");
-const listingCounter = require("../updaters/listings");
 const mapCategory = require("../middleware/mapCategory");
 const mapListing = require("../middleware/mapListing");
 const validateCategoryId = require("../middleware/validateCategoryId");
@@ -53,7 +53,7 @@ router.post(
     listing = new Listing(listing);
 
     await listing.save();
-    listingCounter(listing.author);
+    updateAuthorListingsCount(listing.author);
 
     res.send(imageMapper(listing));
   }
@@ -75,7 +75,7 @@ router.delete(
 
     imageUnmapper(listing);
     await Listing.deleteOne({ _id: req.params.id });
-    await listingCounter(req.listing.author);
+    await updateAuthorListingsCount(req.listing.author);
 
     res.send(listing);
   }
