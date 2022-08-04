@@ -5,6 +5,11 @@ const fs = require("fs");
 const outputFolder = "public/assets";
 
 module.exports = async (req, res, next) => {
+  if (!req.files) {
+    req.images = [];
+    return next();
+  }
+
   const images = [];
 
   const resizePromises = req.files.map(async (file) => {
