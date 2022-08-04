@@ -28,8 +28,8 @@ router.post(
   "/",
   [
     // Order of this middlewares matters
-    upload.array("images", process.env.MAX_IMAGE_COUNT),
     auth,
+    upload.array("images", process.env.MAX_IMAGE_COUNT),
     validateUser,
     validateCategoryId,
     mapListing,
