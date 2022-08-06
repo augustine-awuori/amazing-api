@@ -5,11 +5,11 @@ const _ = require("lodash");
 
 const { imageMapper } = require("../mappers/listings");
 const { Post } = require("../models/post");
-const { User } = require("../models/user");
 const auth = require("../middleware/auth");
+const checkPostExistence = require("../middleware/checkPostExistence");
 const imageResize = require("../middleware/imageResize");
-const validateUser = require("../middleware/validateUser");
 const validatePost = require("../middleware/validatePost");
+const validateUser = require("../middleware/validateUser");
 
 const upload = multer({
   dest: "uploads",
@@ -20,17 +20,30 @@ router.post(
   "/",
   [auth, upload.array("images"), validateUser, imageResize, validatePost],
   async (req, res) => {
-    let post = new Post({
-      author: _.pick(await User.findById(req.user._id), [
-        "_id",
-        "avatar",
-        "name",
-        "username",
-      ]),
-      message: req.body.message,
-    });
+    delete req.user.aboutMe;
+    let post = new Post({ author: req.user, message: req.body.message });
     post.images = req.images.map((fileName) => ({ fileName }));
 
+    await post.save();
+
+    res.send(imageMapper(post));
+  }
+);
+
+router.patch(
+  "/:id",
+  [auth, validateUser, checkPostExistence],
+  async (req, res) => {
+    const { isAboutLike } = req.body;
+    let post = req.post;
+
+    if (isAboutLike) {
+      const index = post.likes.findIndex(
+        (lover) => lover._id.valueOf() === req.user._id.valueOf()
+      );
+      if (index >= 0) post.likes.splice(index, 1);
+      else post.likes = [req.user, ...post.likes];
+    }
     await post.save();
 
     res.send(imageMapper(post));

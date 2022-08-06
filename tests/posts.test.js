@@ -11,11 +11,12 @@ describe(endpoint, () => {
   let token;
   let message;
   let username = "@awuori";
+  let user;
 
   beforeEach(async () => {
     app = require("../index");
 
-    const user = new User({
+    user = new User({
       name: "Augustine Awuori",
       username,
       password: "123456",
@@ -129,8 +130,82 @@ describe(endpoint, () => {
       await Post.deleteMany({});
     });
 
-    it("should return every post with the resources URLs", async () => {
+    it("should return every post with the resources URLs set", async () => {
       const res = await createPost();
+
+      expect(res.body.images[0].url.startsWith("http")).toBeTruthy();
+      expect(res.body.images[0].thumbnailUrl.startsWith("http")).toBeTruthy();
+    });
+  });
+
+  describe("PATCH", () => {
+    let postId;
+
+    beforeEach(async () => {
+      await createPost();
+      const post = await Post.findOne({});
+      postId = post._id.valueOf();
+    });
+
+    afterEach(async () => {
+      await Post.deleteMany({});
+      deleteImages();
+    });
+
+    const exec = () =>
+      request(app)
+        .patch(`${endpoint}/${postId}`)
+        .set("x-auth-token", token)
+        .send({ isAboutLike: true, user: { _id: user._id } });
+
+    it("should return 401 if token is not provided", async () => {
+      token = "";
+
+      const res = await exec();
+
+      expect(res.status).toBe(401);
+    });
+
+    it("should return 400 if token is invalid", async () => {
+      token = "invalid";
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it("should return 400 if the user doesn't exist", async () => {
+      token = new User().generateAuthToken();
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it("should return 400 if the post doesn't exist", async () => {
+      await Post.deleteMany({});
+
+      const res = await exec();
+
+      expect(res.status).toBe(400);
+    });
+
+    it("should like a post if it's about like", async () => {
+      const res = await exec();
+
+      expect(res.body.likes.length).toBe(1);
+      expect(res.body.likes[0].username).toBe(username);
+    });
+
+    it("should dislike a post if it's about like", async () => {
+      await exec();
+      const res = await exec();
+
+      expect(res.body.likes.length).toBe(0);
+    });
+
+    it("should return the post with assets resources URL set", async () => {
+      const res = await exec();
 
       expect(res.body.images[0].url.startsWith("http")).toBeTruthy();
       expect(res.body.images[0].thumbnailUrl.startsWith("http")).toBeTruthy();
