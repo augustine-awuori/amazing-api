@@ -8,45 +8,48 @@ const endpoint = "/api/posts";
 
 describe(endpoint, () => {
   let app;
+  let token;
+  let message;
+  let username = "@awuori";
 
-  beforeEach(() => {
+  beforeEach(async () => {
     app = require("../index");
+
+    const user = new User({
+      name: "Augustine Awuori",
+      username,
+      password: "123456",
+    });
+    token = user.generateAuthToken();
+    await user.save();
+
+    message = "This is a simple message just to say hi in Spanish";
   });
 
+  afterEach(async () => {
+    await User.deleteMany({});
+  });
+
+  async function deleteImages() {
+    const posts = await Post.find({});
+    posts.forEach(imageUnmapper);
+  }
+
+  const createPost = () =>
+    request(app)
+      .post(endpoint)
+      .field("message", message)
+      .attach("images", "public/test/assets/file.jpg")
+      .set("x-auth-token", token);
+
   describe("POST/", () => {
-    let token;
-    let message;
-    let username = "@awuori";
-
-    beforeEach(async () => {
-      const user = new User({
-        name: "Augustine Awuori",
-        username,
-        password: "123456",
-      });
-      token = user.generateAuthToken();
-      await user.save();
-
-      message = "This is a simple message just to say hi in Spanish";
-    });
-
     afterEach(async () => {
       await User.deleteMany({});
       await Post.deleteMany({});
       await deleteImages();
     });
 
-    async function deleteImages() {
-      const posts = await Post.find({});
-      posts.forEach(imageUnmapper);
-    }
-
-    const exec = () =>
-      request(app)
-        .post(endpoint)
-        .field("message", message)
-        .attach("images", "public/test/assets/file.jpg")
-        .set("x-auth-token", token);
+    const exec = createPost;
 
     it("should return 401 if the token is not provided", async () => {
       token = "";
@@ -105,8 +108,8 @@ describe(endpoint, () => {
 
       const image = body.images[0];
 
-      expect(image.url.endsWith("_full.jpg")).toBeTruthy();
-      expect(image.thumbnailUrl.endsWith("_thumb.jpg")).toBeTruthy();
+      expect(image.url.startsWith("http")).toBeTruthy();
+      expect(image.thumbnailUrl.startsWith("http")).toBeTruthy();
     });
 
     it("should return the post if was saved successfully", async () => {
@@ -116,6 +119,21 @@ describe(endpoint, () => {
       expect(res.body.author.username).toBe(username);
       expect(res.body.message).toBe(message);
       expect(res.body.images.length).toBe(1);
+    });
+  });
+
+  describe("/GET", () => {
+    afterEach(async () => {
+      deleteImages();
+      await User.deleteMany({});
+      await Post.deleteMany({});
+    });
+
+    it("should return every post with the resources URLs", async () => {
+      const res = await createPost();
+
+      expect(res.body.images[0].url.startsWith("http")).toBeTruthy();
+      expect(res.body.images[0].thumbnailUrl.startsWith("http")).toBeTruthy();
     });
   });
 });

@@ -37,4 +37,12 @@ router.post(
   }
 );
 
+router.get("/", async (req, res) => {
+  const posts = await Post.find({}).sort("-_id");
+
+  const resources = posts.map(imageMapper);
+
+  res.send(resources);
+});
+
 module.exports = router;
