@@ -28,7 +28,7 @@ const schema = new mongoose.Schema({
     }),
   },
   message: {
-    // maxlength: 50,
+    maxlength: 255,
     minlength: 2,
     trim: true,
     type: String,
