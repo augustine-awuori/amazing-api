@@ -1,4 +1,6 @@
 const { Listing } = require("../models/listing");
+const moment = require("moment");
+const { imageUnmapper } = require("../mappers/listings");
 
 const getAuthorProperties = (author) => ({
   _id: author._id,
@@ -14,23 +16,26 @@ const getAuthorListings = async (author) =>
 
 const updateListingExpiry = (listings) =>
   listings.forEach(async (listing) => {
-    // listing.hasExpired = listing.timestamp; // TODO: Extract logic
-
+    listing.hasExpired =
+      moment().diff(moment(listing.timestamp), "hours") >= 72; // TODO: Get time from a constant
     await listing.save();
   });
 
 const deleteExpiredListings = async (listings) => {
   await updateListingExpiry(listings);
+  listings.forEach((listing) => {
+    if (listing.hasExpired) imageUnmapper(listing);
+  });
   await Listing.deleteMany({ hasExpired: true });
 };
 
-async function updateCounts(listings) {
+function updateCounts(listings) {
   const authorIds = {};
 
-  listings.forEach(({ author }) => {
+  listings.forEach(async ({ author }) => {
     if (authorIds[author._id]) return;
 
-    const listingsByAuthor = getAuthorListings(author);
+    const listingsByAuthor = await getAuthorListings(author);
     listingsByAuthor.forEach((listing) => {
       listing.count = listingsByAuthor.length;
     });
@@ -40,7 +45,7 @@ async function updateCounts(listings) {
 }
 
 const getFreshListings = async (listings) => {
-  deleteExpiredListings();
+  deleteExpiredListings(listings);
   updateCounts(listings);
   return await Listing.find({}).sort("-_id");
 };

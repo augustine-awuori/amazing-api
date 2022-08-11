@@ -4,7 +4,10 @@ const router = express.Router();
 const _ = require("lodash");
 
 const { imageMapper, imageUnmapper } = require("../mappers/listings");
-const { updateAuthorListingsCount } = require("../updaters/listings");
+const {
+  updateAuthorListingsCount,
+  getFreshListings,
+} = require("../updaters/listings");
 const { User } = require("../models/user");
 const { validateListing, Listing } = require("../models/listing");
 const auth = require("../middleware/auth");
@@ -64,7 +67,7 @@ router.get("/", async (req, res) => {
 
   const resources = listings.map(imageMapper);
 
-  res.send(resources);
+  res.send(await getFreshListings(resources));
 });
 
 router.delete(
