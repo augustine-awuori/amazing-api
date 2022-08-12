@@ -34,21 +34,35 @@ router.patch(
   "/:id",
   [auth, validateUser, checkPostExistence],
   async (req, res) => {
-    const { isAboutLike } = req.body;
     let post = req.post;
+    const userId = req.user._id.valueOf();
 
-    if (isAboutLike) {
+    const { isAboutLiking } = req.body;
+    if (isAboutLiking) {
       const index = post.likes.findIndex(
-        (lover) => lover._id.valueOf() === req.user._id.valueOf()
+        (lover) => lover._id.valueOf() === userId
       );
-      if (index >= 0) post.likes.splice(index, 1);
-      else post.likes = [req.user, ...post.likes];
+      if (isLiking(index)) {
+        post.likes = [req.user, ...post.likes];
+        if (!post.likesAuthorsId) post.likesAuthorsId = {};
+        post.likesAuthorsId[userId] = userId;
+      } else {
+        post.likes.splice(index, 1);
+        const loversId = { ...post.likesAuthorsId };
+        delete loversId[userId];
+        post.likesAuthorsId = loversId;
+      }
     }
+
     await post.save();
 
     res.send(imageMapper(post));
   }
 );
+
+function isLiking(index) {
+  return index === -1;
+}
 
 router.get("/", async (req, res) => {
   const posts = await Post.find({}).sort("-_id");

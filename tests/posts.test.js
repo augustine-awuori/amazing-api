@@ -138,7 +138,7 @@ describe(endpoint, () => {
     });
   });
 
-  describe("PATCH", () => {
+  describe("/PATCH", () => {
     let postId;
 
     beforeEach(async () => {
@@ -156,7 +156,7 @@ describe(endpoint, () => {
       request(app)
         .patch(`${endpoint}/${postId}`)
         .set("x-auth-token", token)
-        .send({ isAboutLike: true, user: { _id: user._id } });
+        .send({ isAboutLiking: true, user: { _id: user._id } });
 
     it("should return 401 if token is not provided", async () => {
       token = "";
@@ -190,7 +190,7 @@ describe(endpoint, () => {
       expect(res.status).toBe(400);
     });
 
-    it("should like a post if it's about like", async () => {
+    it("should like a post if it's about liking", async () => {
       const res = await exec();
 
       expect(res.body.likes.length).toBe(1);
@@ -209,6 +209,20 @@ describe(endpoint, () => {
 
       expect(res.body.images[0].url.startsWith("http")).toBeTruthy();
       expect(res.body.images[0].thumbnailUrl.startsWith("http")).toBeTruthy();
+    });
+
+    it("should add the lover id to the 'likesAuthorsId' collection when post is liked", async () => {
+      const { body } = await exec();
+
+      expect(body.likesAuthorsId).toHaveProperty(user._id.valueOf());
+    });
+
+    it("should remove the lover id from the 'likesAuthorsId' collection when post is disliked", async () => {
+      await exec();
+
+      const { body } = await exec();
+
+      expect(body.likesAuthorsId).toBeFalsy();
     });
   });
 });

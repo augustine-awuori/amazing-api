@@ -40,7 +40,8 @@ const schema = new mongoose.Schema({
       return this._id.getTimestamp();
     },
   },
-  likes: [],
+  likes: [Object],
+  likesAuthorsId: Object,
   comments: [],
   reposts: [],
   likes: [],
