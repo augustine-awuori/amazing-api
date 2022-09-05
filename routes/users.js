@@ -6,7 +6,7 @@ const router = express.Router();
 
 const validator = require("../middleware/validate");
 const { User, validate } = require("../models/user");
-const avatarResize = require("../middleware/avatarResize");
+const avatarResize = require("../middleware/imageResize");
 
 const upload = multer({ dest: "uploads/" });
 
@@ -21,7 +21,7 @@ router.post(
     user = new User(_.pick(req.body, ["name", "username", "password"]));
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(user.password, salt);
-    if (req.avatar) user.avatar = req.avatar;
+    if (req.image) user.avatar = req.image;
 
     await user.save();
 

@@ -3,11 +3,19 @@ const router = express.Router();
 const multer = require("multer");
 const _ = require("lodash");
 
-const { imageMapper } = require("../mappers/listings");
+const { Comment } = require("../models/comment");
+const { imageMapper, mapImage } = require("../mappers/images");
+const {
+  mapPostComment,
+  mapPostsComments,
+  mapPostsImages,
+} = require("../mappers/posts");
 const { Post } = require("../models/post");
+const { Reply } = require("../models/reply");
 const auth = require("../middleware/auth");
 const checkPostExistence = require("../middleware/checkPostExistence");
 const imageResize = require("../middleware/imageResize");
+const imagesResize = require("../middleware/imagesResize");
 const validatePost = require("../middleware/validatePost");
 const validateUser = require("../middleware/validateUser");
 
@@ -18,7 +26,7 @@ const upload = multer({
 
 router.post(
   "/",
-  [auth, upload.array("images"), validateUser, imageResize, validatePost],
+  [auth, upload.array("images"), validateUser, imagesResize, validatePost],
   async (req, res) => {
     delete req.user.aboutMe;
     let post = new Post({ author: req.user, message: req.body.message });
@@ -30,46 +38,97 @@ router.post(
   }
 );
 
+router.get("/", async (req, res) => {
+  const posts = await Post.find({}).sort("-_id");
+
+  const resources = mapPostsComments(posts.map(imageMapper));
+  // const resources = mapPostsImages(posts);
+  res.send(resources);
+});
+
 router.patch(
   "/:id",
-  [auth, validateUser, checkPostExistence],
+  [
+    upload.single("avatar"),
+    imageResize,
+    auth,
+    validateUser,
+    checkPostExistence,
+  ],
   async (req, res) => {
-    let post = req.post;
-    const userId = req.user._id.valueOf();
+    const { isAboutLiking, isAboutCommenting, isAboutReplying } = req.body;
+    let result;
 
-    const { isAboutLiking } = req.body;
-    if (isAboutLiking) {
-      const index = post.likes.findIndex(
-        (lover) => lover._id.valueOf() === userId
-      );
-      if (isLiking(index)) {
-        post.likes = [req.user, ...post.likes];
-        if (!post.likesAuthorsId) post.likesAuthorsId = {};
-        post.likesAuthorsId[userId] = userId;
+    if (isAboutLiking === "true") {
+      result = await handleLike(req);
+    } else if (isAboutCommenting === "true") {
+      if (isAboutReplying === "true") {
+        result = await handleReply(req);
       } else {
-        post.likes.splice(index, 1);
-        const loversId = { ...post.likesAuthorsId };
-        delete loversId[userId];
-        post.likesAuthorsId = loversId;
+        result = await handleComment(req);
       }
     }
 
-    await post.save();
-
-    res.send(imageMapper(post));
+    // TODO: Find out why response always send undefined
+    res.send(result);
   }
 );
+
+async function handleReply(req, res) {
+  const reply = new Reply({
+    author: _.pick(req.user, ["_id", "avatar", "name", "username"]),
+    message: req.body.message,
+  });
+  const post = req.post;
+
+  const index = post.comments.findIndex(
+    (c) => c._id.valueOf() === req.body.commentId
+  );
+  if (index < 0) return;
+  post.comments[index].replies.unshift(reply);
+  if (reply.author.avatar) reply.author.avatar = mapImage(reply.author);
+  await post.save();
+
+  return reply;
+}
+
+async function handleComment(req) {
+  let comment = new Comment({
+    author: _.pick(req.user, ["_id", "avatar", "name", "username"]),
+    message: req.body.message,
+  });
+  const post = req.post;
+  if (req.image) comment.image = req.image;
+  post.comments.unshift(comment);
+
+  await post.save();
+
+  return mapPostComment(comment);
+}
+
+async function handleLike(req) {
+  const userId = req.user._id.valueOf();
+  const post = req.post;
+
+  const index = post.likes.findIndex((lover) => lover._id.valueOf() === userId);
+  if (isLiking(index)) {
+    post.likes = [req.user, ...post.likes];
+    if (!post.likesAuthorsId) post.likesAuthorsId = {};
+    post.likesAuthorsId[userId] = userId;
+  } else {
+    post.likes.splice(index, 1);
+    const loversId = { ...post.likesAuthorsId };
+    delete loversId[userId];
+    post.likesAuthorsId = loversId;
+  }
+
+  await post.save();
+
+  return imageMapper(post);
+}
 
 function isLiking(index) {
   return index === -1;
 }
-
-router.get("/", async (req, res) => {
-  const posts = await Post.find({}).sort("-_id");
-
-  const resources = posts.map(imageMapper);
-
-  res.send(resources);
-});
 
 module.exports = router;

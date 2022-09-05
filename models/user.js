@@ -93,7 +93,12 @@ const schema = new mongoose.Schema({
   listings: [listingSchema],
   messages: [messageSchema],
   isAdmin: { type: Boolean, default: false },
-  isVerified: { type: Boolean, default: false },
+  isVerified: {
+    type: Boolean,
+    default: function () {
+      return this.isAdmin || this.followers.length > 200; //TODO: get this from a config file
+    },
+  },
 });
 
 schema.methods.generateAuthToken = function () {

@@ -1,7 +1,6 @@
-const Joi = require("joi");
 const mongoose = require("mongoose");
 
-const { schema: commentSchema } = require("./comment");
+const { schema: replySchema } = require("./reply");
 
 const schema = new mongoose.Schema({
   author: {
@@ -29,28 +28,23 @@ const schema = new mongoose.Schema({
       },
     }),
   },
+  replies: [replySchema],
   message: {
+    type: String,
     maxlength: 255,
     trim: true,
-    type: String,
   },
-  images: [Object],
   timestamp: {
     type: Number,
     default: function () {
       return this._id.getTimestamp();
     },
   },
+  image: Object,
   likes: [Object],
-  likesAuthorsId: Object,
-  comments: [commentSchema],
-  reposts: [],
 });
 
-const Post = mongoose.model("Post", schema);
+const Comment = mongoose.model("Comment", schema);
 
-const validatePost = (post) => Joi.object({}).validate(post);
-
-module.exports.Post = Post;
-module.exports.validate = validatePost;
-module.exports.postSchema = schema;
+module.exports.Comment = Comment;
+module.exports.schema = schema;

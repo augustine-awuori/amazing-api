@@ -11,7 +11,7 @@ const {
 const { User } = require("../models/user");
 const { validateListing, Listing } = require("../models/listing");
 const auth = require("../middleware/auth");
-const imageResize = require("../middleware/imageResize");
+const imageResize = require("../middleware/imagesResize");
 const mapCategory = require("../middleware/mapCategory");
 const mapListing = require("../middleware/mapListing");
 const validateCategoryId = require("../middleware/validateCategoryId");
@@ -30,7 +30,7 @@ const upload = multer({
 router.post(
   "/",
   [
-    // Order of this middlewares matters
+    // Order of these middlewares matters
     auth,
     upload.array("images", process.env.MAX_IMAGE_COUNT),
     validateUser,

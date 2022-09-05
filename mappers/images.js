@@ -8,21 +8,19 @@ const mapImage = (image) => ({
   thumbnailUrl: `${baseUrl}${image.fileName}_thumb.jpg`,
 });
 
-const imageMapper = (listing) => {
-  listing.images = listing.images.map(mapImage);
-  if (listing.author.avatar)
-    listing.author.avatar = mapImage(listing.author.avatar);
+const imageMapper = (item) => {
+  if (item.images) item.images = item.images.map(mapImage);
+  if (item.author?.avatar) item.author.avatar = mapImage(item.author.avatar);
+  if (item.image) item.image = mapImage(item.image);
 
-  return listing;
+  return item;
 };
 
-const imageUnmapper = (listing) => {
-  listing.images.forEach(async (image) => {
+const imageUnmapper = (item) => {
+  item.images.forEach(async (image) => {
     fs.unlinkSync(`${outputFolder}${image.fileName}_full.jpg`);
     fs.unlinkSync(`${outputFolder}${image.fileName}_thumb.jpg`);
   });
 };
 
-const mapAvatar = (avatar) => mapImage(avatar);
-
-module.exports = { imageMapper, imageUnmapper, mapAvatar };
+module.exports = { imageMapper, imageUnmapper, mapImage };

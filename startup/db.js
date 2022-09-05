@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const db = process.env.DB;
+const db = process.env.DB || "kisii-universe-city-api";
 
 module.exports = function () {
   mongoose

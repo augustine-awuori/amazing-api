@@ -1,36 +1,25 @@
-const sharp = require("sharp");
 const path = require("path");
+const sharp = require("sharp");
 const fs = require("fs");
 
 const outputFolder = "public/assets";
 
 module.exports = async (req, res, next) => {
-  if (!req.files) {
-    req.images = [];
-    return next();
-  }
-
-  const images = [];
-
-  const resizePromises = req.files.map(async (file) => {
-    await sharp(file.path)
+  if (req.file) {
+    await sharp(req.file.path)
       .resize(2000)
       .jpeg({ quality: 50 })
-      .toFile(path.resolve(outputFolder, file.filename + "_full.jpg"));
+      .toFile(path.resolve(outputFolder, req.file.filename + "_full.jpg"));
 
-    await sharp(file.path)
+    await sharp(req.file.path)
       .resize(200)
       .jpeg({ quality: 30 })
-      .toFile(path.resolve(outputFolder, file.filename + "_thumb.jpg"));
+      .toFile(path.resolve(outputFolder, req.file.filename + "_thumb.jpg"));
 
-    fs.unlinkSync(file.path);
+    fs.unlinkSync(req.file.path);
 
-    images.push(file.filename);
-  });
-
-  await Promise.all([...resizePromises]);
-
-  req.images = images;
+    req.image = { fileName: req.file.filename };
+  }
 
   next();
 };
