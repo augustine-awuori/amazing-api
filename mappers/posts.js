@@ -8,35 +8,39 @@ const mapAvatar = (avatar) => {
 const mapPostComment = (comment) => {
   const result = imageMapper(comment);
   result.replies = result.replies.map((reply) => {
-    if (reply.author.avatar)
-      reply.author.avatar = mapAvatar(reply.author.avatar);
+    reply.author.avatar = mapAvatar(reply.author.avatar);
     return reply;
   });
+  result.reposts = mapRepostsAvatars(result);
   if (result.image) result.image = mapImage(result.image);
 
   return result;
 };
 
-const mapPostsComments = (posts) =>
-  posts.map((post) => {
-    post.comments = post.comments.map(mapPostComment);
-    return post;
-  });
-
 const mapPostImages = (post) => {
-  if (post.author.avatar) post.author.avatar = mapAvatar(post.author.avatar);
-  post.images = post.images.map(mapImage);
-  if (post?.likes?.length)
-    post.likes = post.likes.map((like) => mapAvatar(like.author.avatar));
-  if (post?.comments?.length) post.comments = post.comments.map(mapPostComment);
-  if (post?.comments?.likes?.length)
-    post.comments.likes = post.comments.likes.map((like) =>
-      mapAvatar(like.author.avatar)
-    );
+  post.comments = post.comments.map(mapPostComment);
+  post.reposts = mapRepostsAvatars(post);
+  post.quotedReposts = mapQuotedReposts(post);
 
-  return post;
+  return imageMapper(post);
 };
 
 const mapPostsImages = (posts) => posts.map(mapPostImages);
 
-module.exports = { mapPostComment, mapPostsComments, mapPostsImages };
+function mapQuotedReposts(post) {
+  return post.quotedReposts.map((quote) => {
+    quote.author.avatar = mapAvatar(quote.author.avatar);
+    quote.images = quote.images.map(mapImage);
+
+    return quote;
+  });
+}
+
+function mapRepostsAvatars(post) {
+  return post.reposts.map((author) => {
+    author.avatar = mapAvatar(author.avatar);
+    return author;
+  });
+}
+
+module.exports = { mapPostComment, mapPostImages, mapPostsImages };

@@ -1,7 +1,5 @@
 const mongoose = require("mongoose");
 
-const { schema: replySchema } = require("./reply");
-
 const schema = new mongoose.Schema({
   author: {
     required: true,
@@ -28,12 +26,11 @@ const schema = new mongoose.Schema({
       },
     }),
   },
-  replies: [replySchema],
-  reposts: [],
+  images: [Object],
   message: {
     type: String,
-    maxlength: 255,
     trim: true,
+    maxlength: 255,
   },
   timestamp: {
     type: Number,
@@ -41,11 +38,9 @@ const schema = new mongoose.Schema({
       return this._id.getTimestamp();
     },
   },
-  image: Object,
-  likes: [Object],
 });
 
-const Comment = mongoose.model("Comment", schema);
+const QuotedRepost = mongoose.model("QuotedRepost", schema);
 
-module.exports.Comment = Comment;
 module.exports.schema = schema;
+module.exports.QuotedRepost = QuotedRepost;

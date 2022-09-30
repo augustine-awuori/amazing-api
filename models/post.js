@@ -2,6 +2,7 @@ const Joi = require("joi");
 const mongoose = require("mongoose");
 
 const { schema: commentSchema } = require("./comment");
+const { schema: quotedRepostSchema } = require("./quotedRepost");
 
 const schema = new mongoose.Schema({
   author: {
@@ -29,6 +30,10 @@ const schema = new mongoose.Schema({
       },
     }),
   },
+  embeddedPostId: {
+    ref: "Post",
+    type: mongoose.Types.ObjectId,
+  },
   message: {
     maxlength: 255,
     trim: true,
@@ -44,6 +49,7 @@ const schema = new mongoose.Schema({
   likes: [Object],
   likesAuthorsId: Object,
   comments: [commentSchema],
+  quotedReposts: [quotedRepostSchema],
   reposts: [],
 });
 

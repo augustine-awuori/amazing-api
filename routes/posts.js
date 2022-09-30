@@ -7,11 +7,13 @@ const { Comment } = require("../models/comment");
 const { imageMapper, mapImage } = require("../mappers/images");
 const {
   mapPostComment,
-  mapPostsComments,
+  mapPostImages,
   mapPostsImages,
 } = require("../mappers/posts");
 const { Post } = require("../models/post");
 const { Reply } = require("../models/reply");
+const { User } = require("../models/user");
+const { QuotedRepost } = require("../models/quotedRepost");
 const auth = require("../middleware/auth");
 const checkPostExistence = require("../middleware/checkPostExistence");
 const imageResize = require("../middleware/imageResize");
@@ -28,11 +30,37 @@ router.post(
   "/",
   [auth, upload.array("images"), validateUser, imagesResize, validatePost],
   async (req, res) => {
-    delete req.user.aboutMe;
-    let post = new Post({ author: req.user, message: req.body.message });
-    post.images = req.images.map((fileName) => ({ fileName }));
+    let user = req.user;
+    delete user.aboutMe;
+    const { embeddedPostId, message } = req.body;
+    let embeddedPost;
+    user = await getUser(req.user._id);
 
+    let post = new Post({ author: req.user, message });
+    post.images = req.images.map((fileName) => ({ fileName }));
+    if (embeddedPostId) {
+      post.embeddedPostId = embeddedPostId;
+      const quotedRepost = new QuotedRepost({
+        author: getAuthorFrom(req),
+        images: post.images,
+        message,
+      });
+
+      embeddedPost = await Post.findById(embeddedPostId);
+      embeddedPost.quotedReposts.unshift(quotedRepost);
+      await embeddedPost.save();
+
+      user.quotedReposts.unshift(post._id);
+    } else user.posts.unshift(post._id);
+
+    user.save();
     await post.save();
+
+    if (embeddedPost) {
+      embeddedPost = imageMapper(embeddedPost);
+      embeddedPost.quotedReposts = imageMapper(embeddedPost.quotedReposts);
+      post.embeddedPost = embeddedPost;
+    }
 
     res.send(imageMapper(post));
   }
@@ -41,9 +69,22 @@ router.post(
 router.get("/", async (req, res) => {
   const posts = await Post.find({}).sort("-_id");
 
-  const resources = mapPostsComments(posts.map(imageMapper));
-  // const resources = mapPostsImages(posts);
-  res.send(resources);
+  res.send(mapPostsImages(posts));
+});
+
+router.get("/:id", async (req, res) => {
+  const id = req.params.id;
+
+  const post = await Post.findById(id);
+  if (post) return res.send(mapPostImages(post));
+
+  const user = await getUser(id);
+  if (!user) return res.status(404).send("The given ID does not exist.");
+
+  const posts = await Post.find({
+    author: _.pick(user, ["_id", "name", "username", "avatar"]),
+  }).sort("-_id");
+  res.send(mapPostsImages(posts));
 });
 
 router.patch(
@@ -56,33 +97,55 @@ router.patch(
     checkPostExistence,
   ],
   async (req, res) => {
-    const { isAboutLiking, isAboutCommenting, isAboutReplying } = req.body;
+    const {
+      isAboutLiking,
+      isAboutCommenting,
+      isAboutReplying,
+      isAboutReposting,
+    } = req.body;
     let result;
 
-    if (isAboutLiking === "true") {
-      result = await handleLike(req);
-    } else if (isAboutCommenting === "true") {
-      if (isAboutReplying === "true") {
-        result = await handleReply(req);
-      } else {
-        result = await handleComment(req);
-      }
-    }
+    if (isAboutLiking === "true") result = await handleLike(req);
+    else if (isAboutCommenting === "true") {
+      if (isAboutReplying === "true") result = await handleReply(req);
+      else result = await handleComment(req);
+    } else if (isAboutReposting === "true") result = handleReposting(req);
 
     // TODO: Find out why response always send undefined
     res.send(result);
   }
 );
 
-async function handleReply(req, res) {
+async function handleReposting(req) {
+  const author = getAuthorFrom(req);
+  const post = req.post;
+  const user = await User.findById(req.user._id);
+  let comment;
+
+  if (req.body.isAboutCommentReposting === "true") {
+    const index = post.comments.findIndex((c) =>
+      areIdsSame(c, req.body.commentId)
+    );
+    comment = post.comments[index];
+    comment.reposts.unshift(author);
+  } else post.reposts.unshift(author);
+  user.reposts.unshift(post._id);
+
+  await user.save();
+  await post.save();
+
+  return comment || post.reposts[0];
+}
+
+async function handleReply(req) {
   const reply = new Reply({
-    author: _.pick(req.user, ["_id", "avatar", "name", "username"]),
+    author: getAuthorFrom(req),
     message: req.body.message,
   });
   const post = req.post;
 
-  const index = post.comments.findIndex(
-    (c) => c._id.valueOf() === req.body.commentId
+  const index = post.comments.findIndex((c) =>
+    areIdsSame(c, req.body.commentId)
   );
   if (index < 0) return;
   post.comments[index].replies.unshift(reply);
@@ -94,7 +157,7 @@ async function handleReply(req, res) {
 
 async function handleComment(req) {
   let comment = new Comment({
-    author: _.pick(req.user, ["_id", "avatar", "name", "username"]),
+    author: getAuthorFrom(req),
     message: req.body.message,
   });
   const post = req.post;
@@ -110,7 +173,7 @@ async function handleLike(req) {
   const userId = req.user._id.valueOf();
   const post = req.post;
 
-  const index = post.likes.findIndex((lover) => lover._id.valueOf() === userId);
+  const index = post.likes.findIndex((lover) => areIdsSame(lover, userId));
   if (isLiking(index)) {
     post.likes = [req.user, ...post.likes];
     if (!post.likesAuthorsId) post.likesAuthorsId = {};
@@ -129,6 +192,18 @@ async function handleLike(req) {
 
 function isLiking(index) {
   return index === -1;
+}
+
+function getAuthorFrom(req) {
+  return _.pick(req.user, ["_id", "avatar", "name", "username"]);
+}
+
+function areIdsSame(dbObj, localId) {
+  return dbObj._id.valueOf() === localId;
+}
+
+async function getUser(id) {
+  return await User.findById(id);
 }
 
 module.exports = router;

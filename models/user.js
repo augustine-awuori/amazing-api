@@ -2,8 +2,6 @@ const mongoose = require("mongoose");
 const Joi = require("joi");
 const jwt = require("jsonwebtoken");
 
-const { postSchema } = require("./post");
-const { listingSchema } = require("./listing");
 const { messageSchema } = require("./message");
 const { mapAvatar } = require("../mappers/listings");
 
@@ -46,6 +44,7 @@ const schema = new mongoose.Schema({
           maxlength: 50,
           trim: true,
         },
+        avatar: Object,
         username: {
           type: String,
           trim: true,
@@ -72,6 +71,7 @@ const schema = new mongoose.Schema({
           maxlength: 50,
           trim: true,
         },
+        avatar: Object,
         username: {
           type: String,
           trim: true,
@@ -89,16 +89,11 @@ const schema = new mongoose.Schema({
       }),
     ],
   },
-  posts: [postSchema],
-  listings: [listingSchema],
+  reposts: [mongoose.Types.ObjectId],
+  listings: [mongoose.Types.ObjectId],
   messages: [messageSchema],
   isAdmin: { type: Boolean, default: false },
-  isVerified: {
-    type: Boolean,
-    default: function () {
-      return this.isAdmin || this.followers.length > 200; //TODO: get this from a config file
-    },
-  },
+  isVerified: { type: Boolean, default: false },
 });
 
 schema.methods.generateAuthToken = function () {

@@ -4,9 +4,10 @@ const multer = require("multer");
 const express = require("express");
 const router = express.Router();
 
-const validator = require("../middleware/validate");
+const { mapUser } = require("../mappers/users");
 const { User, validate } = require("../models/user");
 const avatarResize = require("../middleware/imageResize");
+const validator = require("../middleware/validate");
 
 const upload = multer({ dest: "uploads/" });
 
@@ -31,5 +32,14 @@ router.post(
       .send(_.pick(user, ["_id", "name", "username", "isAdmin", "isVerified"]));
   }
 );
+
+router.get("/:id", async (req, res) => {
+  const user = await User.findById(req.params.id);
+
+  if (!user)
+    return res.status(404).send("The user with the given ID does not exist.");
+
+  res.send(mapUser(user));
+});
 
 module.exports = router;
