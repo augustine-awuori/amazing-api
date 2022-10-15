@@ -139,4 +139,12 @@ async function getUser(id) {
   return await User.findById(id);
 }
 
+function getAuthorFrom(req) {
+  return _.pick(req.user, ["_id", "avatar", "name", "username"]);
+}
+
+function areIdsSame(dbObj, localId) {
+  return dbObj._id.valueOf() === localId;
+}
+
 module.exports = router;
