@@ -1,46 +1,42 @@
 const { imageMapper, mapImage } = require("../mappers/images");
 
-const mapAvatar = (avatar) => {
-  if (!avatar) return;
-  return mapImage(avatar);
-};
+const mapAvatar = (avatar) => (avatar ? mapImage(avatar) : undefined);
 
-const mapPostComment = (comment) => {
-  const result = imageMapper(comment);
-  result.replies = result.replies.map((reply) => {
-    reply.author.avatar = mapAvatar(reply.author.avatar);
-    return reply;
-  });
-  result.reposts = mapRepostsAvatars(result);
-  if (result.image) result.image = mapImage(result.image);
-
-  return result;
-};
-
-const mapPostImages = (post) => {
-  post.comments = post.comments.map(mapPostComment);
-  post.reposts = mapRepostsAvatars(post);
-  post.quotedReposts = mapQuotedReposts(post);
-
-  return imageMapper(post);
-};
+const mapPostImages = (post) =>
+  imageMapper(mapRepostsAvatars(mapQuotedReposts(post)));
 
 const mapPostsImages = (posts) => posts.map(mapPostImages);
 
 function mapQuotedReposts(post) {
-  return post.quotedReposts.map((quote) => {
+  let authorsId = {};
+
+  post.quotedReposts = post.quotedReposts.map((quote) => {
+    const authorId = quote.author._id.toString();
+    authorsId[authorId] = authorId;
+
     quote.author.avatar = mapAvatar(quote.author.avatar);
     quote.images = quote.images.map(mapImage);
 
     return quote;
   });
+  post.quotedRepostsAuthorsId = authorsId;
+
+  return post;
 }
 
 function mapRepostsAvatars(post) {
-  return post.reposts.map((author) => {
+  let authorsId = {};
+
+  post.reposts = post.reposts.map((author) => {
     author.avatar = mapAvatar(author.avatar);
+    const authorId = author._id.toString();
+    authorsId[authorId] = authorId;
+
     return author;
   });
+  post.repostsAuthorsId = authorsId;
+
+  return post;
 }
 
-module.exports = { mapPostComment, mapPostImages, mapPostsImages };
+module.exports = { mapPostImages, mapPostsImages };

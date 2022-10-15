@@ -1,9 +1,11 @@
 const { Post } = require("../models/post");
 
 module.exports = async (req, res, next) => {
-  const post = await Post.findById(req.params.id);
+  const postId = req.params.id || req.body.postId;
 
-  if (!post) return res.status(400).send({ error: "Post is already deleted." });
+  const post = await Post.findById(postId);
+  if (!post)
+    return res.status(400).send("The post with the given ID doesn't exist.");
   req.post = post;
 
   next();
