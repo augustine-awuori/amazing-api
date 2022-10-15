@@ -6,7 +6,7 @@ const outputFolder = "public/assets";
 
 module.exports = async (req, res, next) => {
   const images = [];
-  console.log(`file ${req.file} files ${req.files}`);
+
   if (!req.files) {
     req.images = images;
     return next();

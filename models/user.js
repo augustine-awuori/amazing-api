@@ -89,7 +89,6 @@ const schema = new mongoose.Schema({
       }),
     ],
   },
-  reposts: [mongoose.Types.ObjectId],
   listings: [mongoose.Types.ObjectId],
   messages: [messageSchema],
   isAdmin: { type: Boolean, default: false },

@@ -1,7 +1,5 @@
-const Joi = require("joi");
 const mongoose = require("mongoose");
 
-const { schema: commentSchema } = require("./comment");
 const { schema: quotedRepostSchema } = require("./quotedRepost");
 
 const schema = new mongoose.Schema({
@@ -30,6 +28,10 @@ const schema = new mongoose.Schema({
       },
     }),
   },
+  embeddedCommentId: {
+    ref: "Comment",
+    type: mongoose.Types.ObjectId,
+  },
   embeddedPostId: {
     ref: "Post",
     type: mongoose.Types.ObjectId,
@@ -48,15 +50,14 @@ const schema = new mongoose.Schema({
   },
   likes: [Object],
   likesAuthorsId: Object,
-  comments: [commentSchema],
+  commentsCount: { default: 0, type: Number },
   quotedReposts: [quotedRepostSchema],
-  reposts: [],
+  quotedRepostsAuthorsId: Object,
+  reposts: [Object],
+  repostsAuthorsId: Object,
 });
 
 const Post = mongoose.model("Post", schema);
 
-const validatePost = (post) => Joi.object({}).validate(post);
-
 module.exports.Post = Post;
-module.exports.validate = validatePost;
 module.exports.postSchema = schema;

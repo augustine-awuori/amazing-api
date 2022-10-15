@@ -1,6 +1,6 @@
 const fs = require("fs");
 
-const baseUrl = "https://0163-41-80-96-223.in.ngrok.io/assets/";
+const baseUrl = "http://192.168.43.210:3000/assets/";
 const outputFolder = "public/assets/";
 
 const mapImage = (image) => ({
@@ -9,9 +9,21 @@ const mapImage = (image) => ({
 });
 
 const imageMapper = (item) => {
+  let likesAuthorsId = {};
+
   if (item.images) item.images = item.images.map(mapImage);
   if (item.author?.avatar) item.author.avatar = mapImage(item.author.avatar);
   if (item.image) item.image = mapImage(item.image);
+  if (item.likes) {
+    item.likes = item.likes.map((author) => {
+      if (author?.avatar) author.avatar = mapImage(author.avatar);
+      const authorId = author._id.toString();
+      likesAuthorsId[authorId] = authorId;
+
+      return author;
+    });
+    item.likesAuthorsId = likesAuthorsId;
+  }
 
   return item;
 };
