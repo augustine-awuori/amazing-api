@@ -14,51 +14,54 @@ const getAuthorListings = async (author) =>
     author: getAuthorProperties(author),
   });
 
-const updateListingExpiry = (listings) =>
-  listings.forEach(async (listing) => {
+const updateExpiry = (listings) =>
+  listings.map((listing) => {
     listing.hasExpired =
       moment().diff(moment(listing.timestamp), "hours") >= 72; // TODO: Get time from a constant
-    await listing.save();
+
+    return listing;
   });
 
-const deleteExpiredListings = async (listings) => {
-  await updateListingExpiry(listings);
-  listings.forEach((listing) => {
-    if (listing.hasExpired) imageUnmapper(listing);
+const deleteExpired = (listings) => {
+  const updated = updateExpiry(listings);
+  const valid = [];
+
+  updated.forEach(async (item) => {
+    if (item.hasExpired) {
+      imageUnmapper(item);
+      await Listing.findByIdAndDelete(item._id);
+    } else valid.push(item);
   });
-  await Listing.deleteMany({ hasExpired: true });
+
+  return valid;
 };
 
 function updateCounts(listings) {
   const authorIds = {};
 
   listings.forEach(async ({ author }) => {
-    if (authorIds[author._id]) return;
+    if (authorIds[author._id.toString()]) return;
 
-    const listingsByAuthor = await getAuthorListings(author);
-    listingsByAuthor.forEach((listing) => {
-      listing.count = listingsByAuthor.length;
+    const listings = await getAuthorListings(author);
+    listings.forEach((listing) => {
+      listing.count = listings.length;
     });
 
-    authorIds[author._id] = author._id;
+    authorIds[author._id.toString()] = author._id.toString();
   });
+
+  return listings;
 }
 
-const getFreshListings = async (listings) => {
-  deleteExpiredListings(listings);
-  updateCounts(listings);
-  return await Listing.find({}).sort("-_id");
-};
+const getValid = (listings) => updateCounts(deleteExpired(listings));
 
 const updateAuthorListingsCount = async (author) => {
   const authorListings = await getAuthorListings(author);
 
-  async function updateCount(listing) {
+  authorListings.forEach(async (listing) => {
     listing.count = authorListings.length;
     await listing.save();
-  }
-
-  authorListings.forEach(updateCount);
+  });
 };
 
-module.exports = { updateCounts, updateAuthorListingsCount, getFreshListings };
+module.exports = { updateCounts, updateAuthorListingsCount, getValid };
