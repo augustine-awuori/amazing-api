@@ -3,7 +3,11 @@ const express = require("express");
 const router = express.Router();
 const _ = require("lodash");
 
-const { imageMapper, imageUnmapper } = require("../mappers/listings");
+const {
+  imageMapper,
+  imageUnmapper,
+  mapListings,
+} = require("../mappers/listings");
 const { updateAuthorListingsCount, getValid } = require("../updaters/listings");
 const { User } = require("../models/user");
 const { validateListing, Listing } = require("../models/listing");
@@ -53,9 +57,21 @@ router.post(
 router.get("/", async (req, res) => {
   const listings = await Listing.find({}).sort("-_id");
 
-  const resources = listings.map(imageMapper);
+  const resources = mapListings(listings);
 
   res.send(getValid(resources));
+});
+
+router.get("/:id", auth, async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (!user)
+    return res.status(404).send("The user with the given ID doesn't exist.");
+
+  const listings = await Listing.find({
+    author: _.pick(user, ["_id", "name", "username", "avatar"]),
+  });
+
+  res.send(mapListings(listings));
 });
 
 router.delete(

@@ -89,7 +89,6 @@ const schema = new mongoose.Schema({
       }),
     ],
   },
-  listings: [mongoose.Types.ObjectId],
   messages: [messageSchema],
   isAdmin: { type: Boolean, default: false },
   isVerified: { type: Boolean, default: false },
