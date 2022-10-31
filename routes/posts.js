@@ -73,19 +73,26 @@ router.get("/", async (req, res) => {
   res.send(mapPostsImages(posts));
 });
 
+router.get("/my/:id", async (req, res) => {
+  const user = await getUser(req.params.id);
+
+  if (!user)
+    return res.status(404).send("The user with the given ID does not exist.");
+
+  const myPosts = (await Post.find({}).sort("-_id")).filter(
+    (post) => post.author._id.toString() === user._id.toString()
+  );
+
+  res.send(mapPostsImages(myPosts));
+});
+
 router.get("/:id", async (req, res) => {
-  const id = req.params.id;
+  const post = await Post.findById(req.params.id);
 
-  const post = await Post.findById(id);
-  if (post) return res.send(mapPostImages(post));
+  if (!post)
+    return res.status(404).send("The post with the given ID was not found.");
 
-  const user = await getUser(id);
-  if (!user) return res.status(404).send("The given ID does not exist.");
-
-  const posts = await Post.find({
-    author: _.pick(user, ["_id", "name", "username", "avatar"]),
-  }).sort("-_id");
-  res.send(mapPostsImages(posts));
+  res.send(mapPostImages(post));
 });
 
 router.patch("/:id", [auth, validateUser, postExists], async (req, res) => {
@@ -96,7 +103,7 @@ router.patch("/:id", [auth, validateUser, postExists], async (req, res) => {
 });
 
 async function handleReposting(req) {
-  const author = getAuthorFrom(req);
+  const author = getAuthorProperties(req.user);
   const post = req.post;
 
   const index = post.reposts.findIndex(
@@ -127,8 +134,8 @@ function exists(index) {
   return index !== -1;
 }
 
-function getAuthorFrom(req) {
-  return _.pick(req.user, ["_id", "avatar", "name", "username"]);
+function getAuthorProperties(user) {
+  return _.pick(user, ["_id", "avatar", "name", "username"]);
 }
 
 function areIdsSame(dbObj, localId) {
@@ -137,10 +144,6 @@ function areIdsSame(dbObj, localId) {
 
 async function getUser(id) {
   return await User.findById(id);
-}
-
-function getAuthorFrom(req) {
-  return _.pick(req.user, ["_id", "avatar", "name", "username"]);
 }
 
 function areIdsSame(dbObj, localId) {

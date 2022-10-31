@@ -3,16 +3,17 @@ const Joi = require("joi");
 const jwt = require("jsonwebtoken");
 
 const { messageSchema } = require("./message");
-const { mapAvatar } = require("../mappers/listings");
+const { mapImage } = require("../mappers/images");
 
 const schema = new mongoose.Schema({
   aboutMe: {
     type: String,
     trim: true,
-    minlength: 1,
-    maxlength: 50,
+    minlength: 3,
+    maxlength: 100,
   },
   avatar: Object,
+  coverPhoto: Object,
   username: {
     type: String,
     maxlength: 50,
@@ -92,10 +93,17 @@ const schema = new mongoose.Schema({
   messages: [messageSchema],
   isAdmin: { type: Boolean, default: false },
   isVerified: { type: Boolean, default: false },
+  otherAccounts: Object,
+  timestamp: {
+    type: Number,
+    default: function () {
+      return this._id.getTimestamp();
+    },
+  },
 });
 
 schema.methods.generateAuthToken = function () {
-  const mappedAvatar = this.avatar ? mapAvatar(this.avatar) : this.avatar;
+  const mappedAvatar = this.avatar ? mapImage(this.avatar) : this.avatar;
 
   return jwt.sign(
     {
@@ -114,6 +122,9 @@ const User = mongoose.model("User", schema);
 
 const validateUser = (user) =>
   Joi.object({
+    aboutMe: Joi.string().min(3).max(100),
+    avatar: Joi.object().optional(),
+    coverPhoto: Joi.object().optional(),
     name: Joi.string().min(3).max(50).required(),
     password: Joi.string().min(6).max(1024).required(),
     username: Joi.string().min(3).max(50).required(),
