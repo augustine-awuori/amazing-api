@@ -29,6 +29,8 @@ const Comment = mongoose.model(
       }),
     },
     image: Object,
+    dislikes: [Object],
+    dislikesAuthorsId: Object,
     likes: [Object],
     likesAuthorsId: Object,
     message: {
@@ -40,11 +42,8 @@ const Comment = mongoose.model(
       required: true,
       type: mongoose.Types.ObjectId,
     },
-    quotedReposts: [],
-    quotedRepostsAuthorsId: Object,
     repliesCount: { default: 0, type: Number },
-    reposts: [],
-    repostsAuthorsId: Object,
+    repliesAuthorsId: Object,
     timestamp: {
       type: Number,
       default: function () {

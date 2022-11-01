@@ -49,18 +49,18 @@ router.get("/:id", async (req, res) => {
 });
 
 router.patch("/:id", [auth, commentExists], async (req, res) => {
-  const { isAboutLiking } = req.body;
+  const { isAboutLiking, isAboutDisliking } = req.body;
 
   if (isAboutLiking) await handleLike(req, res);
-  else await handleReposting(req, res);
+  else if (isAboutDisliking) await handleDislike(req, res);
 });
 
 async function handleLike(req, res) {
   const comment = req.comment;
-  const index = comment.likes.findIndex(
-    (a) => a._id.toString() === req.user._id.toString()
-  );
+  const index = findUserIndex(comment.likes, req);
+  const dislikeIndex = findUserIndex(comment.dislikes, req);
 
+  if (exists(dislikeIndex)) comment.dislikes.splice(dislikeIndex, 1);
   if (exists(index)) comment.likes.splice(index, 1);
   else comment.likes.unshift(await getAuthor(req));
 
@@ -69,18 +69,22 @@ async function handleLike(req, res) {
   res.send(mapComment(comment));
 }
 
-async function handleReposting(req, res) {
+async function handleDislike(req, res) {
   const comment = req.comment;
-  const index = comment.reposts.findIndex(
-    (a) => a._id.toString() === req.user._id.toString()
-  );
+  const likeIndex = findUserIndex(comment.likes, req);
+  const index = findUserIndex(comment.dislikes, req);
 
-  if (exists(index)) comment.reposts.splice(index, 1);
-  else comment.reposts.unshift(await getAuthor(req));
+  if (exists(likeIndex)) comment.likes.splice(likeIndex, 1);
+  if (exists(index)) comment.dislikes.splice(index, 1);
+  else comment.dislikes.unshift(await getAuthor(req));
 
   await comment.save();
 
   res.send(mapComment(comment));
+}
+
+function findUserIndex(list, req) {
+  return list.findIndex((a) => a._id.toString() === req.user._id.toString());
 }
 
 function exists(index) {

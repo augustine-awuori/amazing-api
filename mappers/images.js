@@ -10,6 +10,7 @@ const mapImage = (image) => ({
 
 const imageMapper = (item) => {
   let likesAuthorsId = {};
+  let dislikesAuthorsId = {};
 
   if (item.images) item.images = item.images.map(mapImage);
   if (item.author?.avatar) item.author.avatar = mapImage(item.author.avatar);
@@ -23,6 +24,16 @@ const imageMapper = (item) => {
       return author;
     });
     item.likesAuthorsId = likesAuthorsId;
+  }
+  if (item.dislikes) {
+    item.dislikes = item.dislikes.map((author) => {
+      if (author?.avatar) author.avatar = mapImage(author.avatar);
+      const authorId = author._id.toString();
+      dislikesAuthorsId[authorId] = authorId;
+
+      return author;
+    });
+    item.dislikesAuthorsId = dislikesAuthorsId;
   }
 
   return item;

@@ -17,6 +17,8 @@ router.post("/", [auth, commentExists], async (req, res) => {
     commentId: req.body.commentId,
     message: req.body.message,
   });
+  if (!comment.repliesAuthorsId) comment.repliesAuthorsId = {};
+  comment.repliesAuthorsId[req.user._id.toString()] = req.user._id.toString();
   comment.repliesCount += 1;
 
   comment.save();
