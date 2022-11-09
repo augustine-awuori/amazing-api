@@ -36,22 +36,49 @@ const schema = new mongoose.Schema({
     maxlength: 1024,
     trim: true,
   },
+  followings: {
+    type: [
+      new mongoose.Schema({
+        aboutMe: {
+          type: String,
+          trim: true,
+          minlength: 3,
+          maxlength: 100,
+        },
+        avatar: Object,
+        username: {
+          type: String,
+          maxlength: 50,
+          minlength: 4,
+          required: true,
+          trim: true,
+        },
+        name: {
+          type: String,
+          trim: true,
+          minlength: 3,
+          maxlength: 50,
+          required: true,
+        },
+      }),
+    ],
+  },
   followers: {
     type: [
       new mongoose.Schema({
         aboutMe: {
           type: String,
-          minlength: 3,
-          maxlength: 50,
           trim: true,
+          minlength: 3,
+          maxlength: 100,
         },
         avatar: Object,
         username: {
           type: String,
-          trim: true,
-          minlength: 3,
           maxlength: 50,
+          minlength: 4,
           required: true,
+          trim: true,
         },
         name: {
           type: String,
@@ -63,33 +90,8 @@ const schema = new mongoose.Schema({
       }),
     ],
   },
-  following: {
-    type: [
-      new mongoose.Schema({
-        aboutMe: {
-          type: String,
-          minlength: 1,
-          maxlength: 50,
-          trim: true,
-        },
-        avatar: Object,
-        username: {
-          type: String,
-          trim: true,
-          minlength: 3,
-          maxlength: 50,
-          required: true,
-        },
-        name: {
-          type: String,
-          trim: true,
-          minlength: 3,
-          maxlength: 50,
-          required: true,
-        },
-      }),
-    ],
-  },
+  followingsId: Object,
+  followersId: Object,
   messages: [messageSchema],
   isAdmin: { type: Boolean, default: false },
   isVerified: { type: Boolean, default: false },
@@ -108,11 +110,11 @@ schema.methods.generateAuthToken = function () {
   return jwt.sign(
     {
       _id: this._id,
+      avatar: mappedAvatar,
       isAdmin: this.isAdmin,
       isVerified: this.isVerified,
       name: this.name,
       username: this.username,
-      avatar: mappedAvatar,
     },
     process.env.JWT_PRIVATE_KEY
   );
