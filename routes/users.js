@@ -5,7 +5,7 @@ const express = require("express");
 const router = express.Router();
 
 const { imageUnmapper } = require("../mappers/images");
-const { mapUser } = require("../mappers/users");
+const { mapUser, mapUsers } = require("../mappers/users");
 const { User, validate } = require("../models/user");
 const { Post } = require("../models/post");
 const { Listing } = require("../models/listing");
@@ -38,6 +38,12 @@ router.post(
       .send(_.pick(user, ["_id", "name", "username", "isAdmin", "isVerified"]));
   }
 );
+
+router.get("/", async (req, res) => {
+  const users = await User.find({});
+
+  res.send(mapUsers(users));
+});
 
 router.get("/:id", async (req, res) => {
   const user = await User.findById(req.params.id);

@@ -40,4 +40,6 @@ const mapUser = (user) => {
   return mapFollowersAndFollowings(user);
 };
 
-module.exports = { mapUser };
+const mapUsers = (users) => users.map(mapUser);
+
+module.exports = { mapUser, mapUsers };
