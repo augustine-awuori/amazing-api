@@ -1,6 +1,6 @@
 const fs = require("fs");
 
-const baseUrl = "http://192.168.43.210:3000/assets/";
+const baseUrl = "https://4dd2-41-89-196-20.in.ngrok.io/assets/";
 const outputFolder = "public/assets/";
 
 const mapImage = (image) => ({
@@ -18,12 +18,13 @@ const imageMapper = (listing) => {
 
 const mapListings = (listings) => listings.map(imageMapper);
 
-const imageUnmapper = (listing) => {
+const imageUnmapper = (listing) =>
   listing.images.forEach(async (image) => {
-    fs.unlinkSync(`${outputFolder}${image.fileName}_full.jpg`);
-    fs.unlinkSync(`${outputFolder}${image.fileName}_thumb.jpg`);
+    if (image?.fileName) {
+      fs.unlinkSync(`${outputFolder}${image.fileName}_full.jpg`);
+      fs.unlinkSync(`${outputFolder}${image.fileName}_thumb.jpg`);
+    }
   });
-};
 
 const mapAvatar = (avatar) => mapImage(avatar);
 
