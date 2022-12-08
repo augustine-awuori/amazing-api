@@ -1,6 +1,6 @@
 const fs = require("fs");
 
-const baseUrl = "https://4dd2-41-89-196-20.in.ngrok.io/assets/";
+const baseUrl = "http://192.168.43.210:3000/assets/";
 const outputFolder = "public/assets/";
 
 const mapImage = (image) => ({
