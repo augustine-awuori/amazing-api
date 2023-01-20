@@ -39,6 +39,8 @@ const imageMapper = (item) => {
   return item;
 };
 
+const imageMappers = (items) => items.map(imageMapper);
+
 const imageUnmapper = (item) => {
   item.images.forEach(async (image) => {
     fs.unlinkSync(`${outputFolder}${image.fileName}_full.jpg`);
@@ -46,4 +48,4 @@ const imageUnmapper = (item) => {
   });
 };
 
-module.exports = { imageMapper, imageUnmapper, mapImage };
+module.exports = { imageMapper, imageMappers, imageUnmapper, mapImage };
