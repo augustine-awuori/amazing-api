@@ -29,6 +29,7 @@ router.post(
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(user.password, salt);
     if (req.image) user.avatar = req.image;
+    user.otherAccounts = { whatsapp: req.body.whatsapp };
 
     await user.save();
 
@@ -58,25 +59,8 @@ router.patch(
   "/",
   [auth, validateUser, upload.array("images"), imagesResize],
   async (req, res) => {
-    const {
-      aboutMe,
-      isAboutFollowing,
-      leaderId,
-      name,
-      otherAccounts,
-      username,
-    } = req.body;
+    const { aboutMe, name, instagram, twitter, whatsapp, username } = req.body;
     const user = await User.findById(req.user._id);
-
-    if (isAboutFollowing) {
-      const follower = await handleFollowingsAndFollowers(user, leaderId);
-
-      return follower
-        ? res.send(follower)
-        : res
-            .status(404)
-            .send("The user you're trying to follow/unfollow doesn't exist");
-    }
 
     if (aboutMe) user.aboutMe = aboutMe;
     if (user.username !== username) {
@@ -87,7 +71,11 @@ router.patch(
     }
     user.name = name;
     user.username = username;
-    user.otherAccounts = otherAccounts;
+    console.log("data", req.body);
+    console.log("before ", user.otherAccounts);
+    user.otherAccounts = { whatsapp, instagram, twitter };
+    console.log("after ", user.otherAccounts);
+
     for (let image of req.files) {
       const name = image.originalname;
       if (user[name]) imageUnmapper(user[name]);

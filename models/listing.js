@@ -2,58 +2,18 @@ const Joi = require("joi");
 const mongoose = require("mongoose");
 
 const schema = new mongoose.Schema({
-  author: {
-    required: true,
-    type: new mongoose.Schema({
-      _id: {
-        ref: "User",
-        required: true,
-        type: mongoose.Types.ObjectId,
-      },
-      avatar: Object,
-      name: {
-        maxlength: 50,
-        minlength: 3,
-        required: true,
-        trim: true,
-        type: String,
-      },
-      username: {
-        maxlength: 50,
-        minlength: 4,
-        required: true,
-        trim: true,
-        type: String,
-      },
-    }),
-  },
-  category: {
-    required: true,
-    type: new mongoose.Schema({
-      _id: {
-        ref: "Category",
-        required: true,
-        type: mongoose.Types.ObjectId,
-      },
-      label: {
-        max: 50,
-        min: 3,
-        required: true,
-        trim: true,
-        type: String,
-      },
-    }),
-  },
-  count: { type: Number, default: 1 },
+  author: Object,
+  authorId: mongoose.Types.ObjectId,
+  category: Object,
+  categoryId: mongoose.Types.ObjectId,
   description: {
     maxlength: 200,
     trim: true,
     type: String,
   },
-  hasExpired: { type: Boolean, default: false },
   images: [Object],
   price: {
-    max: 10_000,
+    max: 1_000_000,
     min: 1,
     required: true,
     type: Number,
@@ -77,18 +37,11 @@ const Listing = mongoose.model("Listing", schema);
 
 const validate = (listing) =>
   Joi.object({
-    author: Joi.object({
-      _id: Joi.any(),
-      name: Joi.string().min(3).max(50).required(),
-      username: Joi.string().min(3).max(50).required(),
-    }),
-    category: Joi.object({
-      _id: Joi.any(),
-      label: Joi.string().min(3).max(50).required(),
-    }),
+    authorId: Joi.string(),
+    categoryId: Joi.string(),
     description: Joi.string().max(200).allow(""),
     images: Joi.array().min(1).max(3),
-    price: Joi.number().required().min(1).max(100_000),
+    price: Joi.number().required().min(1).max(1_000_000),
     title: Joi.string().required().min(2).max(50),
   }).validate(listing);
 
