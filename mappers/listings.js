@@ -1,6 +1,8 @@
 const fs = require("fs");
+const { Category } = require("../models/category");
+const { User } = require("../models/user");
 
-const baseUrl = "http://192.168.43.210:3000/assets/";
+const baseUrl = "http://192.168.100.2:3000/assets/";
 const outputFolder = "public/assets/";
 
 const mapImage = (image) => ({
@@ -8,15 +10,27 @@ const mapImage = (image) => ({
   thumbnailUrl: `${baseUrl}${image.fileName}_thumb.jpg`,
 });
 
-const imageMapper = (listing) => {
+const mapAuthorImages = (author) => {
+  if (author.avatar) author.avatar = mapImage(author.avatar);
+  if (author.coverPhoto) author.coverPhoto = mapImage(author.coverPhoto);
+
+  return author;
+};
+
+const mapListing = async (listing) => {
+  const author = mapAuthorImages(await User.findById(listing.authorId));
+  const category = await Category.findById(listing.categoryId);
+
+  author.password = "";
+  listing.author = author;
+  listing.category = category;
   listing.images = listing.images.map(mapImage);
-  if (listing.author.avatar)
-    listing.author.avatar = mapImage(listing.author.avatar);
 
   return listing;
 };
 
-const mapListings = (listings) => listings.map(imageMapper);
+const mapListings = async (listings) =>
+  await Promise.all(listings.map(mapListing));
 
 const imageUnmapper = (listing) =>
   listing.images.forEach(async (image) => {
@@ -26,6 +40,11 @@ const imageUnmapper = (listing) =>
     }
   });
 
-const mapAvatar = (avatar) => mapImage(avatar);
+const mapAvatar = (avatar) => (avatar ? mapImage(avatar) : avatar);
 
-module.exports = { imageMapper, imageUnmapper, mapAvatar, mapListings };
+module.exports = {
+  imageUnmapper,
+  mapAvatar,
+  mapListing,
+  mapListings,
+};

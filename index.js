@@ -5,12 +5,8 @@ const app = express();
 
 const auth = require("./routes/auth");
 const categories = require("./routes/categories");
-const comments = require("./routes/comments");
-const events = require("./routes/events");
-const jobs = require("./routes/jobs");
 const listings = require("./routes/listings");
-const posts = require("./routes/posts");
-const replies = require("./routes/replies");
+const requests = require("./routes/requests");
 const users = require("./routes/users");
 
 app.use(express.json());
@@ -18,12 +14,8 @@ app.use(serveStatic("public", { acceptRanges: false }));
 app.use(compression());
 app.use("/api/auth", auth);
 app.use("/api/categories", categories);
-app.use("/api/comments", comments);
-app.use("/api/events", events);
-app.use("/api/jobs", jobs);
 app.use("/api/listings", listings);
-app.use("/api/posts", posts);
-app.use("/api/replies", replies);
+app.use("/api/requests", requests);
 app.use("/api/users", users);
 
 require("./startup/db")();

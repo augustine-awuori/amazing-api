@@ -1,6 +1,6 @@
 const fs = require("fs");
 
-const baseUrl = "http://192.168.43.210:3000/assets/";
+const baseUrl = "http://192.168.100.2:3000/assets/";
 const outputFolder = "public/assets/";
 
 const mapImage = (image) => ({
@@ -42,7 +42,7 @@ const imageMapper = (item) => {
 const imageMappers = (items) => items.map(imageMapper);
 
 const imageUnmapper = (item) => {
-  item.images.forEach(async (image) => {
+  item?.images?.forEach(async (image) => {
     fs.unlinkSync(`${outputFolder}${image.fileName}_full.jpg`);
     fs.unlinkSync(`${outputFolder}${image.fileName}_thumb.jpg`);
   });

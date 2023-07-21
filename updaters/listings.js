@@ -64,4 +64,4 @@ const updateAuthorListingsCount = async (author) => {
   });
 };
 
-module.exports = { updateCounts, updateAuthorListingsCount, getValid };
+module.exports = { updateCounts, updateAuthorListingsCount };

@@ -19,7 +19,7 @@ router.post("/", [auth, admin, validatingWith(validate)], async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
-  const categories = await Category.find({}).sort("label");
+  const categories = await Category.find({}).sort("_id");
 
   res.send(categories);
 });
