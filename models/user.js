@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const Joi = require("joi");
 const jwt = require("jsonwebtoken");
 
-const { messageSchema } = require("./message");
 const { mapImage } = require("../mappers/images");
 
 const schema = new mongoose.Schema({
@@ -36,7 +35,6 @@ const schema = new mongoose.Schema({
     maxlength: 1024,
     trim: true,
   },
-  messages: [messageSchema],
   isAdmin: { type: Boolean, default: false },
   isVerified: { type: Boolean, default: false },
   otherAccounts: Object,

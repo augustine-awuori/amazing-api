@@ -7,7 +7,6 @@ const router = express.Router();
 const { imageUnmapper } = require("../mappers/images");
 const { mapUser, mapUsers } = require("../mappers/users");
 const { User, validate } = require("../models/user");
-const { Post } = require("../models/post");
 const { Listing } = require("../models/listing");
 const auth = require("../middleware/auth");
 const avatarResize = require("../middleware/imageResize");
