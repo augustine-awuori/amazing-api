@@ -1,3 +1,4 @@
+const { isValidObjectId } = require("mongoose");
 const multer = require("multer");
 const express = require("express");
 const router = express.Router();
@@ -56,6 +57,24 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/:id", async (req, res) => {
+  const id = req.params.id;
+  if (!isValidObjectId(id))
+    return res.status(400).send({ error: "Invalid ID." });
+
+  const user = await User.findById(id);
+  if (!user) {
+    let listing = await Listing.findById(id);
+
+    if (!listing)
+      return res
+        .status(404)
+        .send({ error: "Listing with the gived ID doesn't exist." });
+
+    return listing
+      ? res.send(await mapListing(listing))
+      : res.status(404).send({ error: "Id provided doesn't exist." });
+  }
+
   const listings = (await Listing.find({}).sort("-_id")).filter(
     ({ authorId }) => authorId.toString() === req.params.id
   );
