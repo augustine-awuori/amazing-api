@@ -13,6 +13,7 @@ const avatarResize = require("../middleware/imageResize");
 const imagesResize = require("../middleware/imagesResize");
 const validateUser = require("../middleware/validateUser");
 const validator = require("../middleware/validate");
+const { isValidObjectId } = require("mongoose");
 
 const upload = multer({ dest: "uploads/" });
 
@@ -46,10 +47,14 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/:id", async (req, res) => {
-  const user = await User.findById(req.params.id);
+  const userId = req.params.id;
+  if (!isValidObjectId) return res.status(400).send({ error: "Invalid ID." });
 
+  const user = await User.findById(userId);
   if (!user)
-    return res.status(404).send("The user with the given ID does not exist.");
+    return res
+      .status(404)
+      .send({ error: "The user with the given ID does not exist." });
 
   res.send(mapUser(user));
 });
