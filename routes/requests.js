@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { isValidObjectId } = require("mongoose");
 
 const { mapRequest, mapRequests } = require("../mappers/requests");
 const { Request, validateRequest } = require("../models/request");
@@ -8,6 +9,7 @@ const validateCategoryId = require("../middleware/validateCategoryId");
 const validateUser = require("../middleware/validateUser");
 const validator = require("../middleware/validate");
 const validateRequestAuthor = require("../middleware/validateRequestAuthor");
+const { User } = require("../models/user");
 
 router.post(
   "/",
@@ -30,6 +32,25 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/:id", async (req, res) => {
+  const id = req.params.id;
+  if (!isValidObjectId(id))
+    return res.status(400).send({ error: "Invalid ID." });
+
+  const user = await User.findById(id);
+
+  if (!user) {
+    let request = await Request.findById(id);
+
+    if (!request)
+      return res
+        .status(404)
+        .send({ error: "Request with the gived ID doesn't exist." });
+
+    return request
+      ? res.send(await mapRequest(request))
+      : res.status(400).send({ error: "Id provided doesn't exist." });
+  }
+
   const requests = (await Request.find({})).filter(
     ({ authorId }) => authorId.toString() === req.params.id
   );
