@@ -2,6 +2,7 @@ const compression = require("compression");
 const serveStatic = require("serve-static");
 const express = require("express");
 const app = express();
+const cors = require("cors");
 
 const auth = require("./routes/auth");
 const categories = require("./routes/categories");
@@ -12,6 +13,7 @@ const users = require("./routes/users");
 app.use(express.json());
 app.use(serveStatic("public", { acceptRanges: false }));
 app.use(compression());
+app.use(cors({ origin: "*" }));
 app.use("/api/auth", auth);
 app.use("/api/categories", categories);
 app.use("/api/listings", listings);
