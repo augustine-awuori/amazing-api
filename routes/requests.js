@@ -4,12 +4,12 @@ const { isValidObjectId } = require("mongoose");
 
 const { mapRequest, mapRequests } = require("../mappers/requests");
 const { Request, validateRequest } = require("../models/request");
+const { User } = require("../models/user");
 const auth = require("../middleware/auth");
 const validateCategoryId = require("../middleware/validateCategoryId");
+const validateRequestAuthor = require("../middleware/validateRequestAuthor");
 const validateUser = require("../middleware/validateUser");
 const validator = require("../middleware/validate");
-const validateRequestAuthor = require("../middleware/validateRequestAuthor");
-const { User } = require("../models/user");
 
 router.post(
   "/",
@@ -51,7 +51,7 @@ router.get("/:id", async (req, res) => {
       : res.status(400).send({ error: "Id provided doesn't exist." });
   }
 
-  const requests = (await Request.find({})).filter(
+  const requests = (await Request.find({}).sort("-_id")).filter(
     ({ authorId }) => authorId.toString() === req.params.id
   );
 
