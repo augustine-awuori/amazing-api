@@ -1,12 +1,15 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
 
+const { schema: categorySchema } = require("./category");
+const { schema: authorSchema } = require("./user");
+
 const Request = mongoose.model(
   "Request",
   new mongoose.Schema({
-    author: Object,
+    author: authorSchema,
     authorId: mongoose.Types.ObjectId,
-    category: Object,
+    category: categorySchema,
     categoryId: mongoose.Types.ObjectId,
     description: {
       maxlength: 255,

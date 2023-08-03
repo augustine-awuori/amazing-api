@@ -18,7 +18,7 @@ router.post(
     const authorId = req.user._id;
     const { categoryId, description, title } = req.body;
 
-    let request = new Request({ authorId, categoryId, description, title });
+    const request = new Request({ authorId, categoryId, description, title });
     await request.save();
 
     res.send(mapRequest(request));

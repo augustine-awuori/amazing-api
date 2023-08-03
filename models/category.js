@@ -1,33 +1,32 @@
 const Joi = require("joi");
 const mongoose = require("mongoose");
 
-const Category = mongoose.model(
-  "Category",
-  new mongoose.Schema({
-    backgroundColor: {
-      max: 10,
-      min: 4,
-      required: true,
-      trim: true,
-      type: String,
-    },
-    icon: {
-      max: 50,
-      min: 1,
-      required: true,
-      trim: true,
-      type: String,
-    },
-    label: {
-      max: 50,
-      min: 3,
-      required: true,
-      trim: true,
-      type: String,
-      unique: true,
-    },
-  })
-);
+const schema = new mongoose.Schema({
+  backgroundColor: {
+    max: 10,
+    min: 4,
+    required: true,
+    trim: true,
+    type: String,
+  },
+  icon: {
+    max: 50,
+    min: 1,
+    required: true,
+    trim: true,
+    type: String,
+  },
+  label: {
+    max: 50,
+    min: 3,
+    required: true,
+    trim: true,
+    type: String,
+    unique: true,
+  },
+});
+
+const Category = mongoose.model("Category", schema);
 
 const validate = (category) =>
   Joi.object({
@@ -36,5 +35,6 @@ const validate = (category) =>
     label: Joi.string().min(3).max(50).required(),
   }).validate(category);
 
-module.exports.Category = Category;
-module.exports.validate = validate;
+exports.Category = Category;
+exports.validate = validate;
+exports.schema = schema;

@@ -4,7 +4,7 @@ module.exports = (req, res, next) => {
   if (!user?.isAdmin)
     return res
       .status(401)
-      .send({ error: "Access denied. User is not an admin." });
+      .send({ error: "Access denied. You're not an admin." });
 
   next();
 };

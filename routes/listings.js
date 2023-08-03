@@ -2,6 +2,7 @@ const { isValidObjectId } = require("mongoose");
 const multer = require("multer");
 const express = require("express");
 const router = express.Router();
+const config = require("config");
 
 const {
   imageUnmapper,
@@ -28,7 +29,7 @@ router.post(
   "/",
   [
     // Order of these middlewares matters
-    upload.array("images", process.env.MAX_IMAGE_COUNT),
+    upload.array("images", config.get("maxImagesCount")),
     auth,
     validateUser,
     validateCategoryId,
@@ -39,9 +40,9 @@ router.post(
     const { categoryId, description, price, title } = req.body;
     const authorId = req.user._id;
 
-    let listing = { authorId, categoryId, description, price, title };
+    const listing = { authorId, categoryId, description, price, title };
     listing.images = req.images.map((fileName) => ({ fileName }));
-    listing = new Listing(listing);
+    new Listing(listing);
     await listing.save();
 
     res.send(mapListing(listing));

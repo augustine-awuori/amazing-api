@@ -4,6 +4,7 @@ const multer = require("multer");
 const express = require("express");
 const router = express.Router();
 const { isValidObjectId } = require("mongoose");
+const config = require("config");
 
 const { mapUser, mapUsers } = require("../mappers/users");
 const { User, validate } = require("../models/user");
@@ -14,8 +15,6 @@ const validateUser = require("../middleware/validateUser");
 const validator = require("../middleware/validate");
 
 const upload = multer({ dest: "uploads/" });
-
-const IMAGES_COUNT = 2;
 
 router.post(
   "/",
@@ -48,7 +47,8 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   const userId = req.params.id;
-  if (!isValidObjectId(userId)) return res.status(400).send({ error: "Invalid ID." });
+  if (!isValidObjectId(userId))
+    return res.status(400).send({ error: "Invalid ID." });
 
   const user = await User.findById(userId);
   if (!user)
@@ -61,7 +61,12 @@ router.get("/:id", async (req, res) => {
 
 router.patch(
   "/",
-  [auth, validateUser, upload.array("images", IMAGES_COUNT), imagesResize],
+  [
+    auth,
+    validateUser,
+    upload.array("images", config.get("userImagesCount")),
+    imagesResize,
+  ],
   async (req, res) => {
     console.log(req.files);
     const { aboutMe, name, instagram, twitter, whatsapp, username } = req.body;

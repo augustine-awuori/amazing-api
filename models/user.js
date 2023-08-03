@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
 const jwt = require("jsonwebtoken");
+const config = require("config");
 
 const { mapImage } = require("../mappers/images");
 
@@ -36,7 +37,12 @@ const schema = new mongoose.Schema({
     trim: true,
   },
   isAdmin: { type: Boolean, default: false },
-  isVerified: { type: Boolean, default: false },
+  isVerified: {
+    type: Boolean,
+    default: function () {
+      return this.isAdmin;
+    },
+  },
   otherAccounts: Object,
   timestamp: {
     type: Number,
@@ -58,7 +64,7 @@ schema.methods.generateAuthToken = function () {
       name: this.name,
       username: this.username,
     },
-    process.env.JWT_PRIVATE_KEY
+    config.get("jwtPrivateKey")
   );
 };
 
@@ -71,9 +77,10 @@ const validateUser = (user) =>
     coverPhoto: Joi.object().optional(),
     name: Joi.string().min(3).max(50).required(),
     password: Joi.string().min(6).max(1024).required(),
-    username: Joi.string().min(3).max(50).required(),
+    username: Joi.string().min(4).max(50).required(),
     whatsapp: Joi.string().min(12).max(13).required(),
   }).validate(user);
 
-module.exports.User = User;
-module.exports.validate = validateUser;
+exports.User = User;
+exports.validate = validateUser;
+exports.schema = schema;

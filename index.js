@@ -1,3 +1,4 @@
+const config = require("config");
 const compression = require("compression");
 const serveStatic = require("serve-static");
 const express = require("express");
@@ -10,6 +11,11 @@ const listings = require("./routes/listings");
 const requests = require("./routes/requests");
 const users = require("./routes/users");
 
+if (!config.get("jwtPrivateKey")) {
+  console.error("FATAL ERROR: jwtPrivateKey is not defined!");
+  process.exit(1);
+}
+
 app.use(express.json());
 app.use(serveStatic("public", { acceptRanges: false }));
 app.use(compression());
@@ -21,7 +27,6 @@ app.use("/api/requests", requests);
 app.use("/api/users", users);
 
 require("./startup/db")();
-require("./startup/env")();
 
 const port = process.env.PORT || 3000;
 const server = app

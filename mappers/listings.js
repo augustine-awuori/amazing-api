@@ -1,14 +1,19 @@
 const fs = require("fs");
+const config = require("config");
+
 const { Category } = require("../models/category");
 const { User } = require("../models/user");
 
-const baseUrl = "http://192.168.100.2:3000/assets/";
 const outputFolder = "public/assets/";
 
-const mapImage = (image) => ({
-  url: `${baseUrl}${image.fileName}_full.jpg`,
-  thumbnailUrl: `${baseUrl}${image.fileName}_thumb.jpg`,
-});
+const mapImage = (image) => {
+  const baseUrl = config.get("assetsBaseUrl");
+
+  return {
+    url: `${baseUrl}${image.fileName}_full.jpg`,
+    thumbnailUrl: `${baseUrl}${image.fileName}_thumb.jpg`,
+  };
+};
 
 const mapAuthorImages = (author) => {
   if (author.avatar) author.avatar = mapImage(author.avatar);
