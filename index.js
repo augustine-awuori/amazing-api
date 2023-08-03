@@ -15,6 +15,11 @@ const listings = require("./routes/listings");
 const requests = require("./routes/requests");
 const users = require("./routes/users");
 
+process.on("uncaughtException", (ex) => {
+  console.log("WE GOT AN UNCAUGHT EXCEPTION");
+  winston.error(ex.message, ex);
+});
+
 winston.configure({
   transports: [
     new winston.transports.File({ filename: "logfile.log" }),
