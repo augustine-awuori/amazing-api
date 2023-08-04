@@ -1,1 +1,1 @@
-{ "jwtPrivateKey": "mart_jwtPrivateKey" }
+{ "db": "mart_db", "jwtPrivateKey": "mart_jwtPrivateKey" }
