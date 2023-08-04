@@ -2,18 +2,10 @@ require("express-async-errors");
 const winston = require("winston");
 require("winston-mongodb");
 const config = require("config");
-const compression = require("compression");
-const serveStatic = require("serve-static");
 const express = require("express");
 const app = express();
-const cors = require("cors");
 
-const auth = require("./routes/auth");
-const categories = require("./routes/categories");
-const error = require("./middleware/error");
-const listings = require("./routes/listings");
-const requests = require("./routes/requests");
-const users = require("./routes/users");
+require("./startup/routes")(app);
 
 new winston.Logger({
   transports: [
@@ -40,17 +32,6 @@ if (!config.get("jwtPrivateKey")) {
   console.error("FATAL ERROR: jwtPrivateKey is not defined!");
   process.exit(1);
 }
-
-app.use(express.json());
-app.use(serveStatic("public", { acceptRanges: false }));
-app.use(compression());
-app.use(cors({ origin: "*" }));
-app.use("/api/auth", auth);
-app.use("/api/categories", categories);
-app.use("/api/listings", listings);
-app.use("/api/requests", requests);
-app.use("/api/users", users);
-app.use(error);
 
 require("./startup/db")();
 
