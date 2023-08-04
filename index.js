@@ -6,6 +6,7 @@ const express = require("express");
 const app = express();
 
 require("./startup/routes")(app);
+require("./startup/db")();
 
 new winston.Logger({
   transports: [
@@ -32,8 +33,6 @@ if (!config.get("jwtPrivateKey")) {
   console.error("FATAL ERROR: jwtPrivateKey is not defined!");
   process.exit(1);
 }
-
-require("./startup/db")();
 
 const port = process.env.PORT || 3000;
 const server = app
