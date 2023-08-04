@@ -40,9 +40,9 @@ router.post(
     const { categoryId, description, price, title } = req.body;
     const authorId = req.user._id;
 
-    const listing = { authorId, categoryId, description, price, title };
+    let listing = { authorId, categoryId, description, price, title };
     listing.images = req.images.map((fileName) => ({ fileName }));
-    new Listing(listing);
+    listing = new Listing(listing);
     await listing.save();
 
     res.send(mapListing(listing));
