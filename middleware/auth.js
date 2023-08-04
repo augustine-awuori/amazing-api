@@ -1,3 +1,4 @@
+const config = require("config");
 const jwt = require("jsonwebtoken");
 
 module.exports = (req, res, next) => {
@@ -8,7 +9,7 @@ module.exports = (req, res, next) => {
       .send({ error: "Access denied. Login to get access." });
 
   try {
-    const payload = jwt.verify(token, process.env.JWT_PRIVATE_KEY);
+    const payload = jwt.verify(token, config.get("jwtPrivateKey"));
     req.user = payload;
     next();
   } catch (err) {
