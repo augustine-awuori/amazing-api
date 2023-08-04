@@ -1,33 +1,10 @@
-require("express-async-errors");
-const winston = require("winston");
-require("winston-mongodb");
 const config = require("config");
 const express = require("express");
 const app = express();
 
+require("./startup/logging");
 require("./startup/routes")(app);
 require("./startup/db")();
-
-new winston.Logger({
-  transports: [
-    new winston.transports.File({
-      handleExceptions: true,
-      handleRejections: true,
-      filename: "uncaughtExceptions.log",
-    }),
-  ],
-});
-
-process.on("unhandledRejection", (ex) => {
-  throw ex;
-});
-
-winston.configure({
-  transports: [
-    new winston.transports.File({ filename: "logfile.log" }),
-    new winston.transports.MongoDB({ db: config.get("db"), level: "info" }),
-  ],
-});
 
 if (!config.get("jwtPrivateKey")) {
   console.error("FATAL ERROR: jwtPrivateKey is not defined!");
