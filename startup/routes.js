@@ -1,5 +1,4 @@
 const cors = require("cors");
-const compression = require("compression");
 const express = require("express");
 const serveStatic = require("serve-static");
 
@@ -13,7 +12,6 @@ const users = require("../routes/users");
 module.exports = function (app) {
   app.use(express.json());
   app.use(serveStatic("public", { acceptRanges: false }));
-  app.use(compression());
   app.use(cors({ origin: "*" }));
   app.use("/api/auth", auth);
   app.use("/api/categories", categories);
