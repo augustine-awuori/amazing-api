@@ -14,7 +14,7 @@ const s3 = new AWS.S3();
 async function saveImage(image) {
   return await s3
     .upload({
-      Body: Buffer.from(image.data),
+      Body: image.buffer,
       Bucket: config.get("bucket"),
       Key: image.filename,
     })
