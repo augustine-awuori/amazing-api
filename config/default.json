@@ -1,4 +1,6 @@
 {
+  "awsAccessKey": "",
+  "awsSecretAccessKey": "",
   "db": "",
   "jwtPrivateKey": "",
   "maxImagesCount": 3,
