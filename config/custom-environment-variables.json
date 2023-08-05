@@ -1,1 +1,6 @@
-{ "db": "mart_db", "jwtPrivateKey": "mart_jwtPrivateKey" }
+{
+  "awsAccessKey": "mart_awsAccessKey",
+  "awsSecretAccessKey": "mart_awsSecretAccessKey",
+  "db": "mart_db",
+  "jwtPrivateKey": "mart_jwtPrivateKey"
+}

@@ -3,6 +3,8 @@ const multer = require("multer");
 const express = require("express");
 const router = express.Router();
 const config = require("config");
+const AWS = require("aws-sdk");
+const fs = require("fs");
 
 const {
   imageUnmapper,
@@ -25,6 +27,16 @@ const upload = multer({
   limits: { fieldSize: 25 * 1024 * 1024 },
 });
 
+AWS.config.update({
+  credentials: {
+    accessKeyId: config.get("mart_awsAccessKey"),
+    secretAccessKey: config.get("mart_awsSecretAccessKey"),
+  },
+  region: "us-east-1",
+});
+
+const s3 = new AWS.S3();
+
 router.post(
   "/",
   [
@@ -34,18 +46,27 @@ router.post(
     validateUser,
     validateCategoryId,
     validator(validateListing),
-    imageResize,
   ],
   async (req, res) => {
     const { categoryId, description, price, title } = req.body;
     const authorId = req.user._id;
 
     let listing = { authorId, categoryId, description, price, title };
-    listing.images = req.images.map((fileName) => ({ fileName }));
+    listing.images = (req.files || []).map(async (file) => {
+      const c = await s3
+        .upload({
+          Body: fs.createReadStream(file.path),
+          Bucket: "kisii-universe-mart-bucket",
+          Key: file.filename,
+        })
+        .promise();
+
+      return { url: c.Location };
+    });
     listing = new Listing(listing);
     await listing.save();
 
-    res.send(mapListing(listing));
+    res.send(listing);
   }
 );
 
@@ -80,7 +101,7 @@ router.get("/:id", async (req, res) => {
     ({ authorId }) => authorId.toString() === req.params.id
   );
 
-  res.send(await mapListings(listings));
+  res.send(listings);
 });
 
 router.delete("/:id", [auth, validateDeleteAuthor], async (req, res) => {
