@@ -1,1 +1,4 @@
-{ "assetsBaseUrl": "https://dry-wave-89045-4354397f63ac.herokuapp.com/assets/" }
+{
+  "assetsBaseUrl": "https://kisii-universe-mart-bucket.s3.amazonaws.com/",
+  "bucket": "kisii-universe-mart-bucket"
+}

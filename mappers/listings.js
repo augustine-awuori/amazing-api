@@ -6,18 +6,16 @@ const { User } = require("../models/user");
 
 const outputFolder = "public/assets/";
 
-const mapImage = (image) => {
-  const baseUrl = config.get("assetsBaseUrl");
-
-  return {
-    url: `${baseUrl}${image.fileName}_full.jpg`,
-    thumbnailUrl: `${baseUrl}${image.fileName}_thumb.jpg`,
-  };
-};
+const mapImage = (image) =>
+  image?.fileName
+    ? {
+        url: `${config.get("assetsBaseUrl")}${image.fileName}`,
+      }
+    : null;
 
 const mapAuthorImages = (author) => {
-  if (author.avatar) author.avatar = mapImage(author.avatar);
-  if (author.coverPhoto) author.coverPhoto = mapImage(author.coverPhoto);
+  // if (author.avatar) author.avatar = mapImage(author.avatar);
+  // if (author.coverPhoto) author.coverPhoto = mapImage(author.coverPhoto);
 
   return author;
 };
