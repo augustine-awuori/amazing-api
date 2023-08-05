@@ -13,11 +13,9 @@ AWS.config.update({
 const s3 = new AWS.S3();
 
 async function saveImage(image) {
-  const imageStream = fs.createReadStream(image.path);
-
   return await s3
     .upload({
-      Body: image,
+      Body: Buffer.from(fs.readFileSync(image.path)),
       Bucket: config.get("bucket"),
       ContentType: "image/jpeg",
       Key: image.filename,
