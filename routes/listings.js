@@ -42,8 +42,8 @@ router.post(
     let listing = { authorId, categoryId, description, price, title };
     if (req.files) {
       listing.images = req.files.map(async (file) => {
-        await saveImage(file);
-        return { fileName: file.filename };
+        const result = await saveImage(file);
+        return { fileName: file.filename, location: result.Location };
       });
     }
     listing = new Listing(listing);
