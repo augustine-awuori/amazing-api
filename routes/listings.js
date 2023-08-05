@@ -3,8 +3,6 @@ const multer = require("multer");
 const express = require("express");
 const router = express.Router();
 const config = require("config");
-const AWS = require("aws-sdk");
-const fs = require("fs");
 
 const {
   imageUnmapper,
@@ -14,28 +12,18 @@ const {
 const { User } = require("../models/user");
 const { validateListing, Listing } = require("../models/listing");
 const auth = require("../middleware/auth");
-const imageResize = require("../middleware/imagesResize");
 const validateCategoryId = require("../middleware/validateCategoryId");
 const validateDeleteAuthor = require("../middleware/validateDeleteAuthor");
 const validateListingAuthor = require("../middleware/validateListingAuthor");
 const validateListingId = require("../middleware/validateListingId");
 const validateUser = require("../middleware/validateUser");
 const validator = require("../middleware/validate");
+const { saveImage } = require("../utility/saveImages");
 
 const upload = multer({
   dest: "uploads/",
   limits: { fieldSize: 25 * 1024 * 1024 },
 });
-
-AWS.config.update({
-  credentials: {
-    accessKeyId: config.get("awsAccessKey"),
-    secretAccessKey: config.get("awsSecretAccessKey"),
-  },
-  region: "us-east-1",
-});
-
-const s3 = new AWS.S3();
 
 router.post(
   "/",
@@ -52,21 +40,16 @@ router.post(
     const authorId = req.user._id;
 
     let listing = { authorId, categoryId, description, price, title };
-    listing.images = (req.files || []).map(async (file) => {
-      const c = await s3
-        .upload({
-          Body: fs.createReadStream(file.path),
-          Bucket: "kisii-universe-mart-bucket",
-          Key: file.filename,
-        })
-        .promise();
-
-      return { url: c.Location };
-    });
+    if (req.files) {
+      listing.images = req.files.map(async (file) => {
+        await saveImage(file);
+        return { fileName: file.filename };
+      });
+    }
     listing = new Listing(listing);
     await listing.save();
 
-    res.send(listing);
+    res.send(await mapListing(listing));
   }
 );
 
