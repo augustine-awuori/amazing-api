@@ -1,4 +1,4 @@
-const AWS = require("aws-sdk");
+const AWS = require("aws-sdk/clients");
 const config = require("config");
 const fs = require("fs");
 
