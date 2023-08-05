@@ -1,4 +1,4 @@
-const AWS = require("aws-sdk");
+const AWS = require("aws-sdk/clients");
 const config = require("config");
 const fs = require("fs");
 
@@ -17,8 +17,9 @@ async function saveImage(image) {
 
   return await s3
     .upload({
-      Body: imageStream,
+      Body: image,
       Bucket: config.get("bucket"),
+      ContentType: "image/jpeg",
       Key: image.filename,
     })
     .promise();
