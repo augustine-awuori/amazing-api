@@ -22,10 +22,12 @@ async function saveImage(image) {
 }
 
 function saveImages(images = []) {
-  return images.map(async (image) => {
+  const promises = images.map(async (image) => {
     const result = await saveImage(image);
     return result;
   });
+
+  return Promise.all(promises);
 }
 
 module.exports = { saveImage, saveImages };
