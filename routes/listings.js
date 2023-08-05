@@ -29,8 +29,8 @@ const upload = multer({
 
 AWS.config.update({
   credentials: {
-    accessKeyId: config.get("mart_awsAccessKey"),
-    secretAccessKey: config.get("mart_awsSecretAccessKey"),
+    accessKeyId: config.get("awsAccessKey"),
+    secretAccessKey: config.get("awsSecretAccessKey"),
   },
   region: "us-east-1",
 });
