@@ -1,5 +1,6 @@
 const AWS = require("aws-sdk");
 const config = require("config");
+const fs = require("fs");
 
 AWS.config.update({
   credentials: {
@@ -12,9 +13,11 @@ AWS.config.update({
 const s3 = new AWS.S3();
 
 async function saveImage(image) {
+  const imageStream = fs.createReadStream(image.path);
+
   return await s3
     .upload({
-      Body: image.buffer,
+      Body: imageStream,
       Bucket: config.get("bucket"),
       Key: image.filename,
     })
