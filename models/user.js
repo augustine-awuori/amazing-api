@@ -12,8 +12,8 @@ const schema = new mongoose.Schema({
     minlength: 3,
     maxlength: 255,
   },
-  avatar: Object,
-  coverPhoto: Object,
+  avatar: String,
+  coverPhoto: String,
   username: {
     type: String,
     maxlength: 50,

@@ -7,6 +7,7 @@ const { isValidObjectId } = require("mongoose");
 const config = require("config");
 
 const { mapUser, mapUsers } = require("../mappers/users");
+const { saveImage } = require("../utility/saveImages");
 const { User, validate } = require("../models/user");
 const auth = require("../middleware/auth");
 const avatarResize = require("../middleware/imageResize");
@@ -18,19 +19,21 @@ const upload = multer({ dest: "uploads/" });
 
 router.post(
   "/",
-  [upload.single("avatar"), avatarResize, validator(validate)],
+  [upload.single("avatar"), validator(validate)],
   async (req, res) => {
-    let user = await User.findOne({ username: req.body.username });
+    const username = req.body.username;
+    let user = await User.findOne({ username });
     if (user)
-      return res.status(400).send("A user with the username already exist.");
+      return res.status(400).send({ error: `${username} is already taken.` });
 
     user = new User(_.pick(req.body, ["name", "username", "password"]));
     const salt = await bcrypt.genSalt(10);
+    if (req.file) user.avatar = req.file?.filename;
     user.password = await bcrypt.hash(user.password, salt);
-    if (req.image) user.avatar = req.image;
     user.otherAccounts = { whatsapp: req.body.whatsapp };
 
     await user.save();
+    if (req.file) saveImage(req.file);
 
     res
       .header("x-auth-token", user.generateAuthToken())

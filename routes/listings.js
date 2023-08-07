@@ -44,7 +44,7 @@ router.post(
     listing = new Listing(listing);
 
     await listing.save();
-    saveImages(req.files);
+    await saveImages(req.files);
 
     res.send(await mapListing(listing));
   }

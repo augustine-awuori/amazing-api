@@ -1,12 +1,10 @@
 const fs = require("fs");
-const config = require("config");
 
 const { Category } = require("../models/category");
+const { mapImage } = require("../mappers/images");
 const { User } = require("../models/user");
 
 const outputFolder = "public/assets/";
-
-const mapImage = (imageUrl) => `${config.get("assetsBaseUrl")}${imageUrl}`;
 
 const mapListing = async (listing) => {
   const author = await User.findById(listing.authorId);
@@ -31,7 +29,7 @@ const imageUnmapper = (listing) =>
     }
   });
 
-const mapAvatar = (avatar) => (avatar ? mapImage(avatar) : avatar);
+const mapAvatar = (avatarUrl) => (avatarUrl ? mapImage(avatarUrl) : avatarUrl);
 
 module.exports = {
   imageUnmapper,

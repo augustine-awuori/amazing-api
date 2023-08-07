@@ -3,14 +3,7 @@ const config = require("config");
 
 const outputFolder = "public/assets/";
 
-const mapImage = (image) => {
-  const baseUrl = config.get("assetsBaseUrl");
-
-  return {
-    url: `${baseUrl}${image.fileName}_full.jpg`,
-    thumbnailUrl: `${baseUrl}${image.fileName}_thumb.jpg`,
-  };
-};
+const mapImage = (imageUrl) => `${config.get("assetsBaseUrl")}${imageUrl}`;
 
 const imageMapper = (item) => {
   if (item.images) item.images = item.images.map(mapImage);
