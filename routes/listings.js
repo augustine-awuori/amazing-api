@@ -12,6 +12,7 @@ const {
 const { User } = require("../models/user");
 const { validateListing, Listing } = require("../models/listing");
 const { saveImages } = require("../utility/saveImages");
+const { mapImage } = require("../mappers/images");
 const auth = require("../middleware/auth");
 const validateCategoryId = require("../middleware/validateCategoryId");
 const validateDeleteAuthor = require("../middleware/validateDeleteAuthor");
@@ -39,7 +40,7 @@ router.post(
     const { categoryId, description, price, title } = req.body;
 
     const authorId = req.user._id;
-    let images = req.files.map((file) => file.filename);
+    let images = req.files.map((file) => mapImage(file.filename));
     let listing = { authorId, categoryId, description, price, title, images };
     listing = new Listing(listing);
 
