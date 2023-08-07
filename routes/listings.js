@@ -81,7 +81,7 @@ router.get("/:id", async (req, res) => {
     ({ authorId }) => authorId.toString() === req.params.id
   );
 
-  res.send(listings);
+  res.send(await mapListings(listings));
 });
 
 router.delete("/:id", [auth, validateDeleteAuthor], async (req, res) => {
@@ -90,7 +90,7 @@ router.delete("/:id", [auth, validateDeleteAuthor], async (req, res) => {
   imageUnmapper(listing);
   await Listing.deleteOne({ _id: req.params.id });
 
-  res.send(listing);
+  res.send(await mapListing(listing));
 });
 
 router.patch(
@@ -105,7 +105,7 @@ router.patch(
       { new: true }
     );
 
-    res.send(listing);
+    res.send(await mapListing(listing));
   }
 );
 
