@@ -11,7 +11,7 @@ const schema = new mongoose.Schema({
     trim: true,
     type: String,
   },
-  images: [Object],
+  images: [String],
   price: {
     max: 1_000_000,
     min: 1,

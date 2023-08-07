@@ -6,10 +6,10 @@ const { User } = require("../models/user");
 
 const outputFolder = "public/assets/";
 
-const mapImage = (image) =>
-  image?.fileName
+const mapImage = (imageUrl) =>
+  imageUrl?.fileName
     ? {
-        url: `${config.get("assetsBaseUrl")}${image.fileName}`,
+        url: `${config.get("assetsBaseUrl")}${imageUrl}`,
       }
     : null;
 
@@ -21,7 +21,7 @@ const mapAuthorImages = (author) => {
 };
 
 const mapListing = async (listing) => {
-  const author = mapAuthorImages(await User.findById(listing.authorId));
+  const author = await User.findById(listing.authorId);
   const category = await Category.findById(listing.categoryId);
 
   author.password = "";
