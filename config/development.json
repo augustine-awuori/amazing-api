@@ -1,5 +1,5 @@
 {
   "assetsBaseUrl": "https://kisii-universe-mart-bucket.s3.amazonaws.com/",
-  "db": "mongodb://localhost/kisii-universe-mart-api",
-  "bucket": "kisii-universe-mart-bucket"
+  "bucket": "kisii-universe-mart-bucket",
+  "db": "mongodb://localhost/kisii-universe-mart-api"
 }

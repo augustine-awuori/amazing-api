@@ -1,4 +1,5 @@
 {
+  "assetsBaseUrl": "https://kisii-universe-mart-bucket.s3.amazonaws.com/",
   "awsAccessKey": "",
   "awsSecretAccessKey": "",
   "db": "",

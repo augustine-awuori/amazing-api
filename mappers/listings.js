@@ -6,7 +6,9 @@ const { User } = require("../models/user");
 
 const outputFolder = "public/assets/";
 
-const mapImage = (imageUrl) => `${config.get("assetsBaseUrl")}${imageUrl}`;
+const mapImage = (imageUrl) => ({
+  url: `${config.get("assetsBaseUrl")}${imageUrl}`,
+});
 
 const mapListing = async (listing) => {
   const author = await User.findById(listing.authorId);
