@@ -4,14 +4,10 @@ const express = require("express");
 const router = express.Router();
 const config = require("config");
 
-const {
-  imageUnmapper,
-  mapListing,
-  mapListings,
-} = require("../mappers/listings");
+const { mapListing, mapListings } = require("../mappers/listings");
 const { User } = require("../models/user");
 const { validateListing, Listing } = require("../models/listing");
-const { saveImages } = require("../utility/saveImages");
+const { saveImages, deleteImages } = require("../utility/imageManager");
 const auth = require("../middleware/auth");
 const validateCategoryId = require("../middleware/validateCategoryId");
 const validateDeleteAuthor = require("../middleware/validateDeleteAuthor");
@@ -87,7 +83,7 @@ router.get("/:id", async (req, res) => {
 router.delete("/:id", [auth, validateDeleteAuthor], async (req, res) => {
   let listing = req.listing;
 
-  imageUnmapper(listing);
+  deleteImages(listing.images);
   await Listing.deleteOne({ _id: req.params.id });
 
   res.send(await mapListing(listing));

@@ -1,4 +1,4 @@
-const { mapImage } = require("./images");
+const { mapImage } = require("../utility/imageManager");
 
 const mapAvatar = (avatar) => (avatar ? mapImage(avatar) : avatar);
 

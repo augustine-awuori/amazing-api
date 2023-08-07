@@ -1,7 +1,7 @@
 const fs = require("fs");
 
 const { Category } = require("../models/category");
-const { mapImage } = require("../mappers/images");
+const { mapImage } = require("../utility/imageManager");
 const { User } = require("../models/user");
 
 const outputFolder = "public/assets/";

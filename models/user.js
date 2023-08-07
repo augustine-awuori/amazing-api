@@ -3,7 +3,7 @@ const Joi = require("joi");
 const jwt = require("jsonwebtoken");
 const config = require("config");
 
-const { mapImage } = require("../mappers/images");
+const { mapImage } = require("../utility/imageManager");
 
 const schema = new mongoose.Schema({
   aboutMe: {

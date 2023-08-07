@@ -1,17 +1,15 @@
 const _ = require("lodash");
-const bcrypt = require("bcrypt");
-const multer = require("multer");
-const express = require("express");
-const router = express.Router();
 const { isValidObjectId } = require("mongoose");
+const bcrypt = require("bcrypt");
 const config = require("config");
+const express = require("express");
+const multer = require("multer");
+const router = express.Router();
 
 const { mapUser, mapUsers } = require("../mappers/users");
-const { saveImage } = require("../utility/saveImages");
+const { saveImage, deleteImage } = require("../utility/imageManager");
 const { User, validate } = require("../models/user");
 const auth = require("../middleware/auth");
-const avatarResize = require("../middleware/imageResize");
-const imagesResize = require("../middleware/imagesResize");
 const validateUser = require("../middleware/validateUser");
 const validator = require("../middleware/validate");
 
@@ -32,8 +30,8 @@ router.post(
     user.password = await bcrypt.hash(user.password, salt);
     user.otherAccounts = { whatsapp: req.body.whatsapp };
 
+    if (req.file) await saveImage(req.file);
     await user.save();
-    if (req.file) saveImage(req.file);
 
     res
       .header("x-auth-token", user.generateAuthToken())
@@ -64,14 +62,8 @@ router.get("/:id", async (req, res) => {
 
 router.patch(
   "/",
-  [
-    auth,
-    validateUser,
-    upload.array("images", config.get("userImagesCount")),
-    imagesResize,
-  ],
+  [auth, validateUser, upload.array("images", config.get("userImagesCount"))],
   async (req, res) => {
-    console.log(req.files);
     const { aboutMe, name, instagram, twitter, whatsapp, username } = req.body;
     const user = await User.findById(req.user._id);
 
@@ -79,10 +71,10 @@ router.patch(
     if (user.username !== username) {
       const userByUsername = await User.findOne({ username });
       if (userByUsername)
-        return res
-          .status(400)
-          .send({ error: "The username is already taken." });
+        return res.status(400).send({ error: `${username} is already taken.` });
     }
+    const updatedUserImages = updateImages(req.files, user);
+    if (updatedUserImages) user = updatedUserImages;
     user.name = name;
     user.username = username;
     user.otherAccounts = { whatsapp, instagram, twitter };
@@ -92,5 +84,63 @@ router.patch(
     res.send({ token: user.generateAuthToken(), user: mapUser(user) });
   }
 );
+
+function updateImages(files = [], user) {
+  const avatar = files.find(({ fieldname }) => fieldname === "avatar");
+  const coverPhoto = files.find(({ fieldname }) => fieldname === "coverPhoto");
+
+  if (thereAreNoImages(files, user, avatar)) return;
+  if (isDeletingAvatar(avatar, user)) deleteImage(user.avatar);
+  if (isDeletingCoverPhoto(coverPhoto, user)) deleteImage(user.coverPhoto);
+  if (isUpdatingAvatar(avatar, user)) {
+    user.avatar = avatar.filename;
+    deleteImage(user.avatar);
+    saveImage(user.avatar);
+  }
+  if (isUpdatingCoverPhoto(coverPhoto, user)) {
+    user.coverPhoto = coverPhoto.filename;
+    deleteImage(user.coverPhoto);
+    saveImage(user.coverPhoto);
+  }
+  if (isAddingAvatar(avatar, user)) user.avatar = avatar.filename;
+  if (isAddingCoverPhoto(coverPhoto, user))
+    user.coverPhoto = coverPhoto.fieldname;
+
+  return user;
+}
+
+function isAddingAvatar(avatar, user) {
+  return avatar && !user?.avatar;
+}
+
+function isAddingCoverPhoto(coverPhoto, user) {
+  return coverPhoto && !user?.coverPhoto;
+}
+
+function isUpdatingCoverPhoto(coverPhoto, user) {
+  return coverPhoto && user?.coverPhoto;
+}
+
+function isUpdatingAvatar(avatar, user) {
+  return avatar && user?.avatar;
+}
+
+function isDeletingCoverPhoto(coverPhoto, user) {
+  return !coverPhoto && user?.coverPhoto;
+}
+
+function isDeletingAvatar(avatar, user) {
+  return !avatar && user?.avatar;
+}
+
+function thereAreNoImages(files, user, avatar) {
+  return (
+    !files.length &&
+    !avatar &&
+    !coverPhoto &&
+    !user?.avatar &&
+    !user?.coverPhoto
+  );
+}
 
 module.exports = router;

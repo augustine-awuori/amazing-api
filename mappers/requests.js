@@ -1,5 +1,5 @@
 const { Category } = require("../models/category");
-const { mapImage } = require("./images");
+const { mapImage } = require("../utility/imageManager");
 const { User } = require("../models/user");
 
 const mapAuthorImages = (author) => {
