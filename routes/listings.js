@@ -11,6 +11,7 @@ const {
 } = require("../mappers/listings");
 const { User } = require("../models/user");
 const { validateListing, Listing } = require("../models/listing");
+const { saveImages } = require("../utility/saveImages");
 const auth = require("../middleware/auth");
 const validateCategoryId = require("../middleware/validateCategoryId");
 const validateDeleteAuthor = require("../middleware/validateDeleteAuthor");
@@ -18,7 +19,6 @@ const validateListingAuthor = require("../middleware/validateListingAuthor");
 const validateListingId = require("../middleware/validateListingId");
 const validateUser = require("../middleware/validateUser");
 const validator = require("../middleware/validate");
-const { saveImage } = require("../utility/saveImages");
 
 const upload = multer({
   dest: "uploads/",
@@ -37,17 +37,14 @@ router.post(
   ],
   async (req, res) => {
     const { categoryId, description, price, title } = req.body;
-    const authorId = req.user._id;
 
-    let listing = { authorId, categoryId, description, price, title };
-    if (req.files) {
-      listing.images = req.files.map(async (file) => {
-        const result = await saveImage(file);
-        return { fileName: file.filename, location: result.Location };
-      });
-    }
+    const authorId = req.user._id;
+    let images = req.files.map((file) => file.filename);
+    let listing = { authorId, categoryId, description, price, title, images };
     listing = new Listing(listing);
+
     await listing.save();
+    saveImages(req.files);
 
     res.send(await mapListing(listing));
   }

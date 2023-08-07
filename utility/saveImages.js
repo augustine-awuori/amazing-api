@@ -15,7 +15,7 @@ const s3 = new AWS.S3();
 async function saveImage(image) {
   return await s3
     .upload({
-      Body: Buffer.from(fs.readFileSync(image.path)),
+      Body: fs.readFileSync(image.path),
       Bucket: config.get("bucket"),
       ContentType: "image/jpeg",
       Key: image.filename,
@@ -24,10 +24,7 @@ async function saveImage(image) {
 }
 
 function saveImages(images = []) {
-  const promises = images.map(async (image) => {
-    const result = await saveImage(image);
-    return result;
-  });
+  const promises = images.map(async (image) => await saveImage(image));
 
   return Promise.all(promises);
 }
