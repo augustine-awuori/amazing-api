@@ -15,6 +15,7 @@ const mapListing = async (listing) => {
   author.password = "";
   listing.author = author;
   listing.category = category;
+  listing.images = listing.images.map(mapImage);
 
   return listing;
 };
