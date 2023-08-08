@@ -73,11 +73,11 @@ router.patch(
       if (userByUsername)
         return res.status(400).send({ error: `${username} is already taken.` });
     }
-    const updatedUserImages = updateImages(req.files, user);
-    if (updatedUserImages) user = updatedUserImages;
     user.name = name;
     user.username = username;
     user.otherAccounts = { whatsapp, instagram, twitter };
+    const updated = updateImages(req.files, user);
+    if (updated) user = updated;
 
     await user.save();
 
@@ -89,22 +89,33 @@ function updateImages(files = [], user) {
   const avatar = files.find(({ fieldname }) => fieldname === "avatar");
   const coverPhoto = files.find(({ fieldname }) => fieldname === "coverPhoto");
 
-  if (thereAreNoImages(files, user, avatar)) return;
-  if (isDeletingAvatar(avatar, user)) deleteImage(user.avatar);
-  if (isDeletingCoverPhoto(coverPhoto, user)) deleteImage(user.coverPhoto);
-  if (isUpdatingAvatar(avatar, user)) {
-    user.avatar = avatar.filename;
+  if (thereAreNoImages(files, user, avatar)) return user;
+  if (isDeletingAvatar(avatar, user)) {
+    user.avatar = "";
     deleteImage(user.avatar);
-    saveImage(user.avatar);
+  }
+  if (isDeletingCoverPhoto(coverPhoto, user)) {
+    user.coverPhoto = "";
+    deleteImage(user.coverPhoto);
+  }
+  if (isUpdatingAvatar(avatar, user)) {
+    deleteImage(user.avatar);
+    user.avatar = avatar.filename;
+    saveImage(avatar);
   }
   if (isUpdatingCoverPhoto(coverPhoto, user)) {
-    user.coverPhoto = coverPhoto.filename;
     deleteImage(user.coverPhoto);
-    saveImage(user.coverPhoto);
+    user.coverPhoto = coverPhoto.filename;
+    saveImage(coverPhoto);
   }
-  if (isAddingAvatar(avatar, user)) user.avatar = avatar.filename;
-  if (isAddingCoverPhoto(coverPhoto, user))
+  if (isAddingAvatar(avatar, user)) {
+    user.avatar = avatar.filename;
+    saveImage(avatar);
+  }
+  if (isAddingCoverPhoto(coverPhoto, user)) {
     user.coverPhoto = coverPhoto.fieldname;
+    saveImage(coverPhoto);
+  }
 
   return user;
 }
