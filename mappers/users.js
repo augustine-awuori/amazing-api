@@ -1,10 +1,7 @@
-const { mapImage } = require("../utility/imageManager");
-
-const mapAvatar = (avatar) => (avatar ? mapImage(avatar) : avatar);
+const { mapAuthorImages } = require("../utility/imageManager");
 
 const mapUser = (user) => {
-  user.avatar = mapAvatar(user?.avatar);
-  user.coverPhoto = mapAvatar(user?.coverPhoto);
+  user = mapAuthorImages(user);
   user.password = "";
 
   return user;

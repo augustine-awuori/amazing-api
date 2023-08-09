@@ -1,27 +1,14 @@
-const { Category } = require("../models/category");
-const { mapImage } = require("../utility/imageManager");
-const { User } = require("../models/user");
+const { mapAuthorImages } = require("../utility/imageManager");
 
-const mapAuthorImages = (author) => {
-  if (author.avatar) author.avatar = mapImage(author.avatar);
-  if (author.coverPhoto) author.coverPhoto = mapImage(author.coverPhoto);
+const mapRequest = (request) => {
+  if (!request) return request;
 
-  return author;
-};
-
-const mapRequest = async (request) => {
-  const author = mapAuthorImages(await User.findById(request.authorId));
-  const category = await Category.findById(request.categoryId);
-
-  author.password = "";
-  request.author = author;
-  request.category = category;
+  request.author = mapAuthorImages(request.author);
 
   return request;
 };
 
-const mapRequests = async (requests) =>
-  await Promise.all(requests.map(mapRequest));
+const mapRequests = (requests) => requests.map(mapRequest);
 
 module.exports = {
   mapRequest,

@@ -37,10 +37,30 @@ function deleteImage(image) {
   });
 }
 
-function deleteImages(images = []) {
-  images.forEach(deleteImage);
-}
+const deleteImages = (images = []) => images.forEach(deleteImage);
 
-const mapImage = (imageUrl) => `${config.get("assetsBaseUrl")}${imageUrl}`;
+const needsMapping = (imageUrl) => imageUrl && !imageUrl.startsWith("https://");
 
-module.exports = { deleteImage, deleteImages, mapImage, saveImage, saveImages };
+const mapImage = (imageUrl = "") =>
+  needsMapping(imageUrl)
+    ? `${config.get("assetsBaseUrl")}${imageUrl}`
+    : imageUrl;
+
+const mapAuthorImages = (author) => {
+  author.avatar = mapImage(author.avatar);
+  author.coverPhoto = mapImage(author.coverPhoto);
+
+  return author;
+};
+
+const mapImages = (images = []) => images.map(mapImage);
+
+module.exports = {
+  deleteImage,
+  deleteImages,
+  mapAuthorImages,
+  mapImage,
+  mapImages,
+  saveImage,
+  saveImages,
+};

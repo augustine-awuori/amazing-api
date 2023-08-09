@@ -2,10 +2,8 @@ const Joi = require("joi");
 const mongoose = require("mongoose");
 
 const schema = new mongoose.Schema({
-  author: Object,
-  authorId: mongoose.Types.ObjectId,
-  category: Object,
-  categoryId: mongoose.Types.ObjectId,
+  author: { type: mongoose.Types.ObjectId, ref: "User" },
+  category: { type: mongoose.Types.ObjectId, ref: "Category" },
   description: {
     maxlength: 200,
     trim: true,
