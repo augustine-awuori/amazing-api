@@ -2,10 +2,11 @@ const express = require("express");
 const router = express.Router();
 const { isValidObjectId } = require("mongoose");
 
-const { mapRequest, mapRequests } = require("../mappers/requests");
+const { mapRequest } = require("../mappers/requests");
 const { Request, validateRequest } = require("../models/request");
 const { User } = require("../models/user");
 const auth = require("../middleware/auth");
+const service = require("../services/requestsService");
 const validateCategoryId = require("../middleware/validateCategoryId");
 const validateRequestAuthor = require("../middleware/validateRequestAuthor");
 const validateUser = require("../middleware/validateUser");
@@ -15,20 +16,20 @@ router.post(
   "/",
   [auth, validateUser, validateCategoryId, validator(validateRequest)],
   async (req, res) => {
-    const authorId = req.user._id;
-    const { categoryId, description, title } = req.body;
+    const author = req.user._id;
+    const { categoryId: category, description, title } = req.body;
 
-    const request = new Request({ authorId, categoryId, description, title });
+    const request = new Request({ author, category, description, title });
     await request.save();
 
-    res.send(mapRequest(request));
+    res.send(await service.findById(request._id));
   }
 );
 
 router.get("/", async (req, res) => {
-  const requests = await Request.find({}).sort("-_id");
+  const requests = await service.getAll();
 
-  res.send(await mapRequests(requests));
+  res.send(requests);
 });
 
 router.get("/:id", async (req, res) => {
@@ -37,31 +38,25 @@ router.get("/:id", async (req, res) => {
     return res.status(400).send({ error: "Invalid ID." });
 
   const user = await User.findById(id);
-
   if (!user) {
-    let request = await Request.findById(id);
+    const request = await service.findById(id);
 
-    if (!request)
-      return res
-        .status(404)
-        .send({ error: "Request with the gived ID doesn't exist." });
-
-    return request
-      ? res.send(await mapRequest(request))
-      : res.status(400).send({ error: "Id provided doesn't exist." });
+    request
+      ? res.send(request)
+      : res.status(404).send({ error: "Request doesn't exist." });
   }
 
-  const requests = (await Request.find({}).sort("-_id")).filter(
-    ({ authorId }) => authorId.toString() === req.params.id
+  const requests = (await service.getAll()).filter(
+    ({ author }) => author._id.toString() === id
   );
 
-  res.send(await mapRequests(requests));
+  res.send(requests);
 });
 
-router.delete("/:id", validateRequestAuthor, async (req, res) => {
+router.delete("/:id", [auth, validateRequestAuthor], async (req, res) => {
   const deletedRequest = await Request.findByIdAndDelete(req.params.id);
 
-  res.send(mapRequest(deletedRequest));
+  res.send(await mapRequest(deletedRequest));
 });
 
 router.put(
@@ -74,19 +69,22 @@ router.put(
     validator(validateRequest),
   ],
   async (req, res) => {
-    const { categoryId, title, description } = req.body;
-    let request = await Request.findById(req.params.id);
-    if (!request)
-      return res
-        .status(400)
-        .send({ error: "Request intended to be updated doesn't exist" });
+    const { categoryId: category, title, description } = req.body;
+    const id = req.params.id;
 
-    request.categoryId = categoryId;
+    if (!isValidObjectId(id))
+      return res.status(404).send({ error: "Request doesn't exist" });
+
+    let request = await service.findById(id);
+    if (!request)
+      return res.status(404).send({ error: "This request doesn't exist" });
+
+    request.category = category;
     request.title = title;
     request.description = description;
     await request.save();
 
-    res.send(mapRequest(request));
+    res.send(request);
   }
 );
 

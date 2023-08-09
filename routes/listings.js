@@ -1,14 +1,15 @@
-const { isValidObjectId } = require("mongoose");
+const mongoose = require("mongoose");
 const multer = require("multer");
 const express = require("express");
 const router = express.Router();
 const config = require("config");
 
-const { mapListing, mapListings } = require("../mappers/listings");
+const { mapListing } = require("../mappers/listings");
 const { User } = require("../models/user");
 const { validateListing, Listing } = require("../models/listing");
 const { saveImages, deleteImages } = require("../utility/imageManager");
 const auth = require("../middleware/auth");
+const service = require("../services/listingsService");
 const validateCategoryId = require("../middleware/validateCategoryId");
 const validateDeleteAuthor = require("../middleware/validateDeleteAuthor");
 const validateListingAuthor = require("../middleware/validateListingAuthor");
@@ -32,52 +33,46 @@ router.post(
     validator(validateListing),
   ],
   async (req, res) => {
-    const { categoryId, description, price, title } = req.body;
+    const { categoryId: category, description, price, title } = req.body;
 
-    const authorId = req.user._id;
+    const author = req.user._id;
     let images = req.files.map((file) => file.filename);
-    let listing = { authorId, categoryId, description, price, title, images };
+    let listing = { author, category, description, price, title, images };
     listing = new Listing(listing);
 
     await listing.save();
     await saveImages(req.files);
 
-    res.send(await mapListing(listing));
+    res.send(await service.findById(listing._id));
   }
 );
 
 router.get("/", async (req, res) => {
-  const listings = await Listing.find({}).sort("-_id");
+  const listings = await service.getAll();
 
-  const resources = await mapListings(listings);
-
-  res.send(resources);
+  res.send(listings);
 });
 
 router.get("/:id", async (req, res) => {
   const id = req.params.id;
-  if (!isValidObjectId(id))
+  if (!mongoose.isValidObjectId(id))
     return res.status(400).send({ error: "Invalid ID." });
 
   const user = await User.findById(id);
   if (!user) {
-    let listing = await Listing.findById(id);
-
-    if (!listing)
-      return res
-        .status(404)
-        .send({ error: "Listing with the gived ID doesn't exist." });
+    const listing = await service.findById(id);
 
     return listing
-      ? res.send(await mapListing(listing))
-      : res.status(404).send({ error: "Id provided doesn't exist." });
+      ? res.send(listing)
+      : res.status(404).send({ error: "Listing  doesn't exist." });
   }
 
-  const listings = (await Listing.find({}).sort("-_id")).filter(
-    ({ authorId }) => authorId.toString() === req.params.id
+  const userListings = res.send(
+    (await service.getAll()).filter(
+      ({ author }) => author._id.toString() === id
+    )
   );
-
-  res.send(await mapListings(listings));
+  res.send(userListings);
 });
 
 router.delete("/:id", [auth, validateDeleteAuthor], async (req, res) => {
@@ -91,17 +86,25 @@ router.delete("/:id", [auth, validateDeleteAuthor], async (req, res) => {
 
 router.patch(
   "/:id",
-  [auth, validateListingId, validateListingAuthor, validateCategoryId],
+  [
+    auth,
+    validateUser,
+    validateListingId,
+    validateListingAuthor,
+    validateCategoryId,
+  ],
   async (req, res) => {
-    const { _id, categoryId, description, price, title } = req.body;
+    const { _id, categoryId: category, description, price, title } = req.body;
 
-    const listing = await Listing.updateOne(
-      { _id },
-      { $set: { categoryId, description, title, price } },
+    const listing = await service.findByIdAndUpdate(
+      _id,
+      { $set: { category, description, title, price } },
       { new: true }
     );
 
-    res.send(await mapListing(listing));
+    listing
+      ? res.send(listing)
+      : res.status(404).send({ error: "This listing doesn't exist" });
   }
 );
 
