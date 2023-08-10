@@ -3,7 +3,7 @@
   "awsAccessKey": "",
   "awsSecretAccessKey": "",
   "db": "",
-  "jwtPrivateKey": "",
+  "jwtPrivateKey": "something",
   "maxImagesCount": 3,
   "userImagesCount": 2
 }
