@@ -43,6 +43,7 @@ const schema = new mongoose.Schema({
       return this.isAdmin;
     },
   },
+  expoPushToken: String,
   otherAccounts: Object,
   timestamp: {
     type: Number,
