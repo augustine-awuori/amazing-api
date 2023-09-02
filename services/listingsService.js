@@ -26,4 +26,9 @@ const findByIdAndUpdate = async (id, update, options) => {
   return mapListing(listing);
 };
 
-module.exports = { findByIdAndUpdate, getAll, findById };
+const findByIdAndDelete = async (id) => {
+  if (isValidObjectId(id))
+    return mapListing(await Listing.findByIdAndDelete(id));
+};
+
+module.exports = { findByIdAndDelete, findByIdAndUpdate, getAll, findById };

@@ -17,7 +17,7 @@ router.post(
   [auth, validateUser, validateCategoryId, validator(validateRequest)],
   async (req, res) => {
     const author = req.user._id;
-    const { categoryId: category, description, title } = req.body;
+    const { category, description, title } = req.body;
 
     const request = new Request({ author, category, description, title });
     await request.save();
@@ -26,7 +26,7 @@ router.post(
   }
 );
 
-router.get("/", async (req, res) => {
+router.get("/", async (_req, res) => {
   const requests = await service.getAll();
 
   res.send(requests);
@@ -49,7 +49,6 @@ router.get("/:id", async (req, res) => {
   const requests = (await service.getAll()).filter(
     ({ author }) => author._id.toString() === id
   );
-
   res.send(requests);
 });
 
@@ -69,7 +68,7 @@ router.put(
     validator(validateRequest),
   ],
   async (req, res) => {
-    const { categoryId: category, title, description } = req.body;
+    const { category, title, description } = req.body;
     const id = req.params.id;
 
     if (!isValidObjectId(id))
