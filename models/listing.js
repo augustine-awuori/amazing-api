@@ -35,8 +35,8 @@ const Listing = mongoose.model("Listing", schema);
 
 const validate = (listing) =>
   Joi.object({
-    authorId: Joi.string(),
-    categoryId: Joi.string(),
+    author: Joi.string(),
+    category: Joi.string(),
     description: Joi.string().max(200).allow(""),
     images: Joi.array().min(1).max(3),
     price: Joi.number().required().min(1).max(1_000_000),

@@ -17,10 +17,7 @@ const validateListingId = require("../middleware/validateListingId");
 const validateUser = require("../middleware/validateUser");
 const validator = require("../middleware/validate");
 
-const upload = multer({
-  dest: "uploads/",
-  limits: { fieldSize: 25 * 1024 * 1024 },
-});
+const upload = multer({ dest: "uploads/" });
 
 router.post(
   "/",
@@ -33,21 +30,27 @@ router.post(
     validator(validateListing),
   ],
   async (req, res) => {
-    const { categoryId: category, description, price, title } = req.body;
+    const { category, description, price, title } = req.body;
 
     const author = req.user._id;
     let images = req.files.map((file) => file.filename);
-    let listing = { author, category, description, price, title, images };
-    listing = new Listing(listing);
+    const listing = new Listing({
+      author,
+      category,
+      description,
+      price,
+      title,
+      images,
+    });
 
     await listing.save();
-    await saveImages(req.files);
+    if (req.files) await saveImages(req.files);
 
     res.send(await service.findById(listing._id));
   }
 );
 
-router.get("/", async (req, res) => {
+router.get("/", async (_req, res) => {
   const listings = await service.getAll();
 
   res.send(listings);
@@ -67,10 +70,8 @@ router.get("/:id", async (req, res) => {
       : res.status(404).send({ error: "Listing  doesn't exist." });
   }
 
-  const userListings = res.send(
-    (await service.getAll()).filter(
-      ({ author }) => author._id.toString() === id
-    )
+  const userListings = (await service.getAll()).filter(
+    ({ author }) => author._id.toString() === id
   );
   res.send(userListings);
 });
@@ -79,9 +80,9 @@ router.delete("/:id", [auth, validateDeleteAuthor], async (req, res) => {
   let listing = req.listing;
 
   deleteImages(listing.images);
-  await Listing.deleteOne({ _id: req.params.id });
+  listing = await service.findByIdAndDelete(req.params.id);
 
-  res.send(await mapListing(listing));
+  res.send(listing);
 });
 
 router.patch(
@@ -94,7 +95,7 @@ router.patch(
     validateCategoryId,
   ],
   async (req, res) => {
-    const { _id, categoryId: category, description, price, title } = req.body;
+    const { _id, category, description, price, title } = req.body;
 
     const listing = await service.findByIdAndUpdate(
       _id,

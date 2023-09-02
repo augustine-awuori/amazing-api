@@ -29,8 +29,8 @@ const Request = mongoose.model(
 
 const validate = (listing) =>
   Joi.object({
-    authorId: Joi.string(),
-    categoryId: Joi.string(),
+    author: Joi.string(),
+    category: Joi.string(),
     description: Joi.string().max(255).allow(""),
     title: Joi.string().required().min(2).max(50),
   }).validate(listing);

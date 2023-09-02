@@ -4,9 +4,7 @@ module.exports = async (req, res, next) => {
   const listing = await getListing(req.params.id);
 
   if (!listing)
-    return res
-      .status(400)
-      .send({ error: "Operation terminated. The listing is already deleted." });
+    return res.status(200).send({ error: "The listing is already deleted." });
   req.listing = listing;
 
   next();
