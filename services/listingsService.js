@@ -10,8 +10,10 @@ const getAll = async (filter = {}) => {
   return mapListings(listings);
 };
 
-const findById = async (listingId) => {
-  const listing = await populateAndProject(Listing.findById(listingId));
+const findById = async (id) => {
+  if (!isValidObjectId(id)) return;
+
+  const listing = await populateAndProject(Listing.findById(id));
 
   return mapListing(listing);
 };

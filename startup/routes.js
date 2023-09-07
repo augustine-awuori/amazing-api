@@ -7,6 +7,7 @@ const categories = require("../routes/categories");
 const error = require("../middleware/error");
 const expoPushTokens = require("../routes/expoPushTokens");
 const listings = require("../routes/listings");
+const posts = require("../routes/posts");
 const requests = require("../routes/requests");
 const users = require("../routes/users");
 
@@ -17,6 +18,7 @@ module.exports = function (app) {
   app.use("/api/auth", auth);
   app.use("/api/categories", categories);
   app.use("/api/listings", listings);
+  app.use("/api/posts", posts);
   app.use("/api/requests", requests);
   app.use("/api/users", users);
   app.use("/api/expoPushTokens", expoPushTokens);
