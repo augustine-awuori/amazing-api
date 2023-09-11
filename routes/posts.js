@@ -5,11 +5,11 @@ const mongoose = require("mongoose");
 const { mapPost } = require("../mappers/posts");
 const { validatePost, Post } = require("../models/post");
 const auth = require("../middleware/auth");
+const populateReqPost = require("../middleware/populateReqPost");
 const service = require("../services/posts");
 const userService = require("../services/users");
-const validateCategoryId = require("../middleware/validateCategoryId");
-const validateItemAuthor = require("../middleware/validateItemAuthor");
-const validateItemId = require("../middleware/validateItemId");
+const validatePostAuthor = require("../middleware/validatePostAuthor");
+const validatePostId = require("../middleware/validatePostId");
 const validateUser = require("../middleware/validateUser");
 const validator = require("../middleware/validate");
 
@@ -42,7 +42,7 @@ router.get("/:id", async (req, res) => {
 
     return post
       ? res.send(post)
-      : res.status(404).send({ error: "This post  doesn't exist." });
+      : res.status(404).send({ error: "This post doesn't exist." });
   }
 
   const userPosts = (await service.getAll()).filter(
@@ -51,32 +51,29 @@ router.get("/:id", async (req, res) => {
   res.send(userPosts);
 });
 
-router.delete("/:id", auth, async (req, res) => {
-  const post = await service.findById(req.params.id);
+router.delete(
+  "/:id",
+  [auth, populateReqPost, validatePostAuthor],
+  async (req, res) => {
+    const deleted = await service.findByIdAndDelete(req.params.id);
 
-  if (req.user.username !== post?.author?.username)
-    return res
-      .status(403)
-      .send({ error: "Unauthorised! You're not the author" });
-
-  res.send(await service.findByIdAndDelete(req.params.id));
-});
+    res.send(deleted);
+  }
+);
 
 router.patch(
   "/:id",
   [
     auth,
     validateUser,
-    validateItemId(Post.findById),
-    validateItemAuthor,
-    validateCategoryId,
+    validatePostId,
+    validatePostAuthor,
+    validator(validatePost),
   ],
   async (req, res) => {
-    const { _id, text } = req.body;
-
     const post = await service.findByIdAndUpdate(
-      _id,
-      { $set: { text, edited: true } },
+      req.params.id,
+      { $set: { text: req.body.text, edited: true } },
       { new: true }
     );
 

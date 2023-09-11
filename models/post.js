@@ -25,10 +25,7 @@ const Post = mongoose.model(
 );
 
 const validate = (post) =>
-  Joi.object({
-    author: Joi.string(),
-    text: Joi.string().min(2).max(255),
-  }).validate(post);
+  Joi.object({ text: Joi.string().min(2).max(255) }).validate(post);
 
 module.exports.validatePost = validate;
 module.exports.Post = Post;

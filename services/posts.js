@@ -4,8 +4,11 @@ const { mapPosts, mapPost } = require("../mappers/posts");
 const { populateAndProject } = require("./main");
 const { Post } = require("../models/post");
 
-const getAll = async (filter = {}) =>
-  mapPosts(await populateAndProject(Post.find(filter).sort("-_id")));
+const getAll = async (filter = {}) => {
+  const posts = await populateAndProject(Post.find(filter).sort("-_id"));
+
+  return mapPosts(posts);
+};
 
 const findById = async (postId) => {
   if (!isValidObjectId(postId))
