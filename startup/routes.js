@@ -8,6 +8,7 @@ const error = require("../middleware/error");
 const expoPushTokens = require("../routes/expoPushTokens");
 const listings = require("../routes/listings");
 const posts = require("../routes/posts");
+const products = require("../routes/products");
 const requests = require("../routes/requests");
 const shops = require("../routes/shops");
 const types = require("../routes/types");
@@ -21,6 +22,7 @@ module.exports = function (app) {
   app.use("/api/categories", categories);
   app.use("/api/listings", listings);
   app.use("/api/posts", posts);
+  app.use("/api/products", products);
   app.use("/api/requests", requests);
   app.use("/api/shops", shops);
   app.use("/api/types", types);

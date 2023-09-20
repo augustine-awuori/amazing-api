@@ -33,7 +33,6 @@ router.post(
       return res.status(500).send({ error: "Couldn't process image" });
 
     const shop = new Shop({ author, name, type, image: image.filename });
-
     await shop.save();
     await saveImage(image);
 
