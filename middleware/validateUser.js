@@ -1,8 +1,8 @@
-const { User } = require("../models/user");
 const _ = require("lodash");
+const service = require("../services/users");
 
 module.exports = async (req, res, next) => {
-  const user = await User.findById(req.user._id);
+  const user = await service.findById(req.user._id);
 
   if (!user) return res.status(400).send({ error: "Invalid user" });
   req.user = _.pick(user, [
