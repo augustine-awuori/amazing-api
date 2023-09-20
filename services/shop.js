@@ -1,10 +1,10 @@
 const { isValidObjectId } = require("mongoose");
 
-const { Listing } = require("../models/listing");
-const { mapListings, mapListing } = require("../mappers/listings");
-const { populateAndProject } = require("./main");
 const { Shop } = require("../models/shop");
 const { mapShop, mapShops } = require("../mappers/shops");
+
+const populateAndProject = (query) =>
+  query.populate("author", "-password").populate("type");
 
 const getAll = async (filter = {}) => {
   const shops = await populateAndProject(Shop.find(filter).sort("-_id"));
