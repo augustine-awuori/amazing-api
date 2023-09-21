@@ -24,7 +24,13 @@ router.post(
     if (!image)
       return res.status(500).send({ error: "Couldn't process image" });
 
-    const product = new Product({ author, name, price, image, shop });
+    const product = new Product({
+      author,
+      name,
+      price,
+      image: image.filename,
+      shop,
+    });
     await product.save();
     await saveImage(image);
 
