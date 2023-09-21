@@ -25,11 +25,11 @@ const findByIdAndUpdate = async (id, update, options) => {
 
 const findByIdAndDelete = async (id) => {
   if (isValidObjectId(id))
-    return mapListing(await Product.findByIdAndDelete(id));
+    return await populateAndProject(Product.findByIdAndDelete(id));
 };
 
 const findProductsOf = async (shopId) => {
-  const products = await Product.find({ shop: shopId });
+  const products = await populateAndProject(Product.find({ shop: shopId }));
 
   return mapProducts(products);
 };
