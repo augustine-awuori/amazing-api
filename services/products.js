@@ -25,7 +25,18 @@ const findByIdAndUpdate = async (id, update, options) => {
 
 const findByIdAndDelete = async (id) => {
   if (isValidObjectId(id))
-    return mapListing(await Listing.findByIdAndDelete(id));
+    return mapListing(await Product.findByIdAndDelete(id));
 };
 
-module.exports = { findById, findByIdAndDelete, findByIdAndUpdate };
+const findProductsOf = async (shopId) => {
+  const products = await Product.find({ shop: shopId });
+
+  return mapProducts(products);
+};
+
+module.exports = {
+  findById,
+  findByIdAndDelete,
+  findByIdAndUpdate,
+  findProductsOf,
+};

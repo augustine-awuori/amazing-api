@@ -10,6 +10,7 @@ const validateUser = require("../middleware/validateUser");
 const validator = require("../middleware/validate");
 const validateProductId = require("../middleware/validateProductId");
 const validateProductAuthor = require("../middleware/validateProductAuthor");
+const { isValidObjectId } = require("mongoose");
 
 const upload = multer({ dest: "uploads/" });
 
@@ -30,6 +31,16 @@ router.post(
     res.send(await service.findById(product._id));
   }
 );
+
+router.get("/:shopId", async (req, res) => {
+  const shopId = req.params.shopId;
+  if (!isValidObjectId(shopId))
+    return res.status(400).send({ error: "Invalid shop Id" });
+
+  const shopProducts = await service.findProductsOf(shopId);
+
+  res.send(shopProducts);
+});
 
 router.patch(
   "/:id",
