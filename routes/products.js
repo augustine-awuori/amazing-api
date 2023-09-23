@@ -18,7 +18,7 @@ router.post(
   "/",
   [upload.single("image", 1), auth, validateUser, validator(validate)],
   async (req, res) => {
-    const { name, price, shop } = req.body;
+    const { description, name, price, shop } = req.body;
     const author = req.user._id;
     const image = req.file;
     if (!image)
@@ -26,6 +26,7 @@ router.post(
 
     const product = new Product({
       author,
+      description,
       name,
       price,
       image: image.filename,
@@ -52,11 +53,11 @@ router.patch(
   "/:id",
   [auth, validateUser, validateProductId, validateProductAuthor],
   async (req, res) => {
-    const { name, price } = req.body;
+    const { description, name, price } = req.body;
 
     const product = await service.findByIdAndUpdate(
       req.params.id,
-      { $set: { name, price } },
+      { $set: { description, name, price } },
       { new: true }
     );
 
