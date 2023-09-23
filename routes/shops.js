@@ -27,12 +27,19 @@ router.post(
   ],
   async (req, res) => {
     const { name, type } = req.body;
-    const author = req.user._id;
+    const author = req.user;
     const image = req.file;
     if (!image)
       return res.status(500).send({ error: "Couldn't process image" });
 
-    const shop = new Shop({ author, name, type, image: image.filename });
+    const shop = new Shop({
+      author: author._id,
+      name,
+      type,
+      image: image.filename,
+    });
+    author.hasShop = true;
+    author.save();
     await shop.save();
     await saveImage(image);
 
