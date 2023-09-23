@@ -1,7 +1,7 @@
 const { isValidObjectId } = require("mongoose");
 
 const { Order } = require("../models/order");
-const { mapOrder } = require("../mappers/orders");
+const { mapOrder, mapOrders } = require("../mappers/orders");
 
 const populateAndProject = (query) =>
   query
@@ -17,4 +17,20 @@ const findById = async (id) => {
   return mapOrder(order);
 };
 
-module.exports = { findById };
+const findMyOrders = async (myId) => {
+  if (!isValidObjectId(myId)) return;
+
+  const orders = await Order.find({ buyer: myId });
+
+  return mapOrders(orders);
+};
+
+const findShopOrders = async (shopId) => {
+  if (!isValidObjectId(shopId)) return;
+
+  const orders = await Order.find({ seller: shopId });
+
+  return mapOrders(orders);
+};
+
+module.exports = { findById, findMyOrders, findShopOrders };
