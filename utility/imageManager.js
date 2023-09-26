@@ -1,28 +1,21 @@
-const AWS = require("aws-sdk");
+const { Storage } = require("@google-cloud/storage");
 const config = require("config");
-const fs = require("fs");
+const winston = require("winston");
 
-AWS.config.update({
-  credentials: {
-    accessKeyId: config.get("awsAccessKey"),
-    secretAccessKey: config.get("awsSecretAccessKey"),
-  },
-  region: "us-east-1",
-});
+const bucket = config.get("bucket");
 
-const s3 = new AWS.S3();
-
-const Bucket = config.get("bucket");
+const storage = new Storage();
 
 async function saveImage(image) {
-  return await s3
-    .upload({
-      Body: fs.readFileSync(image.path),
-      Bucket,
-      ContentType: "image/jpeg",
-      Key: image.filename,
-    })
-    .promise();
+  try {
+    await storage.bucket(bucket).upload(image.path, {
+      destination: image.filename,
+      public: true,
+      contentType: "image/jpeg",
+    });
+  } catch (error) {
+    winston.error("Error uploading image: ", error);
+  }
 }
 
 function saveImages(images = []) {
@@ -31,10 +24,12 @@ function saveImages(images = []) {
   return Promise.all(promises);
 }
 
-function deleteImage(image) {
-  s3.deleteObject({ Bucket, Key: image }, (err) => {
-    if (err) throw err;
-  });
+async function deleteImage(filename) {
+  try {
+    await storage.bucket(bucket).file(filename).delete();
+  } catch (error) {
+    winston.error(`Error deleting an image ${filename}:`, error);
+  }
 }
 
 const deleteImages = (images = []) => images.forEach(deleteImage);
