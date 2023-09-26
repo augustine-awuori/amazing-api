@@ -2,9 +2,11 @@ const { Storage } = require("@google-cloud/storage");
 const config = require("config");
 const winston = require("winston");
 
-const bucket = config.get("bucket");
+const bucket = storage.bucket(config.get("bucket"));
 
-const storage = new Storage();
+const storage = new Storage({
+  projectId: config.get("googleProjectId"),
+});
 
 async function saveImage(image) {
   try {
@@ -36,10 +38,7 @@ const deleteImages = (images = []) => images.forEach(deleteImage);
 
 const needsMapping = (imageUrl) => imageUrl && !imageUrl.startsWith("https://");
 
-const mapImage = (imageUrl = "") =>
-  needsMapping(imageUrl)
-    ? `${config.get("assetsBaseUrl")}${imageUrl}`
-    : imageUrl;
+const mapImage = (imageUrl = "") => imageUrl;
 
 const mapAuthorImages = (author) => {
   author.avatar = mapImage(author.avatar);

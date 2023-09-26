@@ -34,7 +34,11 @@ router.post(
     if (!image)
       return res.status(500).send({ error: "Couldn't process image" });
 
-    const shop = new Shop({
+    let shop = await service.find({ name });
+    if (shop)
+      return res.status(400).send({ error: "This name is already taken" });
+
+    shop = new Shop({
       author,
       name,
       type,
