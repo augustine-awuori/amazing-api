@@ -8,10 +8,12 @@ const { User } = require("../models/user");
 const { validateShop, Shop } = require("../models/shop");
 const auth = require("../middleware/auth");
 const service = require("../services/shop");
+const userService = require("../services/users");
 const validateDeleteAuthor = require("../middleware/validateDeleteAuthor");
 const validateTypeId = require("../middleware/validateTypeId");
 const validateUser = require("../middleware/validateUser");
 const validator = require("../middleware/validate");
+const mapAuthor = require("../middleware/mapAuthor");
 
 const upload = multer({ dest: "uploads/" });
 
@@ -23,17 +25,19 @@ router.post(
     auth,
     validateUser,
     validateTypeId,
+    mapAuthor,
     validator(validateShop),
   ],
   async (req, res) => {
     const { name, type } = req.body;
-    const author = req.user;
+    const author = await userService.findById(req.user._id);
+    if (!author) return res.status(400).send({ error: "User not found!" });
     const image = req.file;
     if (!image)
       return res.status(500).send({ error: "Couldn't process image" });
 
     const shop = new Shop({
-      author: author._id,
+      author: req.user._id,
       name,
       type,
       image: image.filename,
