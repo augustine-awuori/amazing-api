@@ -2,11 +2,11 @@ const { Storage } = require("@google-cloud/storage");
 const config = require("config");
 const winston = require("winston");
 
-const bucket = storage.bucket(config.get("bucket"));
-
 const storage = new Storage({
   projectId: config.get("googleProjectId"),
 });
+
+const bucket = storage.bucket(config.get("bucket"));
 
 async function saveImage(image) {
   try {
