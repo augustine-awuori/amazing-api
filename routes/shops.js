@@ -29,21 +29,17 @@ router.post(
     validator(validateShop),
   ],
   async (req, res) => {
-    const { name, type } = req.body;
-    const author = await userService.findById(req.user._id);
-    if (!author) return res.status(400).send({ error: "User not found!" });
+    const { author, name, type } = req.body;
     const image = req.file;
     if (!image)
       return res.status(500).send({ error: "Couldn't process image" });
 
     const shop = new Shop({
-      author: req.user._id,
+      author,
       name,
       type,
       image: image.filename,
     });
-    author.hasShop = true;
-    author.save();
     await shop.save();
     await saveImage(image);
 

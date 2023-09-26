@@ -6,11 +6,10 @@ const auth = require("../middleware/auth");
 const mapBuyer = require("../middleware/mapBuyer");
 const service = require("../services/order");
 const validate = require("../middleware/validate");
-const validateSeller = require("../middleware/validateSeller");
 
 router.post(
   "/",
-  [auth, validateSeller, mapBuyer, validate(validateOrder)],
+  [auth, mapBuyer, validate(validateOrder)],
   async (req, res) => {
     const order = new Order(req.body);
 
