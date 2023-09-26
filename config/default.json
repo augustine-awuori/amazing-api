@@ -1,9 +1,8 @@
 {
   "assetsBaseUrl": "https://kisii-universe-mart-bucket.s3.amazonaws.com/",
-  "awsAccessKey": "",
-  "awsSecretAccessKey": "",
   "db": "",
   "jwtPrivateKey": "",
   "maxImagesCount": 3,
+  "googleProjectId": "",
   "userImagesCount": 2
 }
