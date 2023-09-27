@@ -8,9 +8,11 @@ const storage = new Storage({
 
 const bucket = storage.bucket(config.get("bucket"));
 
+const baseURL = config.get("assetsBaseUrl") + config.get("bucket");
+
 async function saveImage(image) {
   try {
-    await bucket(bucket).upload(image.path, {
+    await bucket.upload(image.path, {
       destination: image.filename,
       public: true,
       contentType: "image/jpeg",
@@ -38,7 +40,8 @@ const deleteImages = (images = []) => images.forEach(deleteImage);
 
 const needsMapping = (imageUrl) => imageUrl && !imageUrl.startsWith("https://");
 
-const mapImage = (imageUrl = "") => imageUrl;
+const mapImage = (imageUrl = "") =>
+  imageUrl ? baseURL + "/" + imageUrl : imageUrl;
 
 const mapAuthorImages = (author) => {
   author.avatar = mapImage(author.avatar);
