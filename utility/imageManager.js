@@ -10,7 +10,7 @@ const bucket = storage.bucket(config.get("bucket"));
 
 async function saveImage(image) {
   try {
-    await storage.bucket(bucket).upload(image.path, {
+    await bucket(bucket).upload(image.path, {
       destination: image.filename,
       public: true,
       contentType: "image/jpeg",
@@ -28,7 +28,7 @@ function saveImages(images = []) {
 
 async function deleteImage(filename) {
   try {
-    await storage.bucket(bucket).file(filename).delete();
+    await bucket(bucket).file(filename).delete();
   } catch (error) {
     winston.error(`Error deleting an image ${filename}:`, error);
   }
