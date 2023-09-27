@@ -1,5 +1,5 @@
 {
-  "assetsBaseUrl": "https://kisii-universe-mart-bucket.s3.amazonaws.com/",
+  "assetsBaseUrl": "https://storage.googleapis.com/",
   "db": "",
   "jwtPrivateKey": "",
   "maxImagesCount": 3,
