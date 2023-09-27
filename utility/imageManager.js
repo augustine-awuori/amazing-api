@@ -4,6 +4,7 @@ const winston = require("winston");
 
 const storage = new Storage({
   projectId: config.get("googleProjectId"),
+  keyFilename: "keys.json",
 });
 
 const bucket = storage.bucket(config.get("bucket"));
