@@ -1,10 +1,12 @@
+const { format } = require("util");
 const { Storage } = require("@google-cloud/storage");
 const config = require("config");
+const path = require("path");
 const winston = require("winston");
 
 const storage = new Storage({
+  keyFilename: path.join(__dirname, "../config/keys.json"),
   projectId: config.get("googleProjectId"),
-  keyFilename: "keys.json",
 });
 
 const bucket = storage.bucket(config.get("bucket"));
@@ -12,15 +14,25 @@ const bucket = storage.bucket(config.get("bucket"));
 const baseURL = config.get("assetsBaseUrl") + config.get("bucket");
 
 async function saveImage(image) {
-  try {
-    await bucket.upload(image.path, {
-      destination: image.filename,
-      public: true,
-      contentType: "image/jpeg",
-    });
-  } catch (error) {
-    winston.error("Error uploading image: ", error);
-  }
+  return new Promise((resolve, reject) => {
+    const { originalname, buffer } = image;
+
+    const blob = bucket.file(originalname.replace(/  /g, "_"));
+    const blobStream = blob.createWriteStream({ resumable: false });
+
+    blobStream
+      .on("finish", () => {
+        const publicUrl = format(
+          `https://storage.googleapis.com/${bucket.name}/${blob.name}`
+        );
+        resolve(publicUrl);
+      })
+      .on("error", (error) => {
+        console.error("Error uploading image:", error);
+        reject(`Unable to upload image, something went wrong`);
+      })
+      .end(buffer);
+  });
 }
 
 function saveImages(images = []) {
@@ -39,10 +51,10 @@ async function deleteImage(filename) {
 
 const deleteImages = (images = []) => images.forEach(deleteImage);
 
-const needsMapping = (imageUrl) => imageUrl && !imageUrl.startsWith("https://");
+const isMapped = (imageUrl) => imageUrl && imageUrl.startsWith("https://");
 
 const mapImage = (imageUrl = "") =>
-  imageUrl ? baseURL + "/" + imageUrl : imageUrl;
+  isMapped(imageUrl) ? imageUrl : baseURL + "/" + imageUrl;
 
 const mapAuthorImages = (author) => {
   author.avatar = mapImage(author.avatar);

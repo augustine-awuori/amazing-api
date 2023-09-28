@@ -8,7 +8,6 @@ const { User } = require("../models/user");
 const { validateShop, Shop } = require("../models/shop");
 const auth = require("../middleware/auth");
 const service = require("../services/shop");
-const userService = require("../services/users");
 const validateDeleteAuthor = require("../middleware/validateDeleteAuthor");
 const validateTypeId = require("../middleware/validateTypeId");
 const validateUser = require("../middleware/validateUser");
@@ -30,22 +29,16 @@ router.post(
   ],
   async (req, res) => {
     const { author, name, type } = req.body;
-    const image = req.file;
-    if (!image)
-      return res.status(500).send({ error: "Couldn't process image" });
+    const file = req.file;
+    if (!file) return res.status(500).send({ error: "Couldn't process image" });
 
     let shop = await service.find({ name });
     if (shop)
       return res.status(400).send({ error: "This name is already taken" });
 
-    shop = new Shop({
-      author,
-      name,
-      type,
-      image: image.filename,
-    });
+    const image = await saveImage(file);
+    shop = new Shop({ author, name, type, image });
     await shop.save();
-    await saveImage(image);
 
     res.send(await service.findById(shop._id));
   }
@@ -68,7 +61,7 @@ router.get("/:id", async (req, res) => {
 
     return shop
       ? res.send(shop)
-      : res.status(404).send({ error: "Shop  doesn't exist." });
+      : res.status(404).send({ error: "Shop doesn't exist." });
   }
 
   const userShops = (await service.getAll()).filter(
