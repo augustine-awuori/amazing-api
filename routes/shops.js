@@ -29,9 +29,8 @@ router.post(
   ],
   async (req, res) => {
     const { author, name, type } = req.body;
-    const image = req.file;
-    if (!image)
-      return res.status(500).send({ error: "Couldn't process image" });
+    const file = req.file;
+    if (!file) return res.status(500).send({ error: "Couldn't process image" });
 
     let shop = await service.find({ name });
     if (shop)
@@ -39,7 +38,6 @@ router.post(
 
     shop = new Shop({ author, name, type, image: image.filename });
     await shop.save();
-    await saveImage(image);
 
     res.send(await service.findById(shop._id));
   }
