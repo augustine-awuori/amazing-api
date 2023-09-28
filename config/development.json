@@ -1,5 +1,6 @@
 {
   "assetsBaseUrl": "https://storage.googleapis.com/",
-  "googleProjectId": "",
-  "db": "mongodb://localhost/kisii-universe-mart-api"
+  "db": "mongodb://localhost/kisii-universe-mart-api",
+  "keys_url": "",
+  "googleProjectId": ""
 }

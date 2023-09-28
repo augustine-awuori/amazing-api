@@ -1,4 +1,5 @@
 {
   "assetsBaseUrl": "https://storage.googleapis.com/",
-  "googleProjectId": ""
+  "googleProjectId": "",
+  "keys_url": ""
 }

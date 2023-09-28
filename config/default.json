@@ -4,5 +4,6 @@
   "jwtPrivateKey": "",
   "maxImagesCount": 3,
   "googleProjectId": "",
-  "userImagesCount": 2
+  "userImagesCount": 2,
+  "keys_url": ""
 }
