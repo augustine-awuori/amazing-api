@@ -4,10 +4,9 @@ const express = require("express");
 const router = express.Router();
 const config = require("config");
 
-const { mapListing } = require("../mappers/listings");
 const { User } = require("../models/user");
 const { validateListing, Listing } = require("../models/listing");
-const { saveImages, deleteImages } = require("../utility/imageManager");
+const { deleteImages, saveImages } = require("../utility/imageManager");
 const auth = require("../middleware/auth");
 const service = require("../services/listingsService");
 const validateCategoryId = require("../middleware/validateCategoryId");
@@ -33,7 +32,7 @@ router.post(
     const { category, description, price, title } = req.body;
 
     const author = req.user._id;
-    let images = req.files.map((file) => file.filename);
+    let images = req.files.map((image) => image.filename);
     const listing = new Listing({
       author,
       category,
@@ -44,7 +43,7 @@ router.post(
     });
 
     await listing.save();
-    if (req.files) await saveImages(req.files);
+    await saveImages(req.files);
 
     res.send(await service.findById(listing._id));
   }

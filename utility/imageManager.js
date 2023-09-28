@@ -1,26 +1,24 @@
 const { Storage } = require("@google-cloud/storage");
 const config = require("config");
+const path = require("path");
 const winston = require("winston");
 
 const storage = new Storage({
+  keyFilename: path.join(__dirname, "../config/keys.json"),
   projectId: config.get("googleProjectId"),
-  keyFilename: "keys.json",
 });
 
-const bucket = storage.bucket(config.get("bucket"));
+const bucketName = "kisii-universe-mart-bucket";
 
-const baseURL = config.get("assetsBaseUrl") + config.get("bucket");
+const bucket = storage.bucket(bucketName);
+
+const baseURL = config.get("assetsBaseUrl") + bucketName;
 
 async function saveImage(image) {
-  try {
-    await bucket.upload(image.path, {
-      destination: image.filename,
-      public: true,
-      contentType: "image/jpeg",
-    });
-  } catch (error) {
-    winston.error("Error uploading image: ", error);
-  }
+  await bucket.upload(image.path, {
+    destination: image.filename,
+    preconditionOpts: { ifGenerationMatch: 0 },
+  });
 }
 
 function saveImages(images = []) {
@@ -31,7 +29,7 @@ function saveImages(images = []) {
 
 async function deleteImage(filename) {
   try {
-    await bucket(bucket).file(filename).delete();
+    await bucket.file(filename).delete();
   } catch (error) {
     winston.error(`Error deleting an image ${filename}:`, error);
   }
@@ -39,10 +37,10 @@ async function deleteImage(filename) {
 
 const deleteImages = (images = []) => images.forEach(deleteImage);
 
-const needsMapping = (imageUrl) => imageUrl && !imageUrl.startsWith("https://");
+const isMapped = (imageUrl) => imageUrl?.startsWith("https://");
 
 const mapImage = (imageUrl = "") =>
-  imageUrl ? baseURL + "/" + imageUrl : imageUrl;
+  isMapped(imageUrl) ? imageUrl : `${baseURL}/${imageUrl}`;
 
 const mapAuthorImages = (author) => {
   author.avatar = mapImage(author.avatar);
