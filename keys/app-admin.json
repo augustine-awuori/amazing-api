@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "kisii-universe-mart",
+  "private_key_id": "abeb7c1d8729d90874535a7f758770762229c2e2",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCojgKYKa+/fEzq\nK5vF3hIGVKoW1YHcXLD2hzwausLfhHiWR2LHlTqgv2xub7FcpEIwz+/jgR0Y6Pfd\n27rYsm89hF2s3HQ2hmNRyIom9zSyZ+5y3MWu7q9q+1iOJ44VvvZxueYKGkiEt6nr\nrOL1oKi29mhjYnOvoqAUF+tMi0AiNCFwRhPcrjZyeNEav6ZZJWEq8zI6JXldynxT\nFJx7Y8j90EkU2yb4Q0XeDhaUzSIu9SikPYRIYfqvDLYlQjQQRv+mbpPu91SJOwXX\nviZOniYXnBspNyux8DNiOnzdsZpIsaqCwRe9gjouRaGIdPpC1r/f26+W2JDQLEnE\nCMmCuA6JAgMBAAECggEAAM09c87UuuS2hLifYRy5PVXp3k8ocunSnsUfyh5QS09R\n1C5+aLsr7JtB0Q3E1uuwbK/KSezKdXkmpgA5DnXO0DN7llwtaY2lwLwcEQCaWElW\nmbwKiVZqvtmT+6Q5hfQtoVpLZfuuWruyBNJ0awRXORjluP2ER675SLnZgrijgYKU\nT0oXC2E9VI541oSScFCbtOMndyCryo470NZT5wu/lqaSGhZ9pz2cZf58b5iqgO3E\nGsbHo8VOAIo3iYTo2yMD3RPJdKC/0OIsc62ACKGiZjh5BxbfKMj8De80vwoj7RyD\nix/U3IVaIBejr0mP64T68fuKXYlaBM8KxJzL9gwFQQKBgQDrAbmmRPN138Icxtrk\n0BFXiS1P9o70A43HPlcIgYrFRQ1De5xuU5CIu599fWzLcP7r86PAkomrDva06SZ4\n/2l2XpCQpZWGj3khBbTORmiRRaA0QTwvy5m5YWd9rTKl1tbybkrMkuyJ6FfnZQr0\nVhmWsncjlr1I5aDuQGMOfvpjeQKBgQC3nJ7cKn+5TcExh7S0CD3EPY8G8WWti08Q\nFvMU1SH+sdU/LwAQJNLKO9k8Fg+L9CuuiLp0duIIfLq84KyxCTcNMm/ZEAAfZdnM\nq5GWhWb3t31os/WreLhtejM1MJbMi2hks5EWRY5cGH9FN4OtKdItXBQZPJvxU2Kw\nP8vERJavkQKBgQCOr2J3yF+FjxD9heM7j/Unj9taNJpBH7NCaOBRAs4tzioqce/d\nsJEN49UHTVL0BqxQuIIRFyfNG23BE9pPFsyCmRHvMQojRBNIcH2BzJAKvBpz/7O6\nVUUFoFVEohchR9sEIOD7aq2BYfeVP+0xwuEQdVUO36QXkYxve9po38HJCQKBgDaM\nUy25eoSEsxaR6H9ry13Xo/w+DyUFtBFloAXaY+UU0/OXdP9W0UC/kwQk0a2Udr29\nZRdgkjpPQ/MFFIjr4e0LxOrJtB+f1JrXhcMgEr0ZSCqo/B1bGf98RGZS7xoJeJQi\nPMJPG8IEjRr1KStytzw+lMICnZmOWk1eRp0ie1nhAoGBAIrGbFc0J4+zksfrrOQG\n4IK/6ovJtnJFw31NGkNmEBKbK5EaMXLM7mRj7enhOvSKGWXokvhVUp4yU11JbY51\n4fQXCUJyLiG57DWSkikt5R7NVRLilr9EFPw/xEOWWVvjCXBRrBM5Wt/cVfyTwbZ5\nec/lIM0Igkv7QxnK0gHe5S/7\n-----END PRIVATE KEY-----\n",
+  "client_email": "adminstrator@kisii-universe-mart.iam.gserviceaccount.com",
+  "client_id": "103923757871520552030",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/adminstrator%40kisii-universe-mart.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

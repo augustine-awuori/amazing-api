@@ -1,18 +1,11 @@
 const { Storage } = require("@google-cloud/storage");
 const config = require("config");
-const path = require("path");
 const winston = require("winston");
 
-const storage = new Storage({
-  keyFilename: path.join(__dirname, "../config/keys.json"),
-  projectId: config.get("googleProjectId"),
-});
-
-const bucketName = "kisii-universe-mart-bucket";
-
-const bucket = storage.bucket(bucketName);
-
-const baseURL = config.get("assetsBaseUrl") + bucketName;
+const projectId = "kisii-universe-mart-bucket";
+const storage = new Storage({ keyFilename: config.get("keys_url"), projectId });
+const bucket = storage.bucket(projectId);
+const baseURL = config.get("assetsBaseUrl") + projectId;
 
 async function saveImage(image) {
   await bucket.upload(image.path, {
