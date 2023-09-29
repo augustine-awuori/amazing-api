@@ -36,7 +36,7 @@ router.post(
     if (shop)
       return res.status(400).send({ error: "This name is already taken" });
 
-    shop = new Shop({ author, name, type, image: image.filename });
+    shop = new Shop({ author, name, type, image: file.filename });
     await shop.save();
 
     res.send(await service.findById(shop._id));
