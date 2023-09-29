@@ -1,9 +1,13 @@
 const { Storage } = require("@google-cloud/storage");
 const config = require("config");
 const winston = require("winston");
+const path = require("path");
 
 const projectId = "kisii-universe-mart-bucket";
-const storage = new Storage({ keyFilename: config.get("keys_url"), projectId });
+const storage = new Storage({
+  keyFilename: path.join(__dirname, "../keys/app-admin.json"),
+  projectId,
+});
 const bucket = storage.bucket(projectId);
 const baseURL = config.get("assetsBaseUrl") + projectId;
 
