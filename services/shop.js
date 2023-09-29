@@ -34,7 +34,7 @@ const findByIdAndDelete = async (id) => {
   if (isValidObjectId(id)) return mapShop(await Shop.findByIdAndDelete(id));
 };
 
-const find = async (query = {}) => await Shop.find(query);
+const find = async (query = {}) => await Shop.findOne(query);
 
 module.exports = {
   find,

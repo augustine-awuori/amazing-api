@@ -27,7 +27,6 @@ const Shop = mongoose.model(
 const validate = (shop) =>
   Joi.object({
     author: Joi.string(),
-    image: Joi.object(),
     name: Joi.string().min(3).max(50),
     type: Joi.string(),
   }).validate(shop);
