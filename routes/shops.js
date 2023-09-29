@@ -38,6 +38,7 @@ router.post(
 
     shop = new Shop({ author, name, type, image: file.filename });
     await shop.save();
+    saveImage(file);
 
     res.send(await service.findById(shop._id));
   }
