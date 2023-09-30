@@ -70,14 +70,16 @@ router.get("/:id", async (req, res) => {
 });
 
 router.delete("/:id", auth, async (req, res) => {
-  const shop = await service.findByIdAndDelete(req.params.id);
+  const shop = await Shop.findById(req.params.id);
 
-  if (shop.author.username !== req.user.username)
+  if (!shop) return res.status(200);
+
+  if (shop.author.toString() !== req.user._id.toString())
     return res
       .status(403)
       .send({ error: "Unauthorised! You're not the owner" });
 
-  if (shop) deleteImage(shop.image);
+  deleteImage(shop.image);
 
   res.send(shop);
 });

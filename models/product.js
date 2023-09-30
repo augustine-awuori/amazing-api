@@ -11,7 +11,7 @@ const schema = new mongoose.Schema({
   shop: { type: mongoose.Types.ObjectId, ref: "Shop" },
   image: String,
   price: { max: 1_000_000, min: 1, required: true, type: Number },
-  quantity: { default: 1, max: 1_000, min: 1, required: true, type: Number },
+  quantity: { default: 0, max: 1_000, min: 1, required: true, type: Number },
   name: {
     maxlength: 50,
     minlength: 2,
