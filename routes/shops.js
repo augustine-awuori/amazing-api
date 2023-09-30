@@ -8,7 +8,6 @@ const { User } = require("../models/user");
 const { validateShop, Shop } = require("../models/shop");
 const auth = require("../middleware/auth");
 const service = require("../services/shop");
-const validateDeleteAuthor = require("../middleware/validateDeleteAuthor");
 const validateTypeId = require("../middleware/validateTypeId");
 const validateUser = require("../middleware/validateUser");
 const validator = require("../middleware/validate");
@@ -70,8 +69,13 @@ router.get("/:id", async (req, res) => {
   res.send(userShops);
 });
 
-router.delete("/:id", [auth, validateDeleteAuthor], async (req, res) => {
+router.delete("/:id", auth, async (req, res) => {
   const shop = await service.findByIdAndDelete(req.params.id);
+
+  if (shop.author.username !== req.user.username)
+    return res
+      .status(403)
+      .send({ error: "Unauthorised! You're not the owner" });
 
   if (shop) deleteImage(shop.image);
 

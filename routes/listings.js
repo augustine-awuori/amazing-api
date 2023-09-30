@@ -10,7 +10,6 @@ const { deleteImages, saveImages } = require("../utility/imageManager");
 const auth = require("../middleware/auth");
 const service = require("../services/listingsService");
 const validateCategoryId = require("../middleware/validateCategoryId");
-const validateDeleteAuthor = require("../middleware/validateDeleteAuthor");
 const validateListingAuthor = require("../middleware/validateListingAuthor");
 const validateListingId = require("../middleware/validateListingId");
 const validateUser = require("../middleware/validateUser");
@@ -75,11 +74,18 @@ router.get("/:id", async (req, res) => {
   res.send(userListings);
 });
 
-router.delete("/:id", [auth, validateDeleteAuthor], async (req, res) => {
-  let listing = req.listing;
+router.delete("/:id", auth, async (req, res) => {
+  const listing = await service.findById(req.params.id);
+
+  if (!listing) return res.status(404).send({ error: "Listing not found" });
+
+  if (listing.author.username !== req.user.username)
+    return res
+      .status(403)
+      .send({ error: "Unauthorised! You're not the owner" });
 
   deleteImages(listing.images);
-  listing = await service.findByIdAndDelete(req.params.id);
+  await service.findByIdAndDelete(listing._id);
 
   res.send(listing);
 });
