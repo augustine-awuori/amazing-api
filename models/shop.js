@@ -14,6 +14,12 @@ const Shop = mongoose.model(
       trim: true,
       unique: true,
     },
+    location: {
+      maxlength: 255,
+      minlength: 3,
+      trim: true,
+      type: String,
+    },
     type: { type: mongoose.Types.ObjectId, ref: "Type" },
     timestamp: {
       type: Number,
@@ -28,6 +34,7 @@ const validate = (shop) =>
   Joi.object({
     author: Joi.string(),
     name: Joi.string().min(3).max(50),
+    location: Joi.string().min(3).max(255),
     type: Joi.string(),
   }).validate(shop);
 
