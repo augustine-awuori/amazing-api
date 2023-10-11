@@ -2,6 +2,8 @@ const { isValidObjectId } = require("mongoose");
 
 const { Shop } = require("../models/shop");
 const { mapShop, mapShops } = require("../mappers/shops");
+const { deleteImage } = require("../utility/imageManager");
+const productService = require("./products");
 
 const populateAndProject = (query) =>
   query.populate("author", "-password").populate("type");
@@ -31,7 +33,13 @@ const findByIdAndUpdate = async (id, update, options) => {
 };
 
 const findByIdAndDelete = async (id) => {
-  if (isValidObjectId(id)) return mapShop(await Shop.findByIdAndDelete(id));
+  if (!isValidObjectId(id)) return;
+
+  const shop = await Shop.findByIdAndDelete(id);
+  deleteImage(shop.image);
+  productService.findProductsOfShopAndDelete(id);
+
+  return shop;
 };
 
 const find = async (query = {}) => await Shop.findOne(query);

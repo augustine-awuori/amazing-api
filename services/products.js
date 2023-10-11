@@ -1,7 +1,8 @@
 const { isValidObjectId } = require("mongoose");
 
-const { Product } = require("../models/product");
+const { deleteImage } = require("../utility/imageManager");
 const { mapProduct, mapProducts } = require("../mappers/products");
+const { Product } = require("../models/product");
 
 const populateAndProject = (query) => query.populate("author", "-password");
 
@@ -24,8 +25,12 @@ const findByIdAndUpdate = async (id, update, options) => {
 };
 
 const findByIdAndDelete = async (id) => {
-  if (isValidObjectId(id))
-    return await populateAndProject(Product.findByIdAndDelete(id));
+  if (!isValidObjectId(id)) return;
+
+  const product = await Product.findByIdAndDelete(id);
+  deleteImage(product.image);
+
+  return product;
 };
 
 const findProductsOf = async (shopId) => {
@@ -34,9 +39,18 @@ const findProductsOf = async (shopId) => {
   return mapProducts(products);
 };
 
+const findProductsOfShopAndDelete = async (shopId) => {
+  const shopProducts = await findProductsOf(shopId);
+
+  shopProducts.forEach(async (p) => await findByIdAndDelete(p._id));
+
+  return shopProducts;
+};
+
 module.exports = {
   findById,
   findByIdAndDelete,
   findByIdAndUpdate,
   findProductsOf,
+  findProductsOfShopAndDelete,
 };

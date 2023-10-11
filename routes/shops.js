@@ -79,7 +79,7 @@ router.delete("/:id", auth, async (req, res) => {
       .status(403)
       .send({ error: "Unauthorised! You're not the owner" });
 
-  deleteImage(shop.image);
+  await service.findByIdAndDelete(shop._id);
 
   res.send(shop);
 });
