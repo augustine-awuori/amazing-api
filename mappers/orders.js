@@ -4,7 +4,6 @@ const { mapProducts } = require("./products");
 const mapOrder = (order) => {
   if (order) {
     order.buyer = mapAuthorImages(order.buyer);
-    order.seller = mapAuthorImages(order.seller);
     order.products = mapProducts(order.products);
   }
 
