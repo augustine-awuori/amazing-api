@@ -21,6 +21,7 @@ const Shop = mongoose.model(
       type: String,
     },
     type: { type: mongoose.Types.ObjectId, ref: "Type" },
+    isVerified: { default: false, type: Boolean },
     timestamp: {
       type: Number,
       default: function () {
