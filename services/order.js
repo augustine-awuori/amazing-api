@@ -4,7 +4,7 @@ const { Order } = require("../models/order");
 const { mapOrder, mapOrders } = require("../mappers/orders");
 
 const populateAndProject = (query) =>
-  query.populate("buyer", "-password").populate("products");
+  query.populate("buyer", "-password").populate("products").populate("shop");
 
 const findById = async (id) => {
   if (!isValidObjectId(id)) return;
