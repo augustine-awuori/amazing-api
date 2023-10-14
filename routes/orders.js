@@ -35,4 +35,13 @@ router.get("/shop/:id", auth, async (req, res) => {
   res.send(shopOrders);
 });
 
+router.get("/:id", async (req, res) => {
+  const order = await service.findById(req.params.id);
+
+  if (!order)
+    return res.status(404).send({ error: "This order doesn't exist" });
+
+  res.send(order);
+});
+
 module.exports = router;
