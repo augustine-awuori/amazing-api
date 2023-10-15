@@ -75,11 +75,11 @@ router.get("/:id", async (req, res) => {
 });
 
 router.delete("/:id", auth, async (req, res) => {
-  const listing = await service.findById(req.params.id);
+  const listing = await Listing.findById(req.params.id);
 
-  if (!listing) return res.status(404).send({ error: "Listing not found" });
+  if (!listing) return res.status(200);
 
-  if (listing.author.username !== req.user.username)
+  if (listing.author.toString() !== req.user._id.toString())
     return res
       .status(403)
       .send({ error: "Unauthorised! You're not the owner" });

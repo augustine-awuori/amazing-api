@@ -1,3 +1,4 @@
+const { isValidObjectId } = require("mongoose");
 const multer = require("multer");
 const express = require("express");
 const router = express.Router();
@@ -10,7 +11,6 @@ const validateUser = require("../middleware/validateUser");
 const validator = require("../middleware/validate");
 const validateProductId = require("../middleware/validateProductId");
 const validateProductAuthor = require("../middleware/validateProductAuthor");
-const { isValidObjectId } = require("mongoose");
 
 const upload = multer({ dest: "uploads/" });
 
@@ -71,7 +71,7 @@ router.delete(
   "/:id",
   [auth, validateProductId, validateProductAuthor],
   async (req, res) => {
-    const product = await service.findByIdAndDelete(req.params.id);
+    const product = await Product.findByIdAndDelete(req.params.id);
 
     if (product) deleteImage(product.image);
 
