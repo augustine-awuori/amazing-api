@@ -12,7 +12,7 @@ const findAll = async () => {
   const products = await populateAndProject(Product.find({}).sort("-_id"));
 
   return mapProducts(products).map(async (p) => {
-    p.shop = await shopService.findById(p.shop._id);
+    if (p.shop) p.shop = await shopService.findById(p.shop._id);
 
     return p;
   });
