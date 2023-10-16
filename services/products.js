@@ -4,7 +4,8 @@ const { deleteImage } = require("../utility/imageManager");
 const { mapProduct, mapProducts } = require("../mappers/products");
 const { Product } = require("../models/product");
 
-const populateAndProject = (query) => query.populate("author", "-password");
+const populateAndProject = (query) =>
+  query.populate("author", "-password").populate("shop");
 
 const findAll = async () => {
   const products = await populateAndProject(Product.find({}).sort("-_id"));
