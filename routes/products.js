@@ -49,6 +49,12 @@ router.get("/:shopId", async (req, res) => {
   res.send(shopProducts);
 });
 
+router.get("/", async (_req, res) => {
+  const products = await service.findAll();
+
+  res.send(products);
+});
+
 router.patch(
   "/:id",
   [auth, validateUser, validateProductId, validateProductAuthor],

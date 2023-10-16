@@ -6,6 +6,12 @@ const { Product } = require("../models/product");
 
 const populateAndProject = (query) => query.populate("author", "-password");
 
+const findAll = async () => {
+  const products = await populateAndProject(Product.find({}).sort("-_id"));
+
+  return mapProducts(products);
+};
+
 const findById = async (id) => {
   if (!isValidObjectId(id)) return;
 
@@ -48,6 +54,7 @@ const findProductsOfShopAndDelete = async (shopId) => {
 };
 
 module.exports = {
+  findAll,
   findById,
   findByIdAndDelete,
   findByIdAndUpdate,
