@@ -3,13 +3,19 @@ const { isValidObjectId } = require("mongoose");
 const { deleteImage } = require("../utility/imageManager");
 const { mapProduct, mapProducts } = require("../mappers/products");
 const { Product } = require("../models/product");
+const shopService = require("./shop");
 
-const populateAndProject = (query) => query.populate("author", "-password");
+const populateAndProject = (query) =>
+  query.populate("author", "-password").populate("shop");
 
 const findAll = async () => {
   const products = await populateAndProject(Product.find({}).sort("-_id"));
 
-  return mapProducts(products);
+  return mapProducts(products).map(async (p) => {
+    p.shop = await shopService.findById(p.shop._id);
+
+    return p;
+  });
 };
 
 const findById = async (id) => {
