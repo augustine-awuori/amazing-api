@@ -11,11 +11,7 @@ const populateAndProject = (query) =>
 const findAll = async () => {
   const products = await populateAndProject(Product.find({}).sort("-_id"));
 
-  return mapProducts(products).map(async (p) => {
-    if (p.shop) p.shop = await shopService.findById(p.shop._id);
-
-    return p;
-  });
+  return await mapProducts(products);
 };
 
 const findById = async (id) => {
@@ -23,7 +19,7 @@ const findById = async (id) => {
 
   const product = await populateAndProject(Product.findById(id));
 
-  return mapProduct(product);
+  return await mapProduct(product);
 };
 
 const findByIdAndUpdate = async (id, update, options) => {
@@ -33,7 +29,7 @@ const findByIdAndUpdate = async (id, update, options) => {
     Product.findByIdAndUpdate(id, update, options)
   );
 
-  return mapProduct(product);
+  return await mapProduct(product);
 };
 
 const findByIdAndDelete = async (id) => {
@@ -48,7 +44,7 @@ const findByIdAndDelete = async (id) => {
 const findProductsOf = async (shopId) => {
   const products = await populateAndProject(Product.find({ shop: shopId }));
 
-  return mapProducts(products);
+  return await mapProducts(products);
 };
 
 const findProductsOfShopAndDelete = async (shopId) => {
