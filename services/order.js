@@ -1,7 +1,24 @@
 const { isValidObjectId } = require("mongoose");
+const winston = require("winston");
 
 const { Order } = require("../models/order");
 const { mapOrder, mapOrders } = require("../mappers/orders");
+const shopService = require("./shop");
+const whatsapp = require("../utility/whatsapp");
+
+const getShopId = (order) => {
+  if (typeof order.shop === "string") return order.shop;
+  return order.shop?._id;
+};
+
+const sendMessageToShopOwner = async (order) => {
+  const shopOwner = await shopService.getShopOwner(getShopId(order));
+
+  const phone = shopOwner?.otherAccounts.whatsapp;
+  if (!phone) return winston.error("Can't send whatsapp msg to an empty phone");
+
+  whatsapp.sendTo(phone, order.message);
+};
 
 const populateAndProject = (query) =>
   query.populate("buyer", "-password").populate("products").populate("shop");
@@ -30,4 +47,9 @@ const findShopOrders = async (shopId) => {
   return mapOrders(orders);
 };
 
-module.exports = { findById, findMyOrders, findShopOrders };
+module.exports = {
+  findById,
+  findMyOrders,
+  findShopOrders,
+  sendMessageToShopOwner,
+};

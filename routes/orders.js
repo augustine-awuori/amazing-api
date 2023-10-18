@@ -14,6 +14,7 @@ router.post(
     const order = new Order(req.body);
 
     await order.save();
+    service.sendMessageToShopOwner(order);
 
     res.send(await service.findById(order._id));
   }
