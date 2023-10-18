@@ -4,6 +4,7 @@ const { Shop } = require("../models/shop");
 const { mapShop, mapShops } = require("../mappers/shops");
 const { deleteImage } = require("../utility/imageManager");
 const productService = require("./products");
+const userService = require("./users");
 
 const populateAndProject = (query) =>
   query.populate("author", "-password").populate("type");
@@ -44,10 +45,17 @@ const findByIdAndDelete = async (id) => {
 
 const find = async (query = {}) => await Shop.findOne(query);
 
+const getShopOwner = async (shopId) => {
+  const shop = await findById(shopId);
+
+  return await userService.findById(shop.author._id);
+};
+
 module.exports = {
   find,
+  findById,
   findByIdAndDelete,
   findByIdAndUpdate,
   getAll,
-  findById,
+  getShopOwner,
 };
