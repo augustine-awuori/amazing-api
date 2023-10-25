@@ -34,7 +34,7 @@ const findById = async (id) => {
 const findMyOrders = async (myId) => {
   if (!isValidObjectId(myId)) return;
 
-  const orders = await Order.find({ buyer: myId });
+  const orders = await populateAndProject(Order.find({ buyer: myId }));
 
   return mapOrders(orders);
 };
@@ -42,7 +42,7 @@ const findMyOrders = async (myId) => {
 const findShopOrders = async (shopId) => {
   if (!isValidObjectId(shopId)) return;
 
-  const orders = await Order.find({ shop: shopId });
+  const orders = await populateAndProject(Order.find({ shop: shopId }));
 
   return mapOrders(orders);
 };
