@@ -1,5 +1,13 @@
-const wbm = require("wbm");
+const { Client } = require("whatsapp-web.js");
 const winston = require("winston");
+
+const client = new Client();
+
+const init = () => {
+  client.on("ready", () => winston.info("WhatsApp Messenger is ready!"));
+
+  client.initialize();
+};
 
 const formatMessage = (message) =>
   `
@@ -7,22 +15,13 @@ ${message}.
 FROM KISII UNIVERSE MART at https://kisiiuniversemart.digital
 `;
 
-const sendToMultiple = (phones = [], message = "") =>
-  wbm
-    .start()
-    .then(async () => {
-      await wbm.send(phones, formatMessage(message));
-      await wbm.end();
-    })
-    .catch(winston.error);
+const sendTo = (phone = "", message = "") =>
+  client.sendMessage(phone, formatMessage(message));
 
-const sendTo = async (phone = "", message = "") =>
-  wbm
-    .start()
-    .then(async () => {
-      await wbm.sendTo(phone, formatMessage(message));
-      await wbm.end();
-    })
-    .catch(winston.error);
+const sendToMultiple = (phones = [], message = "") => {
+  const formattedMessage = formatMessage(message);
 
-module.exports = { sendTo, sendToMultiple };
+  phones.forEach((phone) => sendTo(phone, formattedMessage));
+};
+
+module.exports = { init, sendTo, sendToMultiple };
