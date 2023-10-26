@@ -27,7 +27,7 @@ router.post(
     validator(validateShop),
   ],
   async (req, res) => {
-    const { author, name, type } = req.body;
+    const { author, name, type, location } = req.body;
     const file = req.file;
     if (!file) return res.status(500).send({ error: "Couldn't process image" });
 
@@ -35,7 +35,7 @@ router.post(
     if (shop)
       return res.status(400).send({ error: "This name is already taken" });
 
-    shop = new Shop({ author, name, type, image: file.filename });
+    shop = new Shop({ author, name, type, image: file.filename, location });
     await shop.save();
     saveImage(file);
 
