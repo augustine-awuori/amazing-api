@@ -5,7 +5,7 @@ const winston = require("winston");
 
 const init = () => {
   // client.on("ready", () => winston.info("WhatsApp Messenger is ready!"));
-  // client.initialize();
+  // client.initialize();q
 };
 
 const formatMessage = (message) =>
