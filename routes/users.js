@@ -66,7 +66,7 @@ router.patch(
   [auth, validateUser, upload.array("images", config.get("userImagesCount"))],
   async (req, res) => {
     const { aboutMe, name, instagram, twitter, whatsapp, username } = req.body;
-    let user = await User.findById(req.user._id);
+    let user = await service.exists(req.user._id);
 
     if (aboutMe) user.aboutMe = aboutMe;
     if (user.username !== username) {

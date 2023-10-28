@@ -63,10 +63,7 @@ router.get("/:id", async (req, res) => {
       : res.status(404).send({ error: "Shop doesn't exist." });
   }
 
-  const userShops = (await service.getAll()).filter(
-    ({ author }) => author._id.toString() === id
-  );
-  res.send(userShops);
+  res.send(await service.findByAuthorId(id));
 });
 
 router.delete("/:id", auth, async (req, res) => {

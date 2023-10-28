@@ -51,8 +51,16 @@ const getShopOwner = async (shopId) => {
   return await userService.findById(shop.author._id);
 };
 
+const findByAuthorId = async (authorId) =>
+  isValidObjectId(authorId)
+    ? (await getAll()).filter(
+        ({ author }) => author._id.toString() === authorId
+      )
+    : [];
+
 module.exports = {
   find,
+  findByAuthorId,
   findById,
   findByIdAndDelete,
   findByIdAndUpdate,

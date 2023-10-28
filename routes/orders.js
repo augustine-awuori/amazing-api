@@ -1,11 +1,13 @@
 const express = require("express");
 const router = express.Router();
+const { isValidObjectId } = require("mongoose");
 
 const { validateOrder, Order } = require("../models/order");
 const auth = require("../middleware/auth");
 const mapBuyer = require("../middleware/mapBuyer");
 const service = require("../services/order");
 const validate = require("../middleware/validate");
+const userService = require("../services/users");
 
 router.post(
   "/",
@@ -20,23 +22,19 @@ router.post(
   }
 );
 
-router.get("/my/:id", auth, async (req, res) => {
-  const myOrders = await service.findMyOrders(req.params.id);
+router.get("/:id", auth, async (req, res) => {
+  const id = req.params.id;
+  if (!isValidObjectId(id))
+    return res.status(400).send({ error: "Invalid id" });
 
-  if (!myOrders) return res.status(400).send({ error: "Invalid user id" });
+  const orders = (await userService.exists(id))
+    ? await service.findMyOrders(id)
+    : await service.findShopOrders(id);
 
-  res.send(myOrders);
+  res.send(orders);
 });
 
-router.get("/shop/:id", auth, async (req, res) => {
-  const shopOrders = await service.findShopOrders(req.params.id);
-
-  if (!shopOrders) return res.status(400).send({ error: "Invalid shop id" });
-
-  res.send(shopOrders);
-});
-
-router.get("/:id", async (req, res) => {
+router.get("/single/:id", async (req, res) => {
   const order = await service.findById(req.params.id);
 
   if (!order)
