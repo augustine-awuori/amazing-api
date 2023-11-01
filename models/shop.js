@@ -22,6 +22,7 @@ const Shop = mongoose.model(
     },
     type: { type: mongoose.Types.ObjectId, ref: "Type" },
     isVerified: { default: false, type: Boolean },
+    views: { type: Number, default: 0 },
     timestamp: {
       type: Number,
       default: function () {

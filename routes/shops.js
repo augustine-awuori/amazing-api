@@ -81,6 +81,18 @@ router.delete("/:id", auth, async (req, res) => {
   res.send(shop);
 });
 
+router.patch("/views/:shopId", async (req, res) => {
+  const shop = await service.findByIdAndUpdate(
+    req.params.shopId,
+    { $inc: { views: 1 } },
+    { new: true }
+  );
+
+  shop
+    ? res.send(shop)
+    : res.status(404).send({ error: "This shop doesn't exist" });
+});
+
 router.patch("/:id", [auth, validateUser], async (req, res) => {
   const { type, name } = req.body;
 
