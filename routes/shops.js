@@ -68,10 +68,11 @@ router.get("/:id", async (req, res) => {
 
 router.delete("/:id", auth, async (req, res) => {
   const shop = await Shop.findById(req.params.id);
+  const user = req.user;
 
   if (!shop) return res.status(200);
 
-  if (shop.author.toString() !== req.user._id.toString())
+  if (shop.author.toString() !== user._id.toString() && !user.isAdmin)
     return res
       .status(403)
       .send({ error: "Unauthorised! You're not the owner" });
