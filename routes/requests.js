@@ -21,6 +21,7 @@ router.post(
 
     const request = new Request({ author, category, description, title });
     await request.save();
+    service.informOthers(request);
 
     res.send(await service.findById(request._id));
   }

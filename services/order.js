@@ -1,24 +1,10 @@
 const { isValidObjectId } = require("mongoose");
-const winston = require("winston");
 
-const { Order } = require("../models/order");
+const { getWhatsAppNumberFromUser } = require("../utility/func");
 const { mapOrder, mapOrders } = require("../mappers/orders");
+const { Order } = require("../models/order");
+const { sendMessage } = require("../utility/whatsapp");
 const shopService = require("./shop");
-const whatsapp = require("../utility/whatsapp");
-
-const getShopId = (order) => {
-  if (typeof order.shop === "string") return order.shop;
-  return order.shop?._id;
-};
-
-const sendMessageToShopOwner = async (order) => {
-  const shopOwner = await shopService.getShopOwner(getShopId(order));
-
-  const phone = shopOwner?.otherAccounts.whatsapp;
-  if (!phone) return winston.error("Can't send whatsapp msg to an empty phone");
-
-  whatsapp.sendTo(phone, order.message);
-};
 
 const populateAndProject = (query) =>
   query.populate("buyer", "-password").populate("products").populate("shop");
@@ -47,9 +33,25 @@ const findShopOrders = async (shopId) => {
   return mapOrders(orders);
 };
 
+const getNewOrderMessage = (shopId, orderId) => `
+You've a new order. 
+
+Check it out at https://kisiiuniversemart.digital/orders/my-shops/${shopId}/${orderId}
+`;
+
+const informOwner = async (shopId, orderId) => {
+  const phone = getWhatsAppNumberFromUser(
+    await shopService.getShopOwner(shopId)
+  );
+  const message = getNewOrderMessage(shopId, orderId);
+
+  sendMessage(phone, message);
+};
+
 module.exports = {
   findById,
   findMyOrders,
   findShopOrders,
-  sendMessageToShopOwner,
+  getNewOrderMessage,
+  informOwner,
 };

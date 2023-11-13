@@ -1,8 +1,10 @@
 const { isValidObjectId } = require("mongoose");
 
+const { appBaseURL } = require("../utility/func");
 const { deleteImage } = require("../utility/imageManager");
 const { mapProduct, mapProducts } = require("../mappers/products");
 const { Product } = require("../models/product");
+const { sendMessageToAllExcept } = require("../utility/whatsapp");
 
 const populateAndProject = (query) =>
   query.populate("author", "-password").populate("shop");
@@ -54,6 +56,27 @@ const findProductsOfShopAndDelete = async (shopId) => {
   return shopProducts;
 };
 
+const getNewProductMessage = (shopName, shopId, productId) => `
+Subject: 🆕 Discover the Latest Addition on ${shopName} shop!
+
+Hi,
+
+Guess what? A fantastic new product has just landed! 🎉 
+Explore it before it's gone!
+
+${appBaseURL}/${shopId.toString()}/${productId.toString()}
+
+Happy shopping!
+Campus Mart Team
+`;
+
+const informOthers = (product) => {
+  const shop = product.shop;
+  const message = getNewProductMessage(shop.name, shop._id, product._id);
+
+  sendMessageToAllExcept(shop.author, message);
+};
+
 module.exports = {
   findAll,
   findById,
@@ -61,4 +84,5 @@ module.exports = {
   findByIdAndUpdate,
   findProductsOf,
   findProductsOfShopAndDelete,
+  informOthers,
 };

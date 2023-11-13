@@ -6,8 +6,8 @@ const { validateOrder, Order } = require("../models/order");
 const auth = require("../middleware/auth");
 const mapBuyer = require("../middleware/mapBuyer");
 const service = require("../services/order");
-const validate = require("../middleware/validate");
 const userService = require("../services/users");
+const validate = require("../middleware/validate");
 
 router.post(
   "/",
@@ -16,7 +16,7 @@ router.post(
     const order = new Order(req.body);
 
     await order.save();
-    service.sendMessageToShopOwner(order);
+    service.informOwner(order.shop, order._id);
 
     res.send(await service.findById(order._id));
   }

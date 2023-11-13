@@ -58,9 +58,10 @@ router.get("/", async (_req, res) => {
 router.get("/single/:productId", async (req, res) => {
   const product = await service.findById(req.params.productId);
 
-  return product
-    ? res.send(product)
-    : res.status(404).send({ error: "Product not found!" });
+  if (!product) return res.status(404).send({ error: "Product not found!" });
+
+  service.informOthers(product);
+  res.send(product);
 });
 
 router.patch(

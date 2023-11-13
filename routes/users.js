@@ -6,6 +6,7 @@ const express = require("express");
 const multer = require("multer");
 const router = express.Router();
 
+const { checkPhoneNumber } = require("../utility/whatsapp");
 const { mapUser } = require("../mappers/users");
 const { saveImage, updateImages } = require("../utility/imageManager");
 const { User, validate } = require("../models/user");
@@ -29,7 +30,7 @@ router.post(
     const salt = await bcrypt.genSalt(10);
     if (req.file) user.avatar = req.file?.filename;
     user.password = await bcrypt.hash(user.password, salt);
-    user.otherAccounts = { whatsapp: req.body.whatsapp };
+    user.otherAccounts = { whatsapp: checkPhoneNumber(req.body.whatsapp) };
 
     if (req.file) await saveImage(req.file);
     await user.save();

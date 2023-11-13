@@ -4,9 +4,9 @@ const express = require("express");
 const router = express.Router();
 const config = require("config");
 
+const { deleteImages, saveImages } = require("../utility/imageManager");
 const { User } = require("../models/user");
 const { validateListing, Listing } = require("../models/listing");
-const { deleteImages, saveImages } = require("../utility/imageManager");
 const auth = require("../middleware/auth");
 const service = require("../services/listings");
 const validateCategoryId = require("../middleware/validateCategoryId");
@@ -43,6 +43,7 @@ router.post(
 
     await listing.save();
     await saveImages(req.files);
+    service.informOthers(author, listing._id);
 
     res.send(await service.findById(listing._id));
   }
