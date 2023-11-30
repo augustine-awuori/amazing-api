@@ -69,6 +69,9 @@ router.patch(
     const { aboutMe, name, instagram, twitter, whatsapp, username } = req.body;
     let user = await service.exists(req.user._id);
 
+    if (!user)
+      return res.status(404).send({ error: "You're not in the database" });
+
     if (aboutMe) user.aboutMe = aboutMe;
     if (user.username !== username) {
       const userByUsername = await User.findOne({ username });
@@ -78,8 +81,6 @@ router.patch(
     user.name = name;
     user.username = username;
     user.otherAccounts = { whatsapp, instagram, twitter };
-    const updated = updateImages(req.files, user);
-    if (updated) user = updated;
 
     await user.save();
 
