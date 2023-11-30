@@ -69,22 +69,34 @@ router.patch(
     const { aboutMe, name, instagram, twitter, whatsapp, username } = req.body;
     let user = await service.exists(req.user._id);
 
-    if (aboutMe) user.aboutMe = aboutMe;
+    if (!user)
+      return res.status(404).send({ error: "You're not in the database" });
+
+    if (isEdited(aboutMe)) user.aboutMe = aboutMe;
     if (user.username !== username) {
       const userByUsername = await User.findOne({ username });
       if (userByUsername)
         return res.status(400).send({ error: `${username} is already taken.` });
     }
-    user.name = name;
-    user.username = username;
-    user.otherAccounts = { whatsapp, instagram, twitter };
-    const updated = updateImages(req.files, user);
-    if (updated) user = updated;
+    if (isEdited(name)) user.name = name;
+    if (isEdited(username)) user.username = username;
+    const accounts = user.otherAccounts;
+    if (isEdited(whatsapp) || isEdited(instagram) || isEdited(twitter)) {
+      user.otherAccounts = {
+        whatsapp: whatsapp || accounts.whatsapp,
+        instagram: instagram || accounts.instagram,
+        twitter: twitter || accounts.twitter,
+      };
+    }
 
     await user.save();
 
     res.send({ token: user.generateAuthToken(), user: mapUser(user) });
   }
 );
+
+function isEdited(property) {
+  return property !== undefined;
+}
 
 module.exports = router;
