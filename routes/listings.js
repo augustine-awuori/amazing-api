@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const express = require("express");
 const router = express.Router();
-const config = require("config");
 
 const { deleteImages, saveImages } = require("../utility/imageManager");
 const { User } = require("../models/user");
@@ -21,7 +20,7 @@ router.post(
   "/",
   [
     // Order of these middlewares matters
-    upload.array("images", config.get("maxImagesCount")),
+    upload.array("images", process.env.maxImagesCount),
     auth,
     validateUser,
     validateCategoryId,

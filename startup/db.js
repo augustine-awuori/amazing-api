@@ -1,8 +1,7 @@
-const config = require("config");
 const mongoose = require("mongoose");
 const winston = require("winston");
 
-const db = config.get("db");
+const db = process.env.db;
 
 module.exports = function () {
   mongoose

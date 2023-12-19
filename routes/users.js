@@ -1,7 +1,6 @@
 const _ = require("lodash");
 const { isValidObjectId } = require("mongoose");
 const bcrypt = require("bcrypt");
-const config = require("config");
 const express = require("express");
 const multer = require("multer");
 const router = express.Router();
@@ -64,7 +63,7 @@ router.get("/:id", async (req, res) => {
 
 router.patch(
   "/",
-  [auth, validateUser, upload.array("images", config.get("userImagesCount"))],
+  [auth, validateUser, upload.array("images", process.env.userImagesCount)],
   async (req, res) => {
     const { aboutMe, name, instagram, twitter, whatsapp, username } = req.body;
     let user = await service.exists(req.user._id);

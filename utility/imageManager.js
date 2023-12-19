@@ -1,5 +1,4 @@
 const { Storage } = require("@google-cloud/storage");
-const config = require("config");
 const winston = require("winston");
 const path = require("path");
 
@@ -9,7 +8,7 @@ const storage = new Storage({
   projectId,
 });
 const bucket = storage.bucket(projectId);
-const baseURL = config.get("assetsBaseUrl") + projectId;
+const baseURL = process.env.assetsBaseUrl + projectId;
 
 async function saveImage(image) {
   await bucket.upload(image.path, {

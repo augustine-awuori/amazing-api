@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const Joi = require("joi");
 const jwt = require("jsonwebtoken");
-const config = require("config");
 
 const { mapImage } = require("../utility/imageManager");
 
@@ -66,7 +65,7 @@ schema.methods.generateAuthToken = function () {
       name: this.name,
       username: this.username,
     },
-    config.get("jwtPrivateKey")
+    process.env.jwtPrivateKey
   );
 };
 
