@@ -1,19 +1,24 @@
-const { Storage } = require("@google-cloud/storage");
 const winston = require("winston");
+const admin = require("firebase-admin");
 const path = require("path");
 
-const projectId = "kisii-universe-mart-bucket";
-const storage = new Storage({
-  keyFilename: path.join(__dirname, "../keys/app-admin.json"),
-  projectId,
+const storageBucket = process.env.storageBucket;
+
+admin.initializeApp({
+  credential: admin.credential.cert(
+    path.join(__dirname, "../keys/storage-key.json")
+  ),
+  storageBucket,
 });
-const bucket = storage.bucket(projectId);
-const baseURL = process.env.assetsBaseUrl + projectId;
+
+const bucket = admin.storage().bucket();
+const baseURL = process.env.assetsBaseUrl + storageBucket;
 
 async function saveImage(image) {
   await bucket.upload(image.path, {
     destination: image.filename,
     preconditionOpts: { ifGenerationMatch: 0 },
+    gzip: true,
   });
 }
 
