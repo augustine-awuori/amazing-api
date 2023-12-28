@@ -91,7 +91,10 @@ router.delete("/:id", auth, async (req, res) => {
 
   if (!listing) return res.status(200);
 
-  if (listing.author.toString() !== req.user._id.toString())
+  if (
+    listing.author.toString() !== req.user._id.toString() &&
+    !req.user.isAdmin
+  )
     return res
       .status(403)
       .send({ error: "Unauthorised! You're not the owner" });
