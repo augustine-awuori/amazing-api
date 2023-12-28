@@ -9,6 +9,23 @@ const { sendMessageToAllExcept } = require("../utility/whatsapp");
 const populateAndProject = (query) =>
   query.populate("author", "-password").populate("shop");
 
+const createProductFrom = async (listing, shop) => {
+  const { author, description, price, title, timestamp, images } = listing;
+
+  let product = new Product({
+    name: title,
+    price,
+    timestamp,
+    author,
+    description,
+    image: images[0],
+    shop,
+  });
+  product = await product.save();
+
+  return await findById(product._id);
+};
+
 const findAll = async () => {
   const products = await populateAndProject(Product.find({}).sort("-_id"));
 
@@ -78,6 +95,7 @@ const informOthers = (product) => {
 };
 
 module.exports = {
+  createProductFrom,
   findAll,
   findById,
   findByIdAndDelete,

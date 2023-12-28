@@ -8,6 +8,7 @@ const { User } = require("../models/user");
 const { validateListing, Listing } = require("../models/listing");
 const auth = require("../middleware/auth");
 const service = require("../services/listings");
+const productService = require("../services/products");
 const validateCategoryId = require("../middleware/validateCategoryId");
 const validateListingAuthor = require("../middleware/validateListingAuthor");
 const validateListingId = require("../middleware/validateListingId");
@@ -47,6 +48,17 @@ router.post(
     res.send(await service.findById(listing._id));
   }
 );
+
+router.post("/to-product/:id", async (req, res) => {
+  const listing = await service.findById(req.params.id);
+  if (!listing) return res.status(404).send({ error: "Listing not found!" });
+
+  const shop = req.body.shop;
+  if (!shop) return res.status(400).send({ error: "Shop not specified!" });
+
+  const product = await productService.createProductFrom(listing, shop);
+  res.send(product);
+});
 
 router.get("/", async (_req, res) => {
   const listings = await service.getAll();
