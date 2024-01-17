@@ -1,13 +1,12 @@
 const winston = require("winston");
 const admin = require("firebase-admin");
-const path = require("path");
+
+const serviceAccount = require("../keys/storage-key.json");
 
 const storageBucket = process.env.storageBucket;
 
 admin.initializeApp({
-  credential: admin.credential.cert(
-    path.join(__dirname, "../keys/storage-key.json")
-  ),
+  credential: admin.credential.cert(serviceAccount),
   storageBucket,
 });
 
@@ -15,28 +14,35 @@ const bucket = admin.storage().bucket();
 const baseURL = process.env.assetsBaseUrl + storageBucket;
 
 async function saveImage(image) {
-  await bucket.upload(image.path, {
-    destination: image.filename,
-    preconditionOpts: { ifGenerationMatch: 0 },
-    gzip: true,
-  });
-}
-
-function saveImages(images = []) {
-  const promises = images.map(async (image) => await saveImage(image));
-
-  return Promise.all(promises);
+  try {
+    await bucket.upload(image.path, {
+      destination: image.filename,
+      preconditionOpts: { ifGenerationMatch: 0 },
+      gzip: true,
+    });
+  } catch (error) {
+    winston.error(`Error saving an image ${image.filename}:`, error);
+  }
 }
 
 async function deleteImage(filename) {
   try {
     await bucket.file(filename).delete();
+    winston.info(`Image deleted successfully: ${filename}`);
   } catch (error) {
     winston.error(`Error deleting an image ${filename}:`, error);
+    throw error;
   }
 }
 
-const deleteImages = (images = []) => images.forEach(deleteImage);
+const deleteImages = async (images = []) => {
+  try {
+    await Promise.all(images.map(deleteImage));
+  } catch (error) {
+    winston.error("Error deleting images:", error);
+    throw error;
+  }
+};
 
 const isMapped = (imageUrl) => imageUrl?.startsWith("https://");
 
