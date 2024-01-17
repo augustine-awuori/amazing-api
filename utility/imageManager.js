@@ -1,13 +1,12 @@
 const winston = require("winston");
 const admin = require("firebase-admin");
-const path = require("path");
+
+const serviceAccount = require("../keys/storage-key.json");
 
 const storageBucket = process.env.storageBucket;
 
 admin.initializeApp({
-  credential: admin.credential.cert(
-    path.join(__dirname, "../keys/storage-key.json")
-  ),
+  credential: admin.credential.cert(serviceAccount),
   storageBucket,
 });
 
