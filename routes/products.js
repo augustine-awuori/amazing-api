@@ -3,7 +3,7 @@ const multer = require("multer");
 const express = require("express");
 const router = express.Router();
 
-const { saveImage, deleteImage } = require("../utility/imageManager");
+const { saveImage, deleteImage } = require("../utility/storage");
 const { validate, Product } = require("../models/product");
 const auth = require("../middleware/auth");
 const service = require("../services/products");
@@ -29,11 +29,10 @@ router.post(
       description,
       name,
       price,
-      image: image.filename,
+      image: await saveImage(image),
       shop,
     });
     await product.save();
-    await saveImage(image);
 
     res.send(await service.findById(product._id));
   }

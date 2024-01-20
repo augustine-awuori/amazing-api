@@ -2,8 +2,6 @@ const mongoose = require("mongoose");
 const Joi = require("joi");
 const jwt = require("jsonwebtoken");
 
-const { mapImage } = require("../utility/imageManager");
-
 const schema = new mongoose.Schema({
   aboutMe: {
     type: String,
@@ -54,12 +52,10 @@ const schema = new mongoose.Schema({
 });
 
 schema.methods.generateAuthToken = function () {
-  const mappedAvatar = this.avatar ? mapImage(this.avatar) : this.avatar;
-
   return jwt.sign(
     {
       _id: this._id,
-      avatar: mappedAvatar,
+      avatar: this.avatar,
       isAdmin: this.isAdmin,
       isVerified: this.isVerified,
       name: this.name,

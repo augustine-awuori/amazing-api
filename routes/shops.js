@@ -3,7 +3,7 @@ const multer = require("multer");
 const express = require("express");
 const router = express.Router();
 
-const { saveImage, deleteImage } = require("../utility/imageManager");
+const { saveImage } = require("../utility/storage");
 const { User } = require("../models/user");
 const { validateShop, Shop } = require("../models/shop");
 const auth = require("../middleware/auth");
