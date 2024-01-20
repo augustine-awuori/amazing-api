@@ -1,8 +1,7 @@
 const { isValidObjectId } = require("mongoose");
 
 const { appBaseURL } = require("../utility/func");
-const { deleteImage } = require("../utility/imageManager");
-const { mapProduct, mapProducts } = require("../mappers/products");
+const { deleteImage } = require("../utility/storage");
 const { Product } = require("../models/product");
 const { sendMessageToAllExcept } = require("../utility/whatsapp");
 
@@ -29,15 +28,13 @@ const createProductFrom = async (listing, shop) => {
 const findAll = async () => {
   const products = await populateAndProject(Product.find({}).sort("-_id"));
 
-  return mapProducts(products);
+  return products;
 };
 
 const findById = async (id) => {
   if (!isValidObjectId(id)) return;
 
-  const product = await populateAndProject(Product.findById(id));
-
-  return mapProduct(product);
+  return await populateAndProject(Product.findById(id));
 };
 
 const findByIdAndUpdate = async (id, update, options) => {
@@ -47,7 +44,7 @@ const findByIdAndUpdate = async (id, update, options) => {
     Product.findByIdAndUpdate(id, update, options)
   );
 
-  return mapProduct(product);
+  return product;
 };
 
 const findByIdAndDelete = async (id) => {
@@ -62,7 +59,7 @@ const findByIdAndDelete = async (id) => {
 const findProductsOf = async (shopId) => {
   const products = await populateAndProject(Product.find({ shop: shopId }));
 
-  return mapProducts(products);
+  return products;
 };
 
 const findProductsOfShopAndDelete = async (shopId) => {

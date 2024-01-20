@@ -3,7 +3,7 @@ const multer = require("multer");
 const express = require("express");
 const router = express.Router();
 
-const { deleteImages, saveImages } = require("../utility/imageManager");
+const { deleteImages, saveImages } = require("../utility/storage");
 const { User } = require("../models/user");
 const { validateListing, Listing } = require("../models/listing");
 const auth = require("../middleware/auth");
@@ -30,20 +30,16 @@ router.post(
   async (req, res) => {
     const { category, description, price, title } = req.body;
 
-    const author = req.user._id;
-    let images = req.files.map((image) => image.filename);
+    const images = await saveImages(req.files);
     const listing = new Listing({
-      author,
+      author: req.user._id,
       category,
       description,
       price,
       title,
       images,
     });
-
     await listing.save();
-    await saveImages(req.files);
-    service.informOthers(author, listing._id);
 
     res.send(await service.findById(listing._id));
   }

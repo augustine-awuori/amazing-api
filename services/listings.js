@@ -1,32 +1,26 @@
 const { isValidObjectId } = require("mongoose");
 
 const { Listing } = require("../models/listing");
-const { mapListings, mapListing } = require("../mappers/listings");
+const { mapListing } = require("../mappers/listings");
 const { populateAndProject } = require("./main");
 const { sendMessageToAllExcept } = require("../utility/whatsapp");
 
 const getAll = async (filter = {}) => {
   const listings = await populateAndProject(Listing.find(filter).sort("-_id"));
 
-  return mapListings(listings);
+  return listings;
 };
 
 const findById = async (id) => {
-  if (!isValidObjectId(id)) return;
-
-  const listing = await populateAndProject(Listing.findById(id));
-
-  return mapListing(listing);
+  if (isValidObjectId(id))
+    return await populateAndProject(Listing.findById(id));
 };
 
 const findByIdAndUpdate = async (id, update, options) => {
-  if (!isValidObjectId(id)) return;
-
-  const listing = await populateAndProject(
-    Listing.findByIdAndUpdate(id, update, options)
-  );
-
-  return mapListing(listing);
+  if (isValidObjectId(id))
+    return await populateAndProject(
+      Listing.findByIdAndUpdate(id, update, options)
+    );
 };
 
 const findByIdAndDelete = async (id) => {

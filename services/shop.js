@@ -1,8 +1,7 @@
 const { isValidObjectId } = require("mongoose");
 
 const { Shop } = require("../models/shop");
-const { mapShop, mapShops } = require("../mappers/shops");
-const { deleteImage } = require("../utility/imageManager");
+const { deleteImage } = require("../utility/storage");
 const productService = require("./products");
 const userService = require("./users");
 
@@ -12,7 +11,7 @@ const populateAndProject = (query) =>
 const getAll = async (filter = {}) => {
   const shops = await populateAndProject(Shop.find(filter).sort("-_id"));
 
-  return mapShops(shops);
+  return shops;
 };
 
 const findById = async (id) => {
@@ -20,7 +19,7 @@ const findById = async (id) => {
 
   const shop = await populateAndProject(Shop.findById(id));
 
-  return mapShop(shop);
+  return shop;
 };
 
 const findByIdAndUpdate = async (id, update, options) => {
@@ -30,7 +29,7 @@ const findByIdAndUpdate = async (id, update, options) => {
     Shop.findByIdAndUpdate(id, update, options)
   );
 
-  return mapShop(shop);
+  return shop;
 };
 
 const findByIdAndDelete = async (id) => {
