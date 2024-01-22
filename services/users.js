@@ -1,5 +1,4 @@
 const { User } = require("../models/user");
-const { mapUser, mapUsers } = require("../mappers/users");
 const { isValidObjectId } = require("mongoose");
 
 const exists = async (userId) => {
@@ -11,13 +10,13 @@ const findOne = async (filter = {}) => await User.findOne(filter);
 const findById = async (id) => {
   const user = await exists(id);
 
-  return user ? mapUser(user) : user;
+  return user;
 };
 
 const getAll = async (filter = {}) => {
   const users = await User.find(filter);
 
-  return mapUsers(users);
+  return users;
 };
 
 module.exports = { exists, findById, findOne, getAll };

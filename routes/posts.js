@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 
-const { mapPost } = require("../mappers/posts");
 const { validatePost, Post } = require("../models/post");
 const auth = require("../middleware/auth");
 const populateReqPost = require("../middleware/populateReqPost");
@@ -21,7 +20,7 @@ router.post(
 
     await post.save();
 
-    res.send(mapPost(post));
+    res.send(post);
   }
 );
 

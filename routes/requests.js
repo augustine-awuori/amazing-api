@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const { isValidObjectId } = require("mongoose");
 
-const { mapRequest } = require("../mappers/requests");
 const { Request, validateRequest } = require("../models/request");
 const { User } = require("../models/user");
 const auth = require("../middleware/auth");
@@ -56,7 +55,7 @@ router.get("/:id", async (req, res) => {
 router.delete("/:id", [auth, validateRequestAuthor], async (req, res) => {
   const deletedRequest = await Request.findByIdAndDelete(req.params.id);
 
-  res.send(await mapRequest(deletedRequest));
+  res.send(await deletedRequest);
 });
 
 router.put(

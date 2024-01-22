@@ -6,7 +6,6 @@ const multer = require("multer");
 const router = express.Router();
 
 const { checkPhoneNumber } = require("../utility/whatsapp");
-const { mapUser } = require("../mappers/users");
 const { saveImage } = require("../utility/storage");
 const { User, validate } = require("../models/user");
 const auth = require("../middleware/auth");
@@ -90,7 +89,7 @@ router.patch(
 
     await user.save();
 
-    res.send({ token: user.generateAuthToken(), user: mapUser(user) });
+    res.send({ token: user.generateAuthToken(), user });
   }
 );
 

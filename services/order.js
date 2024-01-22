@@ -1,7 +1,6 @@
 const { isValidObjectId } = require("mongoose");
 
 const { getWhatsAppNumberFromUser } = require("../utility/func");
-const { mapOrder, mapOrders } = require("../mappers/orders");
 const { Order } = require("../models/order");
 const { sendMessage } = require("../utility/whatsapp");
 const shopService = require("./shop");
@@ -14,7 +13,7 @@ const findById = async (id) => {
 
   const order = await populateAndProject(Order.findById(id));
 
-  return mapOrder(order);
+  return order;
 };
 
 const findMyOrders = async (myId) => {
@@ -22,7 +21,7 @@ const findMyOrders = async (myId) => {
 
   const orders = await populateAndProject(Order.find({ buyer: myId }));
 
-  return mapOrders(orders);
+  return orders;
 };
 
 const findShopOrders = async (shopId) => {
@@ -30,7 +29,7 @@ const findShopOrders = async (shopId) => {
 
   const orders = await populateAndProject(Order.find({ shop: shopId }));
 
-  return mapOrders(orders);
+  return orders;
 };
 
 const getNewOrderMessage = (shopId, orderId) => `

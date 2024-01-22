@@ -3,7 +3,6 @@ const request = require("supertest");
 const { Category } = require("../models/category");
 const { Listing } = require("../models/listing");
 const { User } = require("../models/user");
-const { imageUnmapper } = require("../mappers/listings");
 
 const endPoint = "/api/listings";
 
@@ -15,7 +14,6 @@ describe(endPoint, () => {
 
   async function deleteImages() {
     const listings = await Listing.find({});
-    listings.forEach(imageUnmapper);
   }
 
   async function createCategory() {

@@ -1,7 +1,6 @@
 const { isValidObjectId } = require("mongoose");
 
 const { Listing } = require("../models/listing");
-const { mapListing } = require("../mappers/listings");
 const { populateAndProject } = require("./main");
 const { sendMessageToAllExcept } = require("../utility/whatsapp");
 
@@ -24,8 +23,7 @@ const findByIdAndUpdate = async (id, update, options) => {
 };
 
 const findByIdAndDelete = async (id) => {
-  if (isValidObjectId(id))
-    return mapListing(await Listing.findByIdAndDelete(id));
+  if (isValidObjectId(id)) return await Listing.findByIdAndDelete(id);
 };
 
 const getAlertMessageFor = (listingId) =>
