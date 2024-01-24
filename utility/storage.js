@@ -22,22 +22,20 @@ const storage = getStorage(initializeApp(firebaseConfig));
 
 const saveImage = async (image) => {
   try {
-    const { ref } = await uploadBytes(ref(storage), image.path, {
+    const result = await uploadBytes(ref(storage, image.buffer), image.path, {
       contentType: "image/jpeg",
     });
-    return await getDownloadURL(ref);
+    return await getDownloadURL(result.ref);
   } catch (error) {
     winston.error(`Image upload or download URL retrieval failed! ${error}`);
   }
 };
 
 const saveImages = async (images = []) => {
-  const uploadPromises = images.map(async (image) => {
-    return await saveImage(image);
-  });
-
   try {
-    const downloadURLs = await Promise.all(uploadPromises);
+    const promises = images.map(async (image) => await saveImage(image));
+    const downloadURLs = await Promise.all(promises);
+
     return downloadURLs;
   } catch (error) {
     winston.error(`Images upload failed! ${error}`);

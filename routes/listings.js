@@ -15,7 +15,7 @@ const validateListingId = require("../middleware/validateListingId");
 const validateUser = require("../middleware/validateUser");
 const validator = require("../middleware/validate");
 
-const upload = multer({ dest: "uploads/" });
+const upload = multer({ dest: "uploads/", storage: multer.memoryStorage() });
 
 router.post(
   "/",
