@@ -1,7 +1,6 @@
 const { isValidObjectId } = require("mongoose");
 
 const { appBaseURL } = require("../utility/func");
-const { deleteImage } = require("../utility/storage");
 const { Product } = require("../models/product");
 const { sendMessageToAllExcept } = require("../utility/whatsapp");
 
@@ -51,7 +50,6 @@ const findByIdAndDelete = async (id) => {
   if (!isValidObjectId(id)) return;
 
   const product = await Product.findByIdAndDelete(id);
-  deleteImage(product.image);
 
   return product;
 };

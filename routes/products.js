@@ -1,9 +1,7 @@
 const { isValidObjectId } = require("mongoose");
-const multer = require("multer");
 const express = require("express");
 const router = express.Router();
 
-const { saveImage, deleteImage } = require("../utility/storage");
 const { validate, Product } = require("../models/product");
 const auth = require("../middleware/auth");
 const service = require("../services/products");
@@ -12,24 +10,18 @@ const validator = require("../middleware/validate");
 const validateProductId = require("../middleware/validateProductId");
 const validateProductAuthor = require("../middleware/validateProductAuthor");
 
-const upload = multer({ dest: "uploads/" });
-
 router.post(
   "/",
-  [upload.single("image", 1), auth, validateUser, validator(validate)],
+  [auth, validateUser, validator(validate)],
   async (req, res) => {
-    const { description, name, price, shop } = req.body;
-    const author = req.user._id;
-    const image = req.file;
-    if (!image)
-      return res.status(500).send({ error: "Couldn't process image" });
+    const { description, name, price, shop, image } = req.body;
 
     const product = new Product({
-      author,
+      author: req.user._id,
       description,
       name,
       price,
-      image: await saveImage(image),
+      image,
       shop,
     });
     await product.save();
@@ -86,8 +78,6 @@ router.delete(
   [auth, validateProductId, validateProductAuthor],
   async (req, res) => {
     const product = await Product.findByIdAndDelete(req.params.id);
-
-    if (product) deleteImage(product.image);
 
     res.send(product);
   }

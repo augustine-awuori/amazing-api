@@ -6,7 +6,6 @@ const multer = require("multer");
 const router = express.Router();
 
 const { checkPhoneNumber } = require("../utility/whatsapp");
-const { saveImage } = require("../utility/storage");
 const { User, validate } = require("../models/user");
 const auth = require("../middleware/auth");
 const validateUser = require("../middleware/validateUser");
@@ -15,30 +14,24 @@ const service = require("../services/users");
 
 const upload = multer({ dest: "uploads/" });
 
-router.post(
-  "/",
-  [upload.single("avatar"), validator(validate)],
-  async (req, res) => {
-    const username = req.body.username;
-    let user = await service.findOne({ username });
-    if (user)
-      return res.status(400).send({ error: `${username} is already taken.` });
+router.post("/", [validator(validate)], async (req, res) => {
+  const username = req.body.username;
+  let user = await service.findOne({ username });
+  if (user)
+    return res.status(400).send({ error: `${username} is already taken.` });
 
-    user = new User(_.pick(req.body, ["name", "username", "password"]));
-    const salt = await bcrypt.genSalt(10);
-    if (req.file) user.avatar = req.file?.filename;
-    user.password = await bcrypt.hash(user.password, salt);
-    user.otherAccounts = { whatsapp: checkPhoneNumber(req.body.whatsapp) };
+  user = new User(_.pick(req.body, ["avatar", "name", "username", "password"]));
+  const salt = await bcrypt.genSalt(10);
+  user.password = await bcrypt.hash(user.password, salt);
+  user.otherAccounts = { whatsapp: checkPhoneNumber(req.body.whatsapp) };
 
-    if (req.file) await saveImage(req.file);
-    await user.save();
+  await user.save();
 
-    res
-      .header("x-auth-token", user.generateAuthToken())
-      .header("access-control-expose-headers", "x-auth-token")
-      .send(_.pick(user, ["_id", "name", "username", "isAdmin", "isVerified"]));
-  }
-);
+  res
+    .header("x-auth-token", user.generateAuthToken())
+    .header("access-control-expose-headers", "x-auth-token")
+    .send(_.pick(user, ["_id", "name", "username", "isAdmin", "isVerified"]));
+});
 
 router.get("/", async (_req, res) => {
   const users = await service.getAll();

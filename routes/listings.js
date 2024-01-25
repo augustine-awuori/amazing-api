@@ -1,9 +1,7 @@
 const mongoose = require("mongoose");
-const multer = require("multer");
 const express = require("express");
 const router = express.Router();
 
-const { deleteImages, saveImages } = require("../utility/storage");
 const { User } = require("../models/user");
 const { validateListing, Listing } = require("../models/listing");
 const auth = require("../middleware/auth");
@@ -15,22 +13,12 @@ const validateListingId = require("../middleware/validateListingId");
 const validateUser = require("../middleware/validateUser");
 const validator = require("../middleware/validate");
 
-const upload = multer({ dest: "uploads/", storage: multer.memoryStorage() });
-
 router.post(
   "/",
-  [
-    // Order of these middlewares matters
-    upload.array("images", process.env.maxImagesCount),
-    auth,
-    validateUser,
-    validateCategoryId,
-    validator(validateListing),
-  ],
+  [auth, validateUser, validateCategoryId, validator(validateListing)],
   async (req, res) => {
-    const { category, description, price, title } = req.body;
+    const { category, description, price, title, images } = req.body;
 
-    const images = await saveImages(req.files);
     const listing = new Listing({
       author: req.user._id,
       category,
@@ -95,7 +83,6 @@ router.delete("/:id", auth, async (req, res) => {
       .status(403)
       .send({ error: "Unauthorised! You're not the owner" });
 
-  deleteImages(listing.images);
   await service.findByIdAndDelete(listing._id);
 
   res.send(listing);

@@ -1,7 +1,6 @@
 const { isValidObjectId } = require("mongoose");
 
 const { Shop } = require("../models/shop");
-const { deleteImage } = require("../utility/storage");
 const productService = require("./products");
 const userService = require("./users");
 
@@ -36,7 +35,6 @@ const findByIdAndDelete = async (id) => {
   if (!isValidObjectId(id)) return;
 
   const shop = await Shop.findByIdAndDelete(id);
-  deleteImage(shop.image);
   productService.findProductsOfShopAndDelete(id);
 
   return shop;

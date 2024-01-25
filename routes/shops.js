@@ -1,9 +1,7 @@
 const mongoose = require("mongoose");
-const multer = require("multer");
 const express = require("express");
 const router = express.Router();
 
-const { saveImage } = require("../utility/storage");
 const { User } = require("../models/user");
 const { validateShop, Shop } = require("../models/shop");
 const auth = require("../middleware/auth");
@@ -13,31 +11,18 @@ const validateUser = require("../middleware/validateUser");
 const validator = require("../middleware/validate");
 const mapAuthor = require("../middleware/mapAuthor");
 
-const upload = multer({ dest: "uploads/" });
-
 router.post(
   "/",
-  [
-    // Order of these middlewares matters
-    upload.single("image", 1),
-    auth,
-    validateUser,
-    validateTypeId,
-    mapAuthor,
-    validator(validateShop),
-  ],
+  [auth, validateUser, validateTypeId, mapAuthor, validator(validateShop)],
   async (req, res) => {
-    const { author, name, type, location } = req.body;
-    const file = req.file;
-    if (!file) return res.status(500).send({ error: "Couldn't process image" });
+    const { author, name, type, location, image } = req.body;
 
     let shop = await service.find({ name });
     if (shop)
       return res.status(400).send({ error: "This name is already taken" });
 
-    shop = new Shop({ author, name, type, image: file.filename, location });
+    shop = new Shop({ author, name, type, image, location });
     await shop.save();
-    saveImage(file);
 
     res.send(await service.findById(shop._id));
   }
