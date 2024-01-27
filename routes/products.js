@@ -73,6 +73,25 @@ router.patch(
   }
 );
 
+router.patch(
+  "/image/:id",
+  [auth, validateUser, validateProductId, validateProductAuthor],
+  async (req, res) => {
+    const image = req.body.image;
+    if (!image) return res.status(400).send({ error: "Image not provided" });
+
+    const product = await service.findByIdAndUpdate(
+      req.params.id,
+      { $set: { image } },
+      { new: true }
+    );
+
+    product
+      ? res.send(product)
+      : res.status(404).send({ error: "This product doesn't exist" });
+  }
+);
+
 router.delete(
   "/:id",
   [auth, validateProductId, validateProductAuthor],
