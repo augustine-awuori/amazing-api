@@ -60,10 +60,15 @@ router.patch(
   [auth, validateUser, validateProductId, validateProductAuthor],
   async (req, res) => {
     const { description, name, price } = req.body;
+    const updated = {};
+
+    if (description) updated.description = description;
+    if (name) updated.name = name;
+    if (price) updated.price = price;
 
     const product = await service.findByIdAndUpdate(
       req.params.id,
-      { $set: { description, name, price } },
+      { $set: { ...updated } },
       { new: true }
     );
 

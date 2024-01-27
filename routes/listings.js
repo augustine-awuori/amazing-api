@@ -99,10 +99,17 @@ router.patch(
   ],
   async (req, res) => {
     const { _id, category, description, price, title } = req.body;
+    const updated = {};
+
+    if (_id) updated._id = _id;
+    if (category) updated.category = category;
+    if (description) updated.description = description;
+    if (price) updated.price = price;
+    if (title) updated.title = title;
 
     const listing = await service.findByIdAndUpdate(
       _id,
-      { $set: { category, description, title, price } },
+      { $set: { ...updated } },
       { new: true }
     );
 

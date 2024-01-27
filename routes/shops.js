@@ -81,10 +81,14 @@ router.patch("/views/:shopId", async (req, res) => {
 
 router.patch("/:id", [auth, validateUser], async (req, res) => {
   const { type, name } = req.body;
+  const updated = {};
+
+  if (type) updated.type = type;
+  if (name) updated.name = name;
 
   const shop = await service.findByIdAndUpdate(
     req.params.id,
-    { $set: { name, type } },
+    { $set: { ...updated } },
     { new: true }
   );
 
