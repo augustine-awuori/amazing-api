@@ -98,7 +98,7 @@ router.patch(
     validateCategoryId,
   ],
   async (req, res) => {
-    const { _id, category, description, price, title } = req.body;
+    const { _id, category, description, price, title, images } = req.body;
     const updated = {};
 
     if (_id) updated._id = _id;
@@ -106,6 +106,7 @@ router.patch(
     if (description) updated.description = description;
     if (price) updated.price = price;
     if (title) updated.title = title;
+    if (images?.length) updated.images = images;
 
     const listing = await service.findByIdAndUpdate(
       _id,
