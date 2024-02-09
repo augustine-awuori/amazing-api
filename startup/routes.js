@@ -4,6 +4,7 @@ const serveStatic = require("serve-static");
 
 const auth = require("../routes/auth");
 const categories = require("../routes/categories");
+const events = require("../routes/events");
 const error = require("../middleware/error");
 const expoPushTokens = require("../routes/expoPushTokens");
 const listings = require("../routes/listings");
@@ -22,6 +23,7 @@ module.exports = function (app) {
   app.use(cors({ origin: "*" }));
   app.use("/api/auth", auth);
   app.use("/api/categories", categories);
+  app.use("/api/events", events);
   app.use("/api/listings", listings);
   app.use("/api/opinions", opinions);
   app.use("/api/orders", orders);
