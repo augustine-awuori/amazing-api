@@ -49,7 +49,6 @@ const Event = mongoose.model("Event", schema);
 
 const validate = (event) =>
   Joi.object({
-    author: Joi.string(),
     description: Joi.string().required().max(255).min(5),
     title: Joi.string().required().max(50).min(3),
     location: Joi.string().required().max(255).min(3),
