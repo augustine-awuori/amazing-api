@@ -56,6 +56,7 @@ const validate = (event) =>
     image: Joi.string().required(),
     startsAt: Joi.date(),
     endsAt: Joi.date(),
+    fee: Joi.number(),
   }).validate(event);
 
 module.exports.Event = Event;
