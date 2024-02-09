@@ -45,7 +45,7 @@ const schema = new mongoose.Schema({
   },
 });
 
-const Event = mongoose.Model("Event", schema);
+const Event = mongoose.model("Event", schema);
 
 const validate = (event) =>
   Joi.object({
