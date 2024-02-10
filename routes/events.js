@@ -45,12 +45,6 @@ router.patch("/:id", [auth, validateUser], async (req, res) => {
   let event = await service.findById(req.params.id);
   if (!event) return res.status(404).send("Event not found");
 
-  if (
-    event.author._id.toString() !== req.user._id.toString() ||
-    !req.user.isAdmin
-  )
-    return res.status(403).send({ error: "Unathorised user" });
-
   const { name, username } = req.body;
   event.turnOut.push({ name, username });
 
