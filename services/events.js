@@ -1,7 +1,8 @@
 const { isValidObjectId } = require("mongoose");
 
 const { Event } = require("../models/event");
-const { populateAndProject } = require("./main");
+
+const populateAndProject = (query) => query.populate("author", "-password");
 
 const findById = async (id) => {
   if (isValidObjectId(id)) return await populateAndProject(Event.findById(id));
