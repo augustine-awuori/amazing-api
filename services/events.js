@@ -19,6 +19,7 @@ const create = async (user, event) => {
     startsAt,
     endsAt,
     location,
+    bookmarks: {},
   });
 
   await initialized.save();

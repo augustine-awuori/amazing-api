@@ -53,8 +53,8 @@ const validate = (event) =>
     title: Joi.string().required().max(50).min(3),
     location: Joi.string().required().max(255).min(3),
     image: Joi.string().required(),
-    startsAt: Joi.date(),
-    endsAt: Joi.date(),
+    startsAt: Joi.date().required(),
+    endsAt: Joi.date().required(),
     fee: Joi.number(),
   }).validate(event);
 
