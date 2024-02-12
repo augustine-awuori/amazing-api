@@ -87,7 +87,7 @@ router.patch(
 
     const product = await service.findByIdAndUpdate(
       req.params.id,
-      { $set: { image } },
+      { image },
       { new: true }
     );
 
