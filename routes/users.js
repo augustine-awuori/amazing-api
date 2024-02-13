@@ -14,13 +14,19 @@ const service = require("../services/users");
 
 const upload = multer({ dest: "uploads/" });
 
-router.post("/", [validator(validate)], async (req, res) => {
-  const username = req.body.username;
+router.post("/", validator(validate), async (req, res) => {
+  const { password, phone, name } = req.body;
+  let username = name.trim().replace(/\s+/g, "");
   let user = await service.findOne({ username });
-  if (user)
-    return res.status(400).send({ error: `${username} is already taken.` });
 
-  user = new User(_.pick(req.body, ["avatar", "name", "username", "password"]));
+  let counter = 1;
+  while (user) {
+    username = `${username}${counter}`;
+    user = await service.findOne({ username });
+    counter++;
+  }
+
+  user = new User({ name, username, password, phone });
   const salt = await bcrypt.genSalt(10);
   user.password = await bcrypt.hash(user.password, salt);
   user.otherAccounts = { whatsapp: checkPhoneNumber(req.body.whatsapp) };
