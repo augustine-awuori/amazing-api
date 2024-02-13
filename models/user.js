@@ -42,6 +42,7 @@ const schema = new mongoose.Schema({
   },
   hasShop: { type: Boolean, default: false },
   expoPushToken: String,
+  phone: String,
   otherAccounts: Object,
   timestamp: {
     type: Number,
@@ -74,8 +75,8 @@ const validateUser = (user) =>
     coverPhoto: Joi.object().optional(),
     name: Joi.string().min(3).max(50).required(),
     password: Joi.string().min(6).max(1024).required(),
-    username: Joi.string().min(4).max(50).required(),
     whatsapp: Joi.string().min(12).max(13).required(),
+    phone: Joi.string(),
   }).validate(user);
 
 exports.User = User;
