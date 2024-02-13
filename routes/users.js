@@ -29,7 +29,7 @@ router.post("/", validator(validate), async (req, res) => {
   user = new User({ name, username, password, phone: phone || whatsapp });
   const salt = await bcrypt.genSalt(10);
   user.password = await bcrypt.hash(user.password, salt);
-  user.otherAccounts = { whatsapp: checkPhoneNumber(req.body.whatsapp) };
+  user.otherAccounts = { whatsapp: checkPhoneNumber(whatsapp) };
 
   await user.save();
 
