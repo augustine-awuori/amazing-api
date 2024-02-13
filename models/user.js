@@ -42,7 +42,13 @@ const schema = new mongoose.Schema({
   },
   hasShop: { type: Boolean, default: false },
   expoPushToken: String,
-  phone: String,
+  phone: {
+    type: String,
+    trim: true,
+    default: function () {
+      return this.otherAccounts.whatsapp || "";
+    },
+  },
   otherAccounts: Object,
   timestamp: {
     type: Number,
