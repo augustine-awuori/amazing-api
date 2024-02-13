@@ -15,8 +15,8 @@ const service = require("../services/users");
 const upload = multer({ dest: "uploads/" });
 
 router.post("/", validator(validate), async (req, res) => {
-  const { password, phone, name } = req.body;
-  let username = name.trim().replace(/\s+/g, "");
+  const { password, phone, name, whatsapp } = req.body;
+  let username = name.trim().toLowerCase().replace(/\s+/g, "");
   let user = await service.findOne({ username });
 
   let counter = 1;
@@ -26,7 +26,7 @@ router.post("/", validator(validate), async (req, res) => {
     counter++;
   }
 
-  user = new User({ name, username, password, phone });
+  user = new User({ name, username, password, phone: phone || whatsapp });
   const salt = await bcrypt.genSalt(10);
   user.password = await bcrypt.hash(user.password, salt);
   user.otherAccounts = { whatsapp: checkPhoneNumber(req.body.whatsapp) };
