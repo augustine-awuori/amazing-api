@@ -36,6 +36,7 @@ const validate = (shop) =>
   Joi.object({
     author: Joi.string(),
     name: Joi.string().min(3).max(50),
+    image: Joi.string().required(),
     location: Joi.string().min(3).max(255),
     type: Joi.string(),
   }).validate(shop);
