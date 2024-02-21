@@ -3,24 +3,10 @@ const mongoose = require("mongoose");
 
 const schema = new mongoose.Schema({
   author: { type: mongoose.Types.ObjectId, ref: "User" },
-  speech: {
-    maxlength: 255,
-    trim: true,
-    type: String,
-  },
+  speech: String,
   image: String,
-  phone: {
-    maxlength: 13,
-    minlength: 10,
-    trim: true,
-    type: String,
-  },
-  position: {
-    maxlength: 60,
-    minlength: 10,
-    trim: true,
-    type: String,
-  },
+  phone: String,
+  position: String,
   timestamp: {
     type: Number,
     default: function () {
