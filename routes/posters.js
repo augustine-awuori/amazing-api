@@ -11,14 +11,9 @@ router.post(
   "/",
   [auth, validateUser, validator(validate)],
   async (req, res) => {
-    const { phone, image, position, speech } = req.body;
-
     const poster = new Poster({
       author: req.user._id,
-      phone,
-      image,
-      position,
-      speech,
+      image: req.body.image,
     });
     await poster.save();
 
