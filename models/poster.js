@@ -19,9 +19,9 @@ const Poster = mongoose.model("Poster", schema);
 
 const validate = (poster) =>
   Joi.object({
-    speech: Joi.string().optional(""),
-    phone: Joi.string().optional(),
-    position: Joi.string().optional(),
+    speech: Joi.string(),
+    phone: Joi.string(),
+    position: Joi.string(),
     image: Joi.string().required(),
   }).validate(poster);
 
