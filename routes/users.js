@@ -59,6 +59,18 @@ router.get("/:id", async (req, res) => {
   res.send(user);
 });
 
+router.patch("/chats/:userId", [auth, validateUser], async (req, res) => {
+  const user = await service.findByIdAndUpdate(
+    req.params.userId,
+    { $addToSet: { chatsId: req.body.chatId } },
+    { new: true }
+  );
+
+  user
+    ? res.send(user)
+    : res.status(404).send({ error: "You don't exist in the database" });
+});
+
 router.patch(
   "/",
   [auth, validateUser, upload.array("images", process.env.userImagesCount)],

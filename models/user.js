@@ -11,6 +11,7 @@ const schema = new mongoose.Schema({
   },
   avatar: String,
   coverPhoto: String,
+  chatIds: Object,
   username: {
     type: String,
     maxlength: 50,
