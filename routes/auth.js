@@ -4,6 +4,7 @@ const express = require("express");
 const router = express.Router();
 
 const { User } = require("../models/user");
+const service = require("../services/users");
 const validator = require("../middleware/validate");
 
 router.post("/", validator(validate), async (req, res) => {
@@ -20,6 +21,15 @@ router.post("/", validator(validate), async (req, res) => {
 
   const token = user.generateAuthToken();
   res.send(token);
+});
+
+router.get("/token", auth, async (req, res) => {
+  const user = await service.findById(req.user._id);
+
+  if (!user)
+    return res.status(404).send({ error: "You don't exist on the database" });
+
+  res.send(user.generateAuthToken());
 });
 
 function validate(req) {
