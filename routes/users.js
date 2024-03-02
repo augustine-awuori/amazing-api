@@ -59,16 +59,27 @@ router.get("/:id", async (req, res) => {
   res.send(user);
 });
 
-router.patch("/chats/:userId", [auth, validateUser], async (req, res) => {
-  const user = await service.findByIdAndUpdate(
-    req.params.userId,
-    { $addToSet: { chatsId: req.body.chatId } },
+router.patch("/chatIds", [auth, validateUser], async (req, res) => {
+  const { email, chatId } = req.body;
+
+  let user = await service.findById(req.user._id);
+  if (!user)
+    return res.status(400).send({ error: "You don't exist in the database" });
+
+  if (!user.chatIds) {
+    user.chatIds = { [email]: chatId };
+    await user.save();
+
+    return res.send(user);
+  }
+
+  user = await service.findByIdAndUpdate(
+    user._id,
+    { $set: { [`chatIds.${email}`]: chatId } },
     { new: true }
   );
 
-  user
-    ? res.send(user)
-    : res.status(404).send({ error: "You don't exist in the database" });
+  res.send(user);
 });
 
 router.patch(

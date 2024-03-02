@@ -47,7 +47,7 @@ const schema = new mongoose.Schema({
     type: String,
     trim: true,
     default: function () {
-      return this.otherAccounts.whatsapp || "";
+      return this.otherAccounts?.whatsapp || "";
     },
   },
   otherAccounts: Object,
