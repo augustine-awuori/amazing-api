@@ -36,7 +36,7 @@ router.post("/", validator(validate), async (req, res) => {
   res
     .header("x-auth-token", user.generateAuthToken())
     .header("access-control-expose-headers", "x-auth-token")
-    .send(_.pick(user, ["_id", "name", "username", "isAdmin", "isVerified"]));
+    .send(user);
 });
 
 router.get("/", async (_req, res) => {
