@@ -41,7 +41,6 @@ const schema = new mongoose.Schema({
       return this.isAdmin;
     },
   },
-  hasShop: { type: Boolean, default: false },
   expoPushToken: String,
   phone: {
     type: String,
