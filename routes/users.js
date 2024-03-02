@@ -36,7 +36,18 @@ router.post("/", validator(validate), async (req, res) => {
   res
     .header("x-auth-token", user.generateAuthToken())
     .header("access-control-expose-headers", "x-auth-token")
-    .send(user);
+    .send(
+      _.pick(user, [
+        "avatar",
+        "aboutMe",
+        "chatIds",
+        "username",
+        "name",
+        "isAdmin",
+        "isVerified",
+        "otherAccounts",
+      ])
+    );
 });
 
 router.get("/", async (_req, res) => {
@@ -56,7 +67,7 @@ router.get("/:id", async (req, res) => {
       .status(404)
       .send({ error: "The user with the given ID does not exist." });
 
-  res.send(user);
+  res.send(_.omit(user, ["password"]));
 });
 
 router.patch("/chatIds", [auth, validateUser], async (req, res) => {
