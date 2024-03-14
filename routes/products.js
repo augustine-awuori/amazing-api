@@ -97,7 +97,7 @@ router.delete(
   "/:id",
   [auth, validateProductId, validateProductAuthor],
   async (req, res) => {
-    const product = await Product.findByIdAndDelete(req.params.id);
+    const product = await service.findByIdAndDelete(req.params.id);
 
     res.send(product);
   }
