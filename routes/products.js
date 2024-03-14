@@ -93,14 +93,22 @@ router.patch("/image/:id", auth, async (req, res) => {
     : res.status(404).send({ error: "This product doesn't exist" });
 });
 
-router.delete(
-  "/:id",
-  [auth, validateProductId, validateProductAuthor],
-  async (req, res) => {
-    const product = await service.findByIdAndDelete(req.params.id);
+router.delete("/:id", [auth, validateProductId], async (req, res) => {
+  const product = await service.findById(req.params.id);
 
-    res.send(product);
-  }
-);
+  if (!product)
+    return res
+      .status(404)
+      .send({ error: "Product doesn't exist in the database" });
+
+  if (
+    product.author._id.toString() !== req.user._id.toString() ||
+    !req.user.isAdmin
+  )
+    return res.status(403).send({ error: "Unauthorised access!" });
+
+  await service.findByIdAndDelete(product._id);
+  res.send(product);
+});
 
 module.exports = router;
