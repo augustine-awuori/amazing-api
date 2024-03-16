@@ -1,7 +1,6 @@
 const { isValidObjectId } = require("mongoose");
 const express = require("express");
 const router = express.Router();
-const winston = require("winston");
 
 const { validate, Product } = require("../models/product");
 const auth = require("../middleware/auth");
@@ -101,24 +100,14 @@ router.delete("/:id", [auth, validateProductId], async (req, res) => {
     return res
       .status(404)
       .send({ error: "Product doesn't exist in the database" });
-  winston.info(
-    "type of product.author._id",
-    typeof product.author._id.toString()
-  );
-  winston.info(`"product.author._id ${product.author._id.toString()}`);
-  winston.info(`"type of req.user._id" ${typeof req.user._id.toString()}`);
-  winston.info(`req.user._id ${req.user._id.toString()}`);
-  winston.info(
-    `areEqual ${product.author._id.toString() === req.user._id.toString()}`
-  );
-  if (
-    product.author._id.toString() !== req.user._id.toString() ||
-    !req.user.isAdmin
-  )
-    return res.status(403).send({ error: "Unauthorised access!" });
 
-  await service.findByIdAndDelete(product._id);
-  res.send(product);
+  if (
+    product.author._id.toString() === req.user._id.toString() ||
+    req.user.isAdmin
+  )
+    res.send(await service.findByIdAndDelete(product._id));
+
+  return res.status(403).send({ error: "Unauthorised access!" });
 });
 
 module.exports = router;
