@@ -1,6 +1,7 @@
 const { isValidObjectId } = require("mongoose");
 const express = require("express");
 const router = express.Router();
+const winston = require("winston");
 
 const { validate, Product } = require("../models/product");
 const auth = require("../middleware/auth");
@@ -100,8 +101,8 @@ router.delete("/:id", [auth, validateProductId], async (req, res) => {
     return res
       .status(404)
       .send({ error: "Product doesn't exist in the database" });
-  console.log("product.author._id", product.author._id.toString());
-  console.log("req.user._id", req.user._id.toString());
+  winston.info("product.author._id", product.author._id.toString());
+  winston.info("req.user._id", req.user._id.toString());
   if (
     product.author._id.toString() !== req.user._id.toString() ||
     !req.user.isAdmin
