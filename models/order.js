@@ -6,6 +6,7 @@ module.exports.Order = mongoose.model(
   new mongoose.Schema({
     buyer: { type: mongoose.Types.ObjectId, ref: "User" },
     shop: { type: mongoose.Types.ObjectId, ref: "Shop" },
+    status: { type: mongoose.Types.ObjectId, ref: "Status" },
     message: {
       maxlength: 255,
       trim: true,
@@ -27,6 +28,7 @@ module.exports.validateOrder = (order) =>
   Joi.object({
     buyer: Joi.string(),
     shop: Joi.string(),
+    status: Joi.string(),
     message: Joi.string().max(255).allow(""),
     products: Joi.array().min(1),
   }).validate(order);

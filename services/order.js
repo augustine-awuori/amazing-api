@@ -6,7 +6,11 @@ const { sendMessage } = require("../utility/whatsapp");
 const shopService = require("./shop");
 
 const populateAndProject = (query) =>
-  query.populate("buyer", "-password").populate("products").populate("shop");
+  query
+    .populate("buyer", "-password")
+    .populate("products")
+    .populate("shop")
+    .populate("status");
 
 const findById = async (id) => {
   if (!isValidObjectId(id)) return;
