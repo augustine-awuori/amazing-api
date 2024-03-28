@@ -54,9 +54,11 @@ router.patch("/:id", auth, async (req, res) => {
   if (!isAuthorised)
     return res.status(403).send({ error: "Unauthorised access" });
 
-  const updatedOrder = await service.findByIdAndUpdate(req.params.id, update, {
-    new: true,
-  });
+  const updatedOrder = await service.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { new: true }
+  );
 
   res.send(updatedOrder);
 });
