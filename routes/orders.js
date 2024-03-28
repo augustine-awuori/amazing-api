@@ -43,4 +43,22 @@ router.get("/single/:id", async (req, res) => {
   res.send(order);
 });
 
+router.patch("/:id", auth, async (req, res) => {
+  const order = await service.findById(req.params.id);
+  if (!order) return res.status(404).send({ error: "Order not found" });
+
+  const userId = req.user._id.toString();
+  const isAuthorised =
+    order.buyer._id.toString() === userId ||
+    order.shop.author._id.toString() === userId;
+  if (!isAuthorised)
+    return res.status(403).send({ error: "Unauthorised access" });
+
+  const updatedOrder = await service.findByIdAndUpdate(req.params.id, update, {
+    new: true,
+  });
+
+  res.send(updatedOrder);
+});
+
 module.exports = router;

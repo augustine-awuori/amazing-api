@@ -20,6 +20,16 @@ const findById = async (id) => {
   return order;
 };
 
+const findByIdAndUpdate = async (id, update, options) => {
+  if (!isValidObjectId(id)) return;
+
+  const order = await populateAndProject(
+    Order.findByIdAndUpdate(id, update, options)
+  );
+
+  return order;
+};
+
 const findMyOrders = async (myId) => {
   if (!isValidObjectId(myId)) return;
 
@@ -53,6 +63,7 @@ const informOwner = async (shopId, orderId) => {
 
 module.exports = {
   findById,
+  findByIdAndUpdate,
   findMyOrders,
   findShopOrders,
   getNewOrderMessage,
