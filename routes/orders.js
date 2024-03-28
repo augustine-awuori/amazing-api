@@ -43,4 +43,14 @@ router.get("/single/:id", async (req, res) => {
   res.send(order);
 });
 
+router.patch("/:id", auth, async (req, res) => {
+  const updatedOrder = await Order.findByIdAndUpdate(req.params.id, update, {
+    new: true,
+  });
+
+  if (!updatedOrder) return res.status(404).send({ error: "Order not found" });
+
+  res.send(updatedOrder);
+});
+
 module.exports = router;
