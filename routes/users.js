@@ -12,7 +12,7 @@ const validator = require("../middleware/validate");
 const service = require("../services/users");
 
 router.post("/", validator(validate), async (req, res) => {
-  const { password, phone, name, whatsapp } = req.body;
+  const { password, name, whatsapp } = req.body;
   let username = name.trim().toLowerCase().replace(/\s+/g, "");
   let user = await service.findOne({ username });
 
@@ -23,7 +23,7 @@ router.post("/", validator(validate), async (req, res) => {
     counter++;
   }
 
-  user = new User({ name, username, password, phone: phone || whatsapp });
+  user = new User({ name, username, password });
   const salt = await bcrypt.genSalt(10);
   user.password = await bcrypt.hash(user.password, salt);
   user.otherAccounts = { whatsapp: checkPhoneNumber(whatsapp) };
