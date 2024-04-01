@@ -12,7 +12,7 @@ module.exports.Order = mongoose.model(
       trim: true,
       type: String,
     },
-    products: [{ type: mongoose.Types.ObjectId, ref: "Product" }],
+    products: Object,
     canceled: { type: Boolean, default: false },
     seen: { type: Boolean, default: false },
     timestamp: {
@@ -30,5 +30,5 @@ module.exports.validateOrder = (order) =>
     shop: Joi.string(),
     status: Joi.string(),
     message: Joi.string().max(255).allow(""),
-    products: Joi.array().min(1),
+    products: Joi.object(),
   }).validate(order);
