@@ -42,13 +42,6 @@ const schema = new mongoose.Schema({
     },
   },
   expoPushToken: String,
-  phone: {
-    type: String,
-    trim: true,
-    default: function () {
-      return this.otherAccounts?.whatsapp || "";
-    },
-  },
   otherAccounts: Object,
   timestamp: {
     type: Number,
@@ -82,7 +75,6 @@ const validateUser = (user) =>
     name: Joi.string().min(3).max(50).required(),
     password: Joi.string().min(6).max(1024).required(),
     whatsapp: Joi.string().min(12).max(13).required(),
-    phone: Joi.string().optional(),
   }).validate(user);
 
 exports.User = User;
