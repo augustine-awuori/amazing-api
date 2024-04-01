@@ -95,7 +95,7 @@ router.patch("/", [auth, validateUser], async (req, res) => {
     new: true,
   });
 
-  res.send({ token: user.generateAuthToken(), user });
+  res.send(user);
 });
 
 module.exports = router;
