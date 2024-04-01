@@ -95,9 +95,7 @@ router.patch("/", [auth, validateUser], async (req, res) => {
     new: true,
   });
 
-  user
-    ? res.send({ token: user.generateAuthToken(), user })
-    : res.status(500).send({ error: "User update failed! Try again later" });
+  res.send({ token: user.generateAuthToken(), user });
 });
 
 module.exports = router;
