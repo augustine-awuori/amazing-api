@@ -20,7 +20,7 @@ const Shop = mongoose.model(
       trim: true,
       type: String,
     },
-    type: { type: mongoose.Types.ObjectId, ref: "Type" },
+    types: Object,
     isVerified: { default: false, type: Boolean },
     views: { type: Number, default: 0 },
     timestamp: {
@@ -38,7 +38,7 @@ const validate = (shop) =>
     name: Joi.string().min(3).max(50),
     image: Joi.string().required(),
     location: Joi.string().min(3).max(255),
-    type: Joi.string(),
+    types: Joi.object(),
   }).validate(shop);
 
 module.exports.validateShop = validate;

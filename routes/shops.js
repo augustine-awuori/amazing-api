@@ -6,22 +6,21 @@ const { User } = require("../models/user");
 const { validateShop, Shop } = require("../models/shop");
 const auth = require("../middleware/auth");
 const service = require("../services/shop");
-const validateTypeId = require("../middleware/validateTypeId");
 const validateUser = require("../middleware/validateUser");
 const validator = require("../middleware/validate");
 const mapAuthor = require("../middleware/mapAuthor");
 
 router.post(
   "/",
-  [auth, validateUser, validateTypeId, mapAuthor, validator(validateShop)],
+  [auth, validateUser, mapAuthor, validator(validateShop)],
   async (req, res) => {
-    const { author, name, type, location, image } = req.body;
+    const { author, name, types, location, image } = req.body;
 
     let shop = await service.find({ name });
     if (shop)
       return res.status(400).send({ error: "This name is already taken" });
 
-    shop = new Shop({ author, name, type, image, location });
+    shop = new Shop({ author, name, types, image, location });
     await shop.save();
 
     res.send(await service.findById(shop._id));
@@ -80,18 +79,9 @@ router.patch("/views/:shopId", async (req, res) => {
 });
 
 router.patch("/:id", [auth, validateUser], async (req, res) => {
-  const { type, name, image } = req.body;
-  const updated = {};
-
-  if (type) updated.type = type;
-  if (name) updated.name = name;
-  if (image) updated.image = image;
-
-  const shop = await service.findByIdAndUpdate(
-    req.params.id,
-    { $set: { ...updated } },
-    { new: true }
-  );
+  const shop = await service.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+  });
 
   shop
     ? res.send(shop)
