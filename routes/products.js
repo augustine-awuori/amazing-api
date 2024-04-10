@@ -14,14 +14,14 @@ router.post(
   "/",
   [auth, validateUser, validator(validate)],
   async (req, res) => {
-    const { description, name, price, shop, image } = req.body;
+    const { description, name, price, shop, images } = req.body;
 
     const product = new Product({
       author: req.user._id,
       description,
       name,
       price,
-      image,
+      images,
       shop,
     });
     await product.save();
