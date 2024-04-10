@@ -59,18 +59,9 @@ router.patch(
   "/:id",
   [auth, validateUser, validateProductId, validateProductAuthor],
   async (req, res) => {
-    const { description, name, price } = req.body;
-    const updated = {};
-
-    if (description) updated.description = description;
-    if (name) updated.name = name;
-    if (price) updated.price = price;
-
-    const product = await service.findByIdAndUpdate(
-      req.params.id,
-      { $set: { ...updated } },
-      { new: true }
-    );
+    const product = await service.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+    });
 
     product
       ? res.send(product)
