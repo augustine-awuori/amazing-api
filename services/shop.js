@@ -4,8 +4,7 @@ const { Shop } = require("../models/shop");
 const productService = require("./products");
 const userService = require("./users");
 
-const populateAndProject = (query) =>
-  query.populate("author", "-password").populate("type");
+const populateAndProject = (query) => query.populate("author", "-password");
 
 const getAll = async (filter = {}) => {
   const shops = await populateAndProject(Shop.find(filter).sort("-_id"));
