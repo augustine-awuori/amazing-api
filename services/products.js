@@ -16,7 +16,7 @@ const createProductFrom = async (listing, shop) => {
     timestamp,
     author,
     description,
-    image: images[0],
+    images,
     shop,
   });
   product = await product.save();
