@@ -5,7 +5,7 @@ const { Product } = require("../models/product");
 const { sendMessageToAllExcept } = require("../utility/whatsapp");
 
 const populateAndProject = (query) =>
-  query.populate("author", "-password").populate("shop");
+  query.populate("author", "-password").populate("shop").populate("type");
 
 const createProductFrom = async (listing, shop) => {
   const { author, description, price, title, timestamp, images } = listing;

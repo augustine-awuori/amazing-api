@@ -10,6 +10,7 @@ const schema = new mongoose.Schema({
   },
   shop: { type: mongoose.Types.ObjectId, ref: "Shop" },
   images: [String],
+  type: { type: mongoose.Types.ObjectId, ref: "Type" },
   price: { max: 1_000_000, min: 1, required: true, type: Number },
   name: {
     maxlength: 50,
@@ -35,6 +36,7 @@ const validate = (product) =>
     shop: Joi.string(),
     images: Joi.array().min(1).max(3),
     price: Joi.number().required().min(1).max(1_000_000),
+    type: Joi.string(),
     name: Joi.string().required().min(2).max(50),
   }).validate(product);
 
