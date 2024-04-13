@@ -20,4 +20,15 @@ router.get("/", async (_req, res) => {
   res.send(types);
 });
 
+router.get("/:id", async (req, res) => {
+  const type = await Type.findById(req.params.id);
+
+  if (!type)
+    return res
+      .status(404)
+      .send({ error: "The type with the given ID doesn't exist" });
+
+  res.send(type);
+});
+
 module.exports = router;
