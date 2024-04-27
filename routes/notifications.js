@@ -54,24 +54,35 @@ router.post("/unsubscribe", auth, async (req, res) => {
   res.send(200).send({ message: "Unsubscribed successfully" });
 });
 
-router.post("/notify", async (req, res) => {
+router.post("/notify/:userId", async (req, res) => {
+  const user = await User.findById(req.params.userId);
+
+  if (!user)
+    return res.status(404).send({ error: "The intended user doesn't exist" });
+
+  await notifyUser(user, req.body);
+});
+
+router.post("/notify", auth, async (req, res) => {
   const payload = JSON.stringify(
     req.body || { title: "Amazing Website", body: "You've unseen notification" }
   );
 
-  (await User.find({})).forEach((user) => {
-    const subscriptions = user?.pushSubscriptions || [];
-
-    subscriptions.forEach(async (sub) => {
-      try {
-        await webpush.sendNotification(sub, payload);
-      } catch (error) {
-        winston.error(`Error sending notification: ${error}`);
-      }
-    });
-  });
+  (await User.find({})).forEach(
+    async (user) => await notifyUser(user, payload)
+  );
 
   res.send({ message: "Done sending notifications to all subscribers." });
 });
+
+async function notifyUser(user, notification) {
+  (user?.pushSubscriptions || []).forEach(async (sub) => {
+    try {
+      await webpush.sendNotification(sub, notification);
+    } catch (error) {
+      winston.error(`Error sending notification: ${error}`);
+    }
+  });
+}
 
 module.exports = router;
