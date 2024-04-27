@@ -4,14 +4,15 @@ const serveStatic = require("serve-static");
 
 const auth = require("../routes/auth");
 const categories = require("../routes/categories");
-const events = require("../routes/events");
 const error = require("../middleware/error");
+const events = require("../routes/events");
 const expoPushTokens = require("../routes/expoPushTokens");
 const listings = require("../routes/listings");
+const notifications = require("../routes/notifications");
 const opinions = require("../routes/opinions");
 const orders = require("../routes/orders");
-const posts = require("../routes/posts");
 const posters = require("../routes/posters");
+const posts = require("../routes/posts");
 const products = require("../routes/products");
 const requests = require("../routes/requests");
 const shops = require("../routes/shops");
@@ -35,6 +36,7 @@ module.exports = function (app) {
   app.use("/api/requests", requests);
   app.use("/api/shops", shops);
   app.use("/api/status", status);
+  app.use("/api/notifications", notifications);
   app.use("/api/types", types);
   app.use("/api/users", users);
   app.use("/api/expoPushTokens", expoPushTokens);

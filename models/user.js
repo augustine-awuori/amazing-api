@@ -2,6 +2,31 @@ const mongoose = require("mongoose");
 const Joi = require("joi");
 const jwt = require("jsonwebtoken");
 
+const pushSubscriptionSchema = new mongoose.Schema({
+  endpoint: {
+    type: String,
+    required: true,
+  },
+  keys: {
+    p256dh: {
+      type: String,
+      required: true,
+    },
+    auth: {
+      type: String,
+      required: true,
+    },
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
 const schema = new mongoose.Schema({
   aboutMe: {
     type: String,
@@ -43,6 +68,7 @@ const schema = new mongoose.Schema({
   },
   expoPushToken: String,
   otherAccounts: Object,
+  pushSubscriptions: [pushSubscriptionSchema],
   timestamp: {
     type: Number,
     default: function () {

@@ -3,6 +3,12 @@ require("winston-mongodb");
 require("express-async-errors");
 
 module.exports = function () {
+  winston.add(
+    new winston.transports.Console({
+      format: winston.format.simple(),
+    })
+  );
+
   new winston.Logger({
     transports: [
       new winston.transports.File({
