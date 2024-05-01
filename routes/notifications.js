@@ -1,88 +1,41 @@
-const webpush = require("web-push");
 const express = require("express");
-const winston = require("winston");
 const router = express.Router();
 
-const { User } = require("../models/user");
+const { Notification } = require("../models/notification");
 const auth = require("../middleware/auth");
+const service = require("../services/notifications");
 
-webpush.setVapidDetails(
-  "mailto:codewithaugustine@gmail.com",
-  process.env.publicVapidKey,
-  process.env.privateVapidKey
-);
+router.post("/", auth, async (req, res) => {
+  const { description, title, to } = req.body;
 
-router.post("/subscribe", auth, async (req, res) => {
-  const user = await User.findById(req.user._id);
-  const subscription = req.body;
-
-  const isAlreadySubscribed = (user?.pushSubscriptions || []).some(
-    (sub) => sub.endpoint === subscription.endpoint
-  );
-  if (isAlreadySubscribed)
-    return res.status(200).send({ message: "User is already subscribed" });
-
-  if (!user.pushSubscriptions) user.pushSubscriptions = [subscription];
-  else user.pushSubscriptions = [...user.pushSubscriptions, subscription];
-
-  await user.save();
-
-  try {
-    await webpush.sendNotification(
-      subscription,
-      JSON.stringify({
-        title: "Subscribed to Amazing Notifications",
-        body: "You'll now be able to get notified for Amazing activities",
-      })
-    );
-    res.status(201).send({ message: "Subscription successful  sent." });
-  } catch (error) {
-    winston.error(`Error sending/subscribing the notification: ${error}`);
-    res.status(500).send({ error: "Failed to send notification" });
-  }
-});
-
-router.post("/unsubscribe", auth, async (req, res) => {
-  const user = await User.findById(req.user._id);
-  const updated = (user?.pushSubscriptions || []).filter(
-    (sub) => sub.endpoint !== req.body.endpoint
-  );
-
-  user.pushSubscriptions = updated;
-  await user.save();
-
-  res.send(200).send({ message: "Unsubscribed successfully" });
-});
-
-router.post("/notify/:userId", async (req, res) => {
-  const user = await User.findById(req.params.userId);
-
-  if (!user)
-    return res.status(404).send({ error: "The intended user doesn't exist" });
-
-  await notifyUser(user, req.body);
-});
-
-router.post("/notify", auth, async (req, res) => {
-  const payload = JSON.stringify(
-    req.body || { title: "Amazing Website", body: "You've unseen notification" }
-  );
-
-  (await User.find({})).forEach(
-    async (user) => await notifyUser(user, payload)
-  );
-
-  res.send({ message: "Done sending notifications to all subscribers." });
-});
-
-async function notifyUser(user, notification) {
-  (user?.pushSubscriptions || []).forEach(async (sub) => {
-    try {
-      await webpush.sendNotification(sub, notification);
-    } catch (error) {
-      winston.error(`Error sending notification: ${error}`);
-    }
+  const notification = new Notification({
+    description,
+    title,
+    to,
+    from: req.user._id,
   });
-}
+
+  await notification.save();
+
+  res.send(await service.findById(notification._id));
+});
+
+router.get("/:userId", auth, async (req, res) => {
+  const notifications = await service.findByUserId(req.user._id);
+
+  res.send(notifications);
+});
+
+router.patch("/:notificationId", auth, async (req, res) => {
+  const notification = await service.findByIdAndUpdate(
+    req.params.notificationId,
+    req.body,
+    { new: true }
+  );
+
+  notification
+    ? res.send(notification)
+    : res.status(404).send({ error: "Notification not found" });
+});
 
 module.exports = router;

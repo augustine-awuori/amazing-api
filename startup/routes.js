@@ -14,6 +14,7 @@ const orders = require("../routes/orders");
 const posters = require("../routes/posters");
 const posts = require("../routes/posts");
 const products = require("../routes/products");
+const pushNotifications = require("../routes/pushNotifications");
 const requests = require("../routes/requests");
 const shops = require("../routes/shops");
 const status = require("../routes/status");
@@ -37,6 +38,7 @@ module.exports = function (app) {
   app.use("/api/shops", shops);
   app.use("/api/status", status);
   app.use("/api/notifications", notifications);
+  app.use("/api/notifications/push", pushNotifications);
   app.use("/api/types", types);
   app.use("/api/users", users);
   app.use("/api/expoPushTokens", expoPushTokens);
