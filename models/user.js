@@ -12,14 +12,16 @@ const schema = new mongoose.Schema({
   avatar: String,
   coverPhoto: String,
   chatIds: Object,
-  email: String,
+  email: {
+    type: String,
+    unique: true,
+  },
   username: {
     type: String,
     maxlength: 50,
     minlength: 4,
     required: true,
     trim: true,
-    unique: true,
   },
   name: {
     type: String,
@@ -27,13 +29,6 @@ const schema = new mongoose.Schema({
     minlength: 3,
     maxlength: 50,
     required: true,
-  },
-  password: {
-    type: String,
-    required: true,
-    minlength: 6,
-    maxlength: 1024,
-    trim: true,
   },
   isAdmin: { type: Boolean, default: false },
   isVerified: {
@@ -55,14 +50,7 @@ const schema = new mongoose.Schema({
 
 schema.methods.generateAuthToken = function () {
   return jwt.sign(
-    {
-      _id: this._id,
-      avatar: this.avatar,
-      isAdmin: this.isAdmin,
-      isVerified: this.isVerified,
-      name: this.name,
-      username: this.username,
-    },
+    { _id: this._id, name: this.name },
     process.env.jwtPrivateKey
   );
 };
@@ -75,8 +63,8 @@ const validateUser = (user) =>
     avatar: Joi.string(),
     coverPhoto: Joi.object().optional(),
     name: Joi.string().min(3).max(50).required(),
-    password: Joi.string().min(6).max(1024).required(),
-    whatsapp: Joi.string().min(12).max(13).required(),
+    email: Joi.string().min(3).max(100).required(),
+    whatsapp: Joi.string().min(12).max(13),
   }).validate(user);
 
 exports.User = User;

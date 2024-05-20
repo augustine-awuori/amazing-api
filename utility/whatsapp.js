@@ -9,7 +9,7 @@ const sendMessage = async (phone = "", message = "") =>
   await apiClient.post(`/+254796720289/messages`, {
     messaging_product: "whatsapp",
     recipient_type: "individual",
-    to: checkPhoneNumber(phone),
+    to: phone,
     type: "text",
     text: {
       preview_url: false,
@@ -33,12 +33,7 @@ function addInfoTo(message) {
   `;
 }
 
-function checkPhoneNumber(number = "") {
-  return number.startsWith("+") ? number : `+${number}`;
-}
-
 module.exports = {
-  checkPhoneNumber,
   sendMessage,
   sendMessageToAllExcept,
 };
