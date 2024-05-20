@@ -1,10 +1,8 @@
 const _ = require("lodash");
 const { isValidObjectId } = require("mongoose");
-const bcrypt = require("bcrypt");
 const express = require("express");
 const router = express.Router();
 
-const { checkPhoneNumber } = require("../utility/whatsapp");
 const { User, validate } = require("../models/user");
 const auth = require("../middleware/auth");
 const validateUser = require("../middleware/validateUser");
@@ -12,39 +10,19 @@ const validator = require("../middleware/validate");
 const service = require("../services/users");
 
 router.post("/", validator(validate), async (req, res) => {
-  const { password, name, whatsapp } = req.body;
-  let username = name.trim().toLowerCase().replace(/\s+/g, "");
-  let user = await service.findOne({ username });
+  const { email, name } = req.body;
+  let user = await service.findOne({ email });
 
-  let counter = 1;
-  while (user) {
-    username = `${username}${counter}`;
-    user = await service.findOne({ username });
-    counter++;
-  }
+  if (user)
+    return res.status(200).send({ message: "User is already registered" });
 
-  user = new User({ name, username, password });
-  const salt = await bcrypt.genSalt(10);
-  user.password = await bcrypt.hash(user.password, salt);
-  user.otherAccounts = { whatsapp: checkPhoneNumber(whatsapp) };
-
+  user = new User({ name, email });
   await user.save();
 
   res
     .header("x-auth-token", user.generateAuthToken())
     .header("access-control-expose-headers", "x-auth-token")
-    .send(
-      _.pick(user, [
-        "avatar",
-        "aboutMe",
-        "chatIds",
-        "username",
-        "name",
-        "isAdmin",
-        "isVerified",
-        "otherAccounts",
-      ])
-    );
+    .send(_.pick(user, ["avatar", "email", "name"]));
 });
 
 router.get("/", async (_req, res) => {
@@ -64,7 +42,7 @@ router.get("/:id", async (req, res) => {
       .status(404)
       .send({ error: "The user with the given ID does not exist." });
 
-  res.send(_.omit(user, ["password"]));
+  res.send(user);
 });
 
 router.patch("/chatIds", [auth, validateUser], async (req, res) => {
