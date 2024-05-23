@@ -20,7 +20,6 @@ const schema = new mongoose.Schema({
     type: String,
     maxlength: 50,
     minlength: 4,
-    required: true,
     trim: true,
   },
   name: {
