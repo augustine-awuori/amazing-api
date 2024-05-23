@@ -49,7 +49,7 @@ const schema = new mongoose.Schema({
 
 schema.methods.generateAuthToken = function () {
   return jwt.sign(
-    { _id: this._id, name: this.name },
+    { _id: this._id, name: this.name, avatar: this.avatar },
     process.env.jwtPrivateKey
   );
 };

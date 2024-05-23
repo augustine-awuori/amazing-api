@@ -12,10 +12,10 @@ router.post("/", validator(validate), async (req, res) => {
   const { avatar, email, name } = req.body;
   let user = await service.findOne({ email });
 
-  if (user) return res.status(200).send(user);
-
-  user = new User({ avatar, name, email });
-  await user.save();
+  if (!user) {
+    user = new User({ avatar, name, email });
+    await user.save();
+  }
 
   res
     .header("x-auth-token", user.generateAuthToken())
