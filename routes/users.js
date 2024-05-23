@@ -1,4 +1,3 @@
-const _ = require("lodash");
 const { isValidObjectId } = require("mongoose");
 const express = require("express");
 const router = express.Router();
@@ -10,19 +9,18 @@ const validator = require("../middleware/validate");
 const service = require("../services/users");
 
 router.post("/", validator(validate), async (req, res) => {
-  const { email, name } = req.body;
+  const { avatar, email, name } = req.body;
   let user = await service.findOne({ email });
 
-  if (user)
-    return res.status(200).send({ message: "User is already registered" });
+  if (user) return res.status(200).send(user);
 
-  user = new User({ name, email });
+  user = new User({ avatar, name, email });
   await user.save();
 
   res
     .header("x-auth-token", user.generateAuthToken())
     .header("access-control-expose-headers", "x-auth-token")
-    .send(_.pick(user, ["avatar", "email", "name"]));
+    .send(user);
 });
 
 router.get("/", async (_req, res) => {
