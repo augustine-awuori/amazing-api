@@ -1,4 +1,4 @@
-const getWhatsAppNumberFromUser = (user) => user.otherAccounts.whatsapp;
+const getWhatsAppNumberFromUser = (user) => user.otherAccounts?.whatsapp || "";
 
 const appBaseURL = "https://kisiiuniversemart.digital";
 
