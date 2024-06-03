@@ -3,7 +3,6 @@ const express = require("express");
 const router = express.Router();
 
 const { User } = require("../models/user");
-const auth = require("../middleware/auth");
 const service = require("../services/users");
 const validator = require("../middleware/validate");
 
@@ -16,8 +15,9 @@ router.post("/", validator(validate), async (req, res) => {
   res.send(token);
 });
 
-router.get("/token", auth, async (req, res) => {
-  const user = await service.findById(req.user._id);
+// TODO: Protect this route ASAP
+router.post("/token", async (req, res) => {
+  const user = await service.findOne({ email: req.body.email });
 
   if (!user)
     return res.status(404).send({ error: "You don't exist on the database" });
