@@ -5,6 +5,7 @@ const router = express.Router();
 const { validate, Product } = require("../models/product");
 const auth = require("../middleware/auth");
 const service = require("../services/products");
+const shopService = require("../services/shop");
 const validateUser = require("../middleware/validateUser");
 const validator = require("../middleware/validate");
 const validateProductId = require("../middleware/validateProductId");
@@ -26,6 +27,11 @@ router.post(
       shop,
     });
     await product.save();
+    const detailedShop = await shopService.findById(shop);
+    if (!detailedShop?.types[type]) {
+      const updated = { ...detailedShop.types, [type]: type };
+      await shopService.findByIdAndUpdate({ types: updated });
+    }
 
     res.send(await service.findById(product._id));
   }
