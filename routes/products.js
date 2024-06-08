@@ -26,14 +26,19 @@ router.post(
       images,
       shop,
     });
+
     await product.save();
+
     const detailedShop = await shopService.findById(shop);
-    if (!detailedShop?.types[type]) {
-      const updated = { ...detailedShop.types, [type]: type };
-      await shopService.findByIdAndUpdate({ types: updated });
+    if (!detailedShop) return res.status(404).send("Shop not found");
+
+    if (!detailedShop.types[type]) {
+      const updatedTypes = { ...detailedShop.types, [type]: type };
+      await shopService.findByIdAndUpdate(shop, { types: updatedTypes });
     }
 
-    res.send(await service.findById(product._id));
+    const updatedProduct = await service.findById(product._id);
+    res.send(updatedProduct);
   }
 );
 
