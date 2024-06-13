@@ -10,8 +10,8 @@ const schema = new mongoose.Schema({
     maxlength: 255,
   },
   avatar: String,
+  chatToken: String,
   coverPhoto: String,
-  chatIds: Object,
   email: {
     type: String,
     unique: true,
