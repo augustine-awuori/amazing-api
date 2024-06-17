@@ -25,14 +25,12 @@ module.exports = function () {
     ],
   });
 
-  // Handle unhandled promise rejections
   process.on("unhandledRejection", (ex) => {
-    winston.error(ex.message, ex);
+    console.error(ex.message, ex);
     throw ex;
   });
 
-  // Handle uncaught exceptions
   process.on("uncaughtException", (ex) => {
-    winston.error(ex.message, ex);
+    console.error(ex.message, ex);
   });
 };
