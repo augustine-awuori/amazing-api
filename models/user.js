@@ -36,6 +36,10 @@ const schema = new mongoose.Schema({
       return this.isAdmin;
     },
   },
+  isAccountVerified: {
+    type: Boolean,
+    default: true,
+  },
   expoPushToken: String,
   otherAccounts: Object,
   pushTokens: Object,

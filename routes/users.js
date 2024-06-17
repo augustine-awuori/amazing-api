@@ -9,11 +9,11 @@ const validator = require("../middleware/validate");
 const service = require("../services/users");
 
 router.post("/", validator(validate), async (req, res) => {
-  const { avatar, email, name } = req.body;
+  const { avatar, email, name, isAccountVerified } = req.body;
   let user = await service.findOne({ email });
 
   if (!user) {
-    user = new User({ avatar, name, email });
+    user = new User({ avatar, name, email, isAccountVerified });
     await user.save();
   }
 
