@@ -35,15 +35,16 @@ router.get("/", async (_req, res) => {
 
 router.get("/:name", async (req, res) => {
   const name = req.params.name;
+  console.log("name", name);
+  const shop = await service.findOne({ name });
+
+  if (shop) return res.send(shop);
 
   const user = await User.findById(name);
-  if (!user) {
-    const shop = await service.findOne({ name });
-
-    return shop
-      ? res.send(shop)
-      : res.status(404).send({ error: "Shop doesn't exist." });
-  }
+  if (!user)
+    return res
+      .status(404)
+      .send({ error: "Shop(s) related to the given ID doesn't exist" });
 
   res.send(await service.findByAuthorId(name));
 });
