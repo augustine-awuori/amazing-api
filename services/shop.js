@@ -39,7 +39,8 @@ const findByIdAndDelete = async (id) => {
   return shop;
 };
 
-const findOne = async (query = {}) => await Shop.findOne(query);
+const findOne = async (query = {}) =>
+  await populateAndProject(Shop.findOne(query));
 
 const getShopOwner = async (shopId) => {
   const shop = await findById(shopId);
