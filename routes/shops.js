@@ -35,18 +35,12 @@ router.get("/", async (_req, res) => {
 
 router.get("/:name", async (req, res) => {
   const name = req.params.name;
-  console.log("name", name);
+
+  if (mongoose.isValidObjectId(name)) return await service.findByAuthorId(name);
+
   const shop = await service.findOne({ name });
 
-  if (shop) return res.send(shop);
-
-  const user = await User.findById(name);
-  if (!user)
-    return res
-      .status(404)
-      .send({ error: "Shop(s) related to the given ID doesn't exist" });
-
-  res.send(await service.findByAuthorId(name));
+  res.send(shop);
 });
 
 router.delete("/:id", auth, async (req, res) => {
