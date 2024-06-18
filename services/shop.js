@@ -39,7 +39,7 @@ const findByIdAndDelete = async (id) => {
   return shop;
 };
 
-const find = async (query = {}) => await Shop.findOne(query);
+const findOne = async (query = {}) => await Shop.findOne(query);
 
 const getShopOwner = async (shopId) => {
   const shop = await findById(shopId);
@@ -55,7 +55,7 @@ const findByAuthorId = async (authorId) =>
     : [];
 
 module.exports = {
-  find,
+  findOne,
   findByAuthorId,
   findById,
   findByIdAndDelete,

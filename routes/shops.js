@@ -16,7 +16,7 @@ router.post(
   async (req, res) => {
     const { author, name, types, location, image } = req.body;
 
-    let shop = await service.find({ name });
+    let shop = await service.findOne({ name });
     if (shop)
       return res.status(400).send({ error: "This name is already taken" });
 
@@ -33,21 +33,19 @@ router.get("/", async (_req, res) => {
   res.send(shops);
 });
 
-router.get("/:id", async (req, res) => {
-  const id = req.params.id;
-  if (!mongoose.isValidObjectId(id))
-    return res.status(400).send({ error: "Invalid ID." });
+router.get("/:name", async (req, res) => {
+  const name = req.params.name;
 
-  const user = await User.findById(id);
+  const user = await User.findById(name);
   if (!user) {
-    const shop = await service.findById(id);
+    const shop = await service.findOne({ name });
 
     return shop
       ? res.send(shop)
       : res.status(404).send({ error: "Shop doesn't exist." });
   }
 
-  res.send(await service.findByAuthorId(id));
+  res.send(await service.findByAuthorId(name));
 });
 
 router.delete("/:id", auth, async (req, res) => {
