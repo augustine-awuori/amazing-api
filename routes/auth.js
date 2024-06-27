@@ -8,7 +8,8 @@ const service = require("../services/users");
 const validator = require("../middleware/validate");
 
 router.post("/", validator(validate), async (req, res) => {
-  const user = await User.findOne({ email: req.body.email });
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
   if (!user) return res.status(404).send({ error: "Email isn't registered." });
 
   if (!user.password) {
@@ -16,7 +17,7 @@ router.post("/", validator(validate), async (req, res) => {
     user.password = bcrypt.hash(password, salt);
     await user.save();
   } else {
-    const isValidPassword = bcrypt.compare(req.body.password, user.password);
+    const isValidPassword = bcrypt.compare(password, user.password);
     if (!isValidPassword)
       return res
         .status(400)
