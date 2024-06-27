@@ -31,9 +31,11 @@ const schema = new mongoose.Schema({
       return this.isAdmin;
     },
   },
-  isAccountVerified: {
-    type: Boolean,
-    default: true,
+  password: {
+    type: String,
+    minlength: 6,
+    maxlength: 1024,
+    trim: true,
   },
   expoPushToken: String,
   otherAccounts: Object,

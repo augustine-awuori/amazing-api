@@ -1,6 +1,8 @@
 const { isValidObjectId } = require("mongoose");
 const express = require("express");
 const router = express.Router();
+const bcrypt = require("bcrypt");
+const _ = require("lodash");
 
 const { User, validate } = require("../models/user");
 const auth = require("../middleware/auth");
@@ -9,18 +11,20 @@ const validator = require("../middleware/validate");
 const service = require("../services/users");
 
 router.post("/", validator(validate), async (req, res) => {
-  const { avatar, email, name, isAccountVerified } = req.body;
+  const { avatar, email, name, password } = req.body;
   let user = await service.findOne({ email });
 
-  if (!user) {
-    user = new User({ avatar, name, email, isAccountVerified });
-    await user.save();
-  }
+  if (user) return res.status(400).send({ error: "Email is already taken" });
+
+  user = new User({ avatar, name, email });
+  const salt = await bcrypt.genSalt(10);
+  if (password) user.password = bcrypt.hash(password, salt);
+  await user.save();
 
   res
     .header("x-auth-token", user.generateAuthToken())
     .header("access-control-expose-headers", "x-auth-token")
-    .send(user);
+    .send(_.omit(user, ["password"]));
 });
 
 router.get("/", async (_req, res) => {
