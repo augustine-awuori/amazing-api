@@ -27,6 +27,22 @@ router.post("/", validator(validate), async (req, res) => {
     .send(_.omit(user, ["password"]));
 });
 
+router.post("/quick", validator(validate), async (req, res) => {
+  const { avatar, email, name } = req.body;
+
+  let user = await service.findOne({ email });
+
+  if (!user) {
+    user = new User({ avatar, name, email });
+    await user.save();
+  }
+
+  res
+    .header("x-auth-token", user.generateAuthToken())
+    .header("access-control-expose-headers", "x-auth-token")
+    .send(_.omit(user, ["password"]));
+});
+
 router.get("/", async (_req, res) => {
   const users = await service.getAll();
 
