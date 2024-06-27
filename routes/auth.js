@@ -14,7 +14,7 @@ router.post("/", validator(validate), async (req, res) => {
   console.log("user.password", user.password);
   if (user.password) {
     console.log("comparing passwords");
-    const isValidPassword = bcrypt.compare(password, user.password);
+    const isValidPassword = await bcrypt.compare(password, user.password);
     console.log("isValidPassword", isValidPassword);
     if (!isValidPassword)
       return res
