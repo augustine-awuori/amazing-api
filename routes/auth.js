@@ -11,17 +11,17 @@ router.post("/", validator(validate), async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
   if (!user) return res.status(404).send({ error: "Email isn't registered." });
-
-  if (!user.password) {
-    const salt = await bcrypt.genSalt(10);
-    user.password = bcrypt.hash(password, salt);
-    await user.save();
-  } else {
+  console.log("user.password", user.password);
+  if (user.password) {
     const isValidPassword = bcrypt.compare(password, user.password);
     if (!isValidPassword)
       return res
         .status(400)
         .send({ error: "Invalid username and/or password." });
+  } else {
+    const salt = await bcrypt.genSalt(10);
+    user.password = bcrypt.hash(password, salt);
+    await user.save();
   }
 
   const token = user.generateAuthToken();
