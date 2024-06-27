@@ -18,7 +18,7 @@ router.post("/", validator(validate), async (req, res) => {
 
   user = new User({ avatar, name, email });
   const salt = await bcrypt.genSalt(10);
-  if (password) user.password = bcrypt.hash(password, salt);
+  user.password = await bcrypt.hash(password, salt);
   await user.save();
 
   res
