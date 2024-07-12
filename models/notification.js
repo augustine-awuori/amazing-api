@@ -2,15 +2,11 @@ const Joi = require("joi");
 const mongoose = require("mongoose");
 
 const schema = new mongoose.Schema({
-  title: {
+  dataId: {
     type: String,
-    required: true,
+    required: true
   },
-  description: {
-    type: String,
-    required: true,
-  },
-  from: {
+  buyer: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
   },
@@ -18,22 +14,26 @@ const schema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  to: {
+  seller: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
+  verb: {
+    type: String,
+    required: true
+  }
 });
 
 const Notification = mongoose.model("Notification", schema);
 
 const validate = (notification) => {
   const schema = Joi.object({
-    title: Joi.string().required(),
-    description: Joi.string().required(),
-    from: Joi.string(),
+    dataId: Joi.string().required(),
+    verb: Joi.string().required(),
+    buyer: Joi.string(),
     read: Joi.boolean().required(),
-    to: Joi.string().required(),
+    seller: Joi.string().required(),
   });
 
   return schema.validate(notification);

@@ -1,7 +1,9 @@
 const { isValidObjectId } = require("mongoose");
 
 const { Notification } = require("../models/notification");
-const { populateAndProject } = require("./main");
+
+const populateAndProject = (query) =>
+  query.populate("buyer", "-password").populate("seller", '-password');
 
 const findById = async (id) => {
   if (isValidObjectId(id))
@@ -15,13 +17,19 @@ const findByIdAndUpdate = async (id, update, options) => {
     );
 };
 
-const findByUserId = async (userId) => {
-  if (isValidObjectId(userId))
-    return await populateAndProject(Notification.find({ to: userId }));
+const findByBuyerId = async (buyerId) => {
+  if (isValidObjectId(buyerId))
+    return await populateAndProject(Notification.find({ buyer: buyerId }));
+};
+
+const findBySellerId = async (sellerId) => {
+  if (isValidObjectId(sellerId))
+    return await populateAndProject(Notification.find({ seller: sellerId }));
 };
 
 module.exports = {
   findById,
   findByIdAndUpdate,
-  findByUserId,
+  findByBuyerId,
+  findBySellerId
 };

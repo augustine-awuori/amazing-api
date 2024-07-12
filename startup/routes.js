@@ -9,6 +9,7 @@ const error = require("../middleware/error");
 const events = require("../routes/events");
 const expoPushTokens = require("../routes/expoPushTokens");
 const listings = require("../routes/listings");
+const notifications = require("../routes/notifications");
 const opinions = require("../routes/opinions");
 const orders = require("../routes/orders");
 const posters = require("../routes/posters");
@@ -28,6 +29,7 @@ module.exports = function (app) {
   app.use("/api/categories", categories);
   app.use("/api/events", events);
   app.use("/api/listings", listings);
+  app.use("/api/notifications", notifications);
   app.use("/api/opinions", opinions);
   app.use("/api/orders", orders);
   app.use("/api/posts", posts);
