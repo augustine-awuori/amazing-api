@@ -9,7 +9,10 @@ const schema = new mongoose.Schema({
     minlength: 3,
     maxlength: 255,
   },
-  avatar: String,
+  avatar: {
+    type: String,
+    default: 'https://picsum.photos/1200/300'
+  },
   chatToken: String,
   coverPhoto: String,
   email: {
