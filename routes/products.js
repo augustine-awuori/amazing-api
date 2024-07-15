@@ -10,6 +10,7 @@ const validateUser = require("../middleware/validateUser");
 const validator = require("../middleware/validate");
 const validateProductId = require("../middleware/validateProductId");
 const validateProductAuthor = require("../middleware/validateProductAuthor");
+const { View } = require("../models/view");
 
 router.post(
   "/",
@@ -65,6 +66,21 @@ router.get("/single/:productId", async (req, res) => {
 
   service.informOthers(product);
   res.send(product);
+});
+
+router.patch('/views/:productId', auth, async (req, res) => {
+  const productId = req.params.productId;
+  const product = await Product.findById(productId);
+  if (!product) return res
+    .status(404)
+    .send({ error: 'The product with the given ID does not exist in the database' });
+
+  const view = new View({ viewer: req.user._id });
+  await view.save();
+
+  const views = [...(product.views || []), view._id];
+  const updated = await service.findByIdAndUpdate(productId, { views }, { new: true });
+  res.send(updated);
 });
 
 router.patch(

@@ -19,6 +19,7 @@ const schema = new mongoose.Schema({
     trim: true,
     type: String,
   },
+  views: [{ type: mongoose.Types.ObjectId, ref: "View" }],
   timestamp: {
     type: Number,
     default: function () {
