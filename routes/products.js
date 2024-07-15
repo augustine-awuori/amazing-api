@@ -70,12 +70,24 @@ router.get("/single/:productId", async (req, res) => {
 
 router.patch('/views/:productId', auth, async (req, res) => {
   const productId = req.params.productId;
+  const userId = req.user._id;
+
   const product = await Product.findById(productId);
   if (!product) return res
     .status(404)
     .send({ error: 'The product with the given ID does not exist in the database' });
 
-  const view = new View({ viewer: req.user._id });
+  let viewed = false;
+  product.views.forEach(view => {
+    if (view.viewer.toString() === userId.toString()) {
+      viewed = true;
+      return;
+    }
+  });
+
+  if (viewed) return res.send(await service.findById(product._id));
+
+  const view = new View({ viewer: userId });
   await view.save();
 
   const views = [...(product.views || []), view._id];
