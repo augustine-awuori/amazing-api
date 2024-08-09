@@ -5,6 +5,7 @@ const serveStatic = require("serve-static");
 const auth = require("../routes/auth");
 const categories = require("../routes/categories");
 const chatToken = require("../routes/chatToken");
+const feedToken = require("../routes/feedToken");
 const error = require("../middleware/error");
 const events = require("../routes/events");
 const expoPushTokens = require("../routes/expoPushTokens");
@@ -41,6 +42,7 @@ module.exports = function (app) {
   app.use("/api/types", types);
   app.use("/api/users", users);
   app.use("/api/chatToken", chatToken);
+  app.use("/api/feedToken", feedToken);
   app.use("/api/expoPushTokens", expoPushTokens);
   app.use(error);
 };
