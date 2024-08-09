@@ -14,6 +14,7 @@ const schema = new mongoose.Schema({
     default: 'https://picsum.photos/1200/300'
   },
   chatToken: String,
+  feedToken: String,
   coverPhoto: String,
   email: {
     type: String,
@@ -57,6 +58,7 @@ schema.methods.generateAuthToken = function () {
       _id: this._id,
       avatar: this.avatar,
       chatToken: this.chatToken,
+      feedToken: this.feedToken,
       email: this.email,
       name: this.name,
     },

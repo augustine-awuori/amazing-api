@@ -1,14 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const { StreamChat } = require("stream-chat");
 
 const auth = require("../middleware/auth");
 const userService = require("../services/users");
-
-const serverClient = StreamChat.getInstance(
-  process.env.chatApiKey,
-  process.env.chatApiSecret
-);
 
 router.post("/", auth, async (req, res) => {
   const userId = req.user._id;
@@ -23,7 +17,7 @@ router.post("/", auth, async (req, res) => {
   if (user.chatToken) {
     token = user.chatToken;
   } else {
-    token = serverClient.createToken(userId);
+    token = userService.getUserChatToken(userId);
 
     await userService.findByIdAndUpdate(userId, { chatToken: token });
   }
