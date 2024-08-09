@@ -38,12 +38,12 @@ const getAll = async (filter = {}) => {
   return users;
 };
 
-export function getUserFeedToken(userId) {
+function getUserFeedToken(userId) {
   return stream
     .connect(process.env.chatApiKey, process.env.chatApiSecret)
     .createUserToken(userId.toString());
 }
-export function getUserChatToken(userId) {
+function getUserChatToken(userId) {
   return serverClient.createToken(userId);
 }
 
