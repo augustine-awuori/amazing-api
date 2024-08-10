@@ -43,6 +43,7 @@ function getUserFeedToken(userId) {
     .connect(process.env.chatApiKey, process.env.chatApiSecret)
     .createUserToken(userId.toString());
 }
+
 function getUserChatToken(userId) {
   return serverClient.createToken(userId);
 }

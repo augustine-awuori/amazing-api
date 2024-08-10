@@ -23,6 +23,7 @@ const Shop = mongoose.model(
     types: Object,
     isVerified: { default: false, type: Boolean },
     views: { type: Number, default: 0 },
+    feedToken: String,
     timestamp: {
       type: Number,
       default: function () {
