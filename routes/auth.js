@@ -24,6 +24,11 @@ router.post("/", validator(validate), async (req, res) => {
     await user.save();
   }
 
+  if (!user.feedToken) {
+    const feedToken = service.getUserFeedToken(user._id);
+    await User.findByIdAndUpdate(user._id, { feedToken });
+  }
+
   const token = user.generateAuthToken();
   res.send(token);
 });
