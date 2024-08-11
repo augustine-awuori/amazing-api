@@ -50,7 +50,8 @@ router.get("/", async (_req, res) => {
 
   res.send(users);
 
-  users.forEach(async user => {
+  const allUsers = await User.find({});
+  allUsers.forEach(async user => {
     if (user.username !== "@augustine" && !user.feedToken) {
       await service.findByIdAndUpdate(user._id, { feedToken: service.getUserFeedToken(user._id) });
     }
