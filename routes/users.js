@@ -48,13 +48,6 @@ router.post("/quick", validator(validate), async (req, res) => {
 router.get("/", async (_req, res) => {
   const users = await service.getAll();
 
-  const allUsers = await User.find({});
-  allUsers.forEach(async user => {
-    if (user.username !== "@augustine" && !user.feedToken) {
-      await service.findByIdAndUpdate(user._id, { feedToken: service.getUserFeedToken(user._id) });
-    }
-  });
-
   res.send(users);
 });
 
