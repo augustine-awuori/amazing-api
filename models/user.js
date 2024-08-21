@@ -42,7 +42,7 @@ const schema = new mongoose.Schema({
     trim: true,
   },
   otherAccounts: Object,
-  pushToken: String,
+  pushTokens: Object,
   timestamp: {
     type: Number,
     default: function () {
