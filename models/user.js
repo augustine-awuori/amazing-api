@@ -41,9 +41,8 @@ const schema = new mongoose.Schema({
     maxlength: 1024,
     trim: true,
   },
-  expoPushToken: String,
   otherAccounts: Object,
-  pushTokens: Object,
+  pushToken: String,
   timestamp: {
     type: Number,
     default: function () {
@@ -59,6 +58,7 @@ schema.methods.generateAuthToken = function () {
       avatar: this.avatar,
       chatToken: this.chatToken,
       feedToken: this.feedToken,
+      pushToken: this.pushToken,
       email: this.email,
       name: this.name,
     },
