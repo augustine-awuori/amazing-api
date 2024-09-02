@@ -17,6 +17,7 @@ const posters = require("../routes/posters");
 const posts = require("../routes/posts");
 const products = require("../routes/products");
 const requests = require("../routes/requests");
+const services = require("../routes/services");
 const shops = require("../routes/shops");
 const status = require("../routes/status");
 const types = require("../routes/types");
@@ -37,6 +38,7 @@ module.exports = function (app) {
   app.use("/api/posters", posters);
   app.use("/api/products", products);
   app.use("/api/requests", requests);
+  app.use("/api/services", services);
   app.use("/api/shops", shops);
   app.use("/api/status", status);
   app.use("/api/types", types);
