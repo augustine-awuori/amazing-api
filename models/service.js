@@ -25,7 +25,7 @@ const validate = (service) => Joi.object({
     description: Joi.string().max(200).allow(""),
     name: Joi.string().required().min(2).max(50),
     price: Joi.number().required().min(1).max(1_000_000),
-    images: Joi.array().min(1).max(3),
+    images: Joi.array().min(1).max(5),
 }).validate(service);
 
 module.exports.schema = schema;
