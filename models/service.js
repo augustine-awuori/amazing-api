@@ -16,6 +16,7 @@ const schema = new mongoose.Schema({
         type: String,
     },
     price: { max: 1_000_000, min: 1, required: true, type: Number },
+    images: [String]
 });
 
 const Service = mongoose.model('Service', schema);
@@ -24,6 +25,7 @@ const validate = (service) => Joi.object({
     description: Joi.string().max(200).allow(""),
     name: Joi.string().required().min(2).max(50),
     price: Joi.number().required().min(1).max(1_000_000),
+    images: Joi.array().min(1).max(3),
 }).validate(service);
 
 module.exports.schema = schema;
