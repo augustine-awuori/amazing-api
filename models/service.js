@@ -16,7 +16,13 @@ const schema = new mongoose.Schema({
         type: String,
     },
     price: { max: 1_000_000, min: 1, required: true, type: Number },
-    images: [String]
+    images: [String],
+    timestamp: {
+        type: Number,
+        default: function () {
+            return this._id.getTimestamp();
+        },
+    },
 });
 
 const Service = mongoose.model('Service', schema);
