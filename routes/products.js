@@ -3,29 +3,23 @@ const express = require("express");
 const router = express.Router();
 
 const { validate, Product } = require("../models/product");
+const { View } = require("../models/view");
 const auth = require("../middleware/auth");
 const service = require("../services/products");
 const shopService = require("../services/shop");
+const validateProductAuthor = require("../middleware/validateProductAuthor");
+const validateProductId = require("../middleware/validateProductId");
 const validateUser = require("../middleware/validateUser");
 const validator = require("../middleware/validate");
-const validateProductId = require("../middleware/validateProductId");
-const validateProductAuthor = require("../middleware/validateProductAuthor");
-const { View } = require("../models/view");
 
 router.post(
   "/",
   [auth, validateUser, validator(validate)],
   async (req, res) => {
-    const { author, description, name, price, shop, type, images } = req.body;
+    const { author, description, name, price, shop, type, images, isNegotiable } = req.body;
 
     const product = new Product({
-      author,
-      description,
-      name,
-      price,
-      type,
-      images,
-      shop,
+      author, description, name, price, type, images, shop, isNegotiable
     });
 
     await product.save();
