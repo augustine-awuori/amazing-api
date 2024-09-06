@@ -24,6 +24,7 @@ const Shop = mongoose.model(
     isVerified: { default: false, type: Boolean },
     views: { type: Number, default: 0 },
     feedToken: String,
+    deliveryInfo: String,
     timestamp: {
       type: Number,
       default: function () {
@@ -36,6 +37,7 @@ const Shop = mongoose.model(
 const validate = (shop) =>
   Joi.object({
     author: Joi.string(),
+    deliveryInfo: Joi.string(),
     name: Joi.string().min(3).max(50),
     image: Joi.string().required(),
     location: Joi.string().min(3).max(255),

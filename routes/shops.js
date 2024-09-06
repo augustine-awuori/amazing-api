@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const express = require("express");
 const router = express.Router();
 
-const { User } = require("../models/user");
 const { validateShop, Shop } = require("../models/shop");
 const auth = require("../middleware/auth");
 const service = require("../services/shop");
@@ -15,13 +14,11 @@ router.post(
   "/",
   [auth, validateUser, mapAuthor, validator(validateShop)],
   async (req, res) => {
-    const { author, name, types, location, image } = req.body;
-
-    let shop = await service.findOne({ name });
+    let shop = await service.findOne({ name: req.body.name });
     if (shop)
       return res.status(400).send({ error: "This name is already taken" });
 
-    shop = new Shop({ author, name, types, image, location });
+    shop = new Shop({ ...req.body });
     shop.feedToken = usersService.getUserFeedToken(shop._id);
     await shop.save();
 
