@@ -73,7 +73,9 @@ router.patch('/views/:productId', auth, async (req, res) => {
 
   let viewed = false;
   product.views.forEach(view => {
-    if (view.viewer.toString() === userId.toString()) {
+    if (!view) return;
+
+    if (view.viewer?.toString() === userId?.toString()) {
       viewed = true;
       return;
     }
