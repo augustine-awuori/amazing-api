@@ -4,7 +4,7 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const _ = require("lodash");
 
-const { sendMail } = require("./mailing");
+const { sendMail } = require("../services/mailing");
 const { User, validate } = require("../models/user");
 const auth = require("../middleware/auth");
 const validateUser = require("../middleware/validateUser");
