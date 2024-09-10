@@ -17,15 +17,10 @@ router.post(
   "/",
   [auth, validateUser, validateCategoryId, validator(validateListing)],
   async (req, res) => {
-    const { category, description, price, title, images } = req.body;
 
     const listing = new Listing({
       author: req.user._id,
-      category,
-      description,
-      price,
-      title,
-      images,
+      ...req.body
     });
     await listing.save();
 

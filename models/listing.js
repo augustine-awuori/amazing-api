@@ -23,6 +23,7 @@ const schema = new mongoose.Schema({
     trim: true,
     type: String,
   },
+  phone: String,
   timestamp: {
     type: Number,
     default: function () {
@@ -36,6 +37,7 @@ const Listing = mongoose.model("Listing", schema);
 const validate = (listing) =>
   Joi.object({
     author: Joi.string(),
+    phone: Joi.string(),
     category: Joi.string(),
     description: Joi.string().max(200).allow(""),
     images: Joi.array().min(1).max(3),
