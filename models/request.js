@@ -18,6 +18,7 @@ const Request = mongoose.model(
       trim: true,
       type: String,
     },
+    image: String,
     timestamp: {
       type: Number,
       default: function () {
@@ -27,13 +28,14 @@ const Request = mongoose.model(
   })
 );
 
-const validate = (listing) =>
+const validate = (request) =>
   Joi.object({
     author: Joi.string(),
+    image: Joi.string(),
     category: Joi.string(),
     description: Joi.string().max(255).allow(""),
     title: Joi.string().required().min(2).max(50),
-  }).validate(listing);
+  }).validate(request);
 
 module.exports.validateRequest = validate;
 module.exports.Request = Request;

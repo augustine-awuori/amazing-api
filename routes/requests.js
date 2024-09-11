@@ -16,11 +16,9 @@ router.post(
   [auth, validateUser, validateCategoryId, validator(validateRequest)],
   async (req, res) => {
     const author = req.user._id;
-    const { category, description, title } = req.body;
 
-    const request = new Request({ author, category, description, title });
+    const request = new Request({ author, ...req.body });
     await request.save();
-    service.informOthers(request);
 
     res.send(await service.findById(request._id));
   }
