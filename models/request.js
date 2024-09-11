@@ -31,7 +31,7 @@ const Request = mongoose.model(
 const validate = (request) =>
   Joi.object({
     author: Joi.string(),
-    image: Joi.string(),
+    image: Joi.string().allow(""),
     category: Joi.string(),
     description: Joi.string().max(255).allow(""),
     title: Joi.string().required().min(2).max(50),
