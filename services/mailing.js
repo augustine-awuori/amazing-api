@@ -4,8 +4,6 @@ const MailGen = require("mailgen");
 const APP_LOGO =
   "https://firebasestorage.googleapis.com/v0/b/kisii-campus-mart-site.appspot.com/o/logo.png?alt=media&token=19e3f069-ae48-46bc-8f54-1ad5c7fdae2e";
 
-const APP_EMAIL_ADDRESS = "campuusmart@gmail.com";
-
 function generateMail({ name, intro }) {
   return new MailGen({
     theme: "default",
@@ -36,9 +34,10 @@ function generateMail({ name, intro }) {
 
 function getMailTransport() {
   return mailer.createTransport({
-    service: "gmail",
+    host: "live.smtp.mailtrap.io", port: 587,
+    secure: false,
     auth: {
-      user: APP_EMAIL_ADDRESS,
+      user: "api",
       pass: process.env.EMAIL_PASS,
     },
   });
@@ -46,7 +45,7 @@ function getMailTransport() {
 
 async function sendMail({ name, intro, to, subject }) {
   return await getMailTransport().sendMail({
-    from: APP_EMAIL_ADDRESS,
+    from: 'Amazing - e-commerce',
     to,
     subject,
     html: generateMail({ name, intro }),

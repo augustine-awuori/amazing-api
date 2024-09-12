@@ -5,7 +5,6 @@ const serveStatic = require("serve-static");
 const auth = require("../routes/auth");
 const categories = require("../routes/categories");
 const chatToken = require("../routes/chatToken");
-const email = require("../routes/email");
 const error = require("../middleware/error");
 const events = require("../routes/events");
 const expoPushTokens = require("../routes/expoPushTokens");
@@ -34,7 +33,6 @@ module.exports = function (app) {
   app.use("/api/categories", categories);
   app.use("/api/events", events);
   app.use("/api/listings", listings);
-  app.use("/api/email", email);
   app.use("/api/mailing", mailing);
   app.use("/api/messaging", messaging);
   app.use("/api/notifications", notifications);

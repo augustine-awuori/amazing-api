@@ -4,7 +4,7 @@ const router = express.Router();
 const bcrypt = require("bcrypt");
 const _ = require("lodash");
 
-const { sendEmail } = require("../services/email");
+const { sendMail } = require("../services/mailing");
 const { User, validate } = require("../models/user");
 const auth = require("../middleware/auth");
 const service = require("../services/users");
@@ -12,7 +12,7 @@ const validateUser = require("../middleware/validateUser");
 const validator = require("../middleware/validate");
 
 async function sendMailForSignUp(user) {
-  await sendEmail({
+  await sendMail({
     body: `Thank you for signing up for Amazing eCommerce! We're thrilled to have you on board. Whether you're ready to showcase your products or explore what other students are selling, you've now got the perfect platform to manage your business while attending classes, anytime, anywhere.`,
     email: user.email,
     subject: "Welcome to Amazing eCommerce – Let's Get Started!",
