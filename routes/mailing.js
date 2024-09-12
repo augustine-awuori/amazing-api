@@ -10,7 +10,7 @@ router.post('/', async (req, res) => {
 
     (accepted)
         ? res.send({ messageId, response })
-        : res.status(500).send({ error: "Email couldn't be sent" })
+        : res.status(400).send({ error: "Email couldn't be sent" })
 });
 
 module.exports = router;
