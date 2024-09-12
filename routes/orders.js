@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const { isValidObjectId } = require("mongoose");
 
-const { sendMail } = require("../services/mailing");
 const { validateOrder, Order } = require("../models/order");
 const auth = require("../middleware/auth");
 const mapBuyer = require("../middleware/mapBuyer");
@@ -17,15 +16,8 @@ router.post(
     const order = new Order(req.body);
 
     await order.save();
-    const completeOrder = await service.findById(order._id);
 
-    await sendMail({
-      body: "Check the amazing app to see the order details",
-      email: completeOrder.shop.author.email,
-      subject: "You've received an order",
-    });
-
-    res.send(completeOrder);
+    res.send(await service.findById(order._id));
   }
 );
 
