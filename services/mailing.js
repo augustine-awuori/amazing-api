@@ -7,7 +7,7 @@ const logo =
 async function sendMail({ name, intro, to, subject }) {
   const from = "campuusmart@gmail.com";
 
-  const htmlMail = new MailGen({
+  const generatedMail = new MailGen({
     theme: "default",
     product: {
       name: "Amazing",
@@ -18,6 +18,13 @@ async function sendMail({ name, intro, to, subject }) {
     body: {
       name,
       intro,
+      action: {
+        instructions: "To get back to the site, please click here:",
+        button: {
+          color: "#22BC66",
+          link: "https://soamazing.shop",
+        },
+      },
       outro: `
     Happy hustling!
     The Amazing Team
@@ -34,7 +41,7 @@ async function sendMail({ name, intro, to, subject }) {
         pass: process.env.EMAIL_PASS,
       },
     })
-    .sendMail({ from, to, subject, html: htmlMail });
+    .sendMail({ from, to, subject, html: generatedMail });
 }
 
 module.exports = { sendMail };
