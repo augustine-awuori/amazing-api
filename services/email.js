@@ -5,7 +5,7 @@ const MailerSend = require("mailersend");
 const APP_EMAIL_ADDRESS = "campuusmart@gmail.com";
 const APP_NAME = "Amazing";
 
-const mailersend = new MailerSend({
+const mailersend = MailerSend({
     apiKey: process.env.MAIL_SENDER_API_KEY,
 });
 
