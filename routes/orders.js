@@ -19,11 +19,11 @@ router.post(
     await order.save();
     const completeOrder = await service.findById(order._id);
 
-    await sendMail({
-      body: "Check the amazing app to see the order details",
-      email: completeOrder.shop.author.email,
-      subject: "You've received an order",
-    });
+    // await sendMail({
+    //   body: "Check the amazing app to see the order details",
+    //   email: completeOrder.shop.author.email,
+    //   subject: "You've received an order",
+    // });
 
     res.send(completeOrder);
   }
