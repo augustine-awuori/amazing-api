@@ -1,4 +1,6 @@
-const { Recipient, EmailParams, MailerSend } = require("mailersend");
+const Recipient = require("mailersend").Recipient;
+const EmailParams = require("mailersend").EmailParams;
+const MailerSend = require("mailersend");
 
 const APP_EMAIL_ADDRESS = "campuusmart@gmail.com";
 const APP_NAME = "Amazing";
