@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 
 async function sendMail({ name, intro, to, subject }) {
   return await transporter.sendMail({
-    from: "demomailtrap.com",
+    from: "info@demomailtrap.com",
     to,
     subject,
     text: `Hello ${name}, ${intro}`
