@@ -24,6 +24,7 @@ const shops = require("../routes/shops");
 const status = require("../routes/status");
 const types = require("../routes/types");
 const users = require("../routes/users");
+const queries = require("../routes/queries");
 
 module.exports = function (app) {
   app.use(express.json());
@@ -50,5 +51,6 @@ module.exports = function (app) {
   app.use("/api/chatToken", chatToken);
   app.use("/api/feedToken", feedToken);
   app.use("/api/expoPushTokens", expoPushTokens);
+  app.use("/api/queries", queries);
   app.use(error);
 };
