@@ -19,7 +19,7 @@ const Query = mongoose.model("Query", schema);
 
 const validate = (query) =>
     Joi.object({
-        userId: Joi.string(),
+        userId: Joi.string().allow(""),
         text: Joi.string().required(),
     }).validate(query);
 
