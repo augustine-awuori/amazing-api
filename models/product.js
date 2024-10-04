@@ -39,7 +39,7 @@ const validate = (product) =>
     author: Joi.string(),
     description: Joi.string().max(200).allow(""),
     shop: Joi.string(),
-    images: Joi.array().min(1).max(3),
+    images: Joi.array().min(1).max(7),
     price: Joi.number().required().min(1).max(1_000_000),
     type: Joi.string(),
     name: Joi.string().required().min(2).max(50),
