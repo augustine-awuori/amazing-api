@@ -16,14 +16,10 @@ router.post(
   "/",
   [auth, validateUser, validator(validate)],
   async (req, res) => {
-    const { author, description, name, price, shop, type, images, isNegotiable } = req.body;
-
-    const product = new Product({
-      author, description, name, price, type, images, shop, isNegotiable
-    });
-
+    const product = new Product({ ...req.body });
     await product.save();
 
+    const { shop, type } = req.body;
     const detailedShop = await shopService.findById(shop);
     if (!detailedShop) return res.status(404).send("Shop not found");
 
