@@ -79,6 +79,21 @@ router.get("/:id", async (req, res) => {
   res.send(user);
 });
 
+router.patch("/cart", auth, async (req, res) => {
+  const user = await service.findById(req.user._id);
+
+  if (!user)
+    return res.status(404).send({ error: 'User does not exist' });
+
+  const { productId } = req.body;
+  if (!productId) return res.status(400).send({ error: 'Invalid product id' });
+
+  let cart = user.cart || {};
+  (cart[productId]) ? delete cart[productId] : cart[productId] = productId;
+
+  res.send(await service.findByIdAndUpdate(user._id, { cart }, { new: true }));
+});
+
 router.patch("/chatIds", [auth, validateUser], async (req, res) => {
   const { email, chatId } = req.body;
 

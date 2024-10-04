@@ -43,6 +43,7 @@ const schema = new mongoose.Schema({
   },
   otherAccounts: Object,
   pushTokens: Object,
+  cart: Object,
   timestamp: {
     type: Number,
     default: function () {
