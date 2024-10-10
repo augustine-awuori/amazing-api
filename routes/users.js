@@ -60,9 +60,9 @@ router.post("/quick", validator(validate), async (req, res) => {
 });
 
 router.get("/admin", async (_req, res) => {
-  const users = await service.getAll();
+  const admins = await service.getAll({ isAdmin: true });
 
-  res.send(users.filter(user => user.isAdmin));
+  res.send(admins);
 });
 
 router.get("/", async (_req, res) => {
