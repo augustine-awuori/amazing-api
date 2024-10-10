@@ -59,6 +59,12 @@ router.post("/quick", validator(validate), async (req, res) => {
     .send(_.omit(user, ["password"]));
 });
 
+router.get("/admin", async (_req, res) => {
+  const users = await service.getAll();
+
+  res.send(users.filter(user => user.isAdmin));
+});
+
 router.get("/", async (_req, res) => {
   const users = await service.getAll();
 
