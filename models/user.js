@@ -62,6 +62,7 @@ schema.methods.generateAuthToken = function () {
       pushToken: this.pushToken,
       email: this.email,
       name: this.name,
+      isAdmin: this.isAdmin
     },
     process.env.jwtPrivateKey
   );
