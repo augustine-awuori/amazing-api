@@ -12,6 +12,8 @@ const populateAndProject = (query) =>
     .populate("shop")
     .populate("status");
 
+const findAll = async () => await populateAndProject(Order.find({}));
+
 const findById = async (id) => {
   if (!isValidObjectId(id)) return;
 
@@ -62,6 +64,7 @@ const informOwner = async (shopId, orderId) => {
 };
 
 module.exports = {
+  findAll,
   findById,
   findByIdAndUpdate,
   findMyOrders,

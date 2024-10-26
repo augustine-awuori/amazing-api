@@ -3,6 +3,7 @@ const router = express.Router();
 const { isValidObjectId } = require("mongoose");
 
 const { validateOrder, Order } = require("../models/order");
+const admin = require("../middleware/admin");
 const auth = require("../middleware/auth");
 const mapBuyer = require("../middleware/mapBuyer");
 const service = require("../services/order");
@@ -20,6 +21,12 @@ router.post(
     res.send(await service.findById(order._id));
   }
 );
+
+router.get('/', [auth, admin], async (_req, res) => {
+  const orders = await service.findAll();
+
+  res.send(orders);
+})
 
 router.get("/:id", auth, async (req, res) => {
   const id = req.params.id;
