@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --watchAll --verbose --coverage --detectOpenHandles",
-    "start": "node index.js"
+    "start": "node index.js",
+    "build": "netlify deploy --prod"
   },
   "engines": {
     "node": "16.18.0"
@@ -33,9 +34,12 @@
     "mailgen": "^2.0.28",
     "moment": "^2.29.4",
     "mongoose": "^6.3.4",
+    "netlify-cli": "^17.37.2",
+    "netlify-lambda": "^2.0.16",
     "nodemailer": "^6.9.15",
     "path": "^0.12.7",
     "serve-static": "^1.15.0",
+    "serverless-http": "^3.2.0",
     "socket.io": "^4.7.5",
     "stream-chat": "^8.36.0",
     "twilio": "^5.3.0",
