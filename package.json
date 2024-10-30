@@ -6,7 +6,7 @@
   "scripts": {
     "test": "jest --watchAll --verbose --coverage --detectOpenHandles",
     "start": "node index.js",
-    "build": "netlify deploy --prod"
+    "build": "npm run build"
   },
   "engines": {
     "node": "16.18.0"

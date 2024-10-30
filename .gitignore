@@ -4,3 +4,6 @@ coverage/
 uploads/
 data/
 .expo/
+
+# Local Netlify folder
+.netlify
