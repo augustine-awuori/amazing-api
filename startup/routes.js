@@ -11,7 +11,6 @@ const expoPushTokens = require("../routes/expoPushTokens");
 const feedToken = require("../routes/feedToken");
 const listings = require("../routes/listings");
 const mailing = require("../routes/mailing");
-const messaging = require("../routes/messaging");
 const notifications = require("../routes/notifications");
 const opinions = require("../routes/opinions");
 const orders = require("../routes/orders");
@@ -35,7 +34,6 @@ module.exports = function (app) {
   app.use("/api/events", events);
   app.use("/api/listings", listings);
   app.use("/api/mailing", mailing);
-  app.use("/api/messaging", messaging);
   app.use("/api/notifications", notifications);
   app.use("/api/opinions", opinions);
   app.use("/api/orders", orders);
