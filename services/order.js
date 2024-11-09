@@ -12,12 +12,13 @@ const populateAndProject = (query) =>
     .populate("shop")
     .populate("status");
 
+const find = async (filter = {}) =>
+  await populateAndProject(Order.find(filter));
+
 const findById = async (id) => {
   if (!isValidObjectId(id)) return;
 
-  const order = await populateAndProject(Order.findById(id));
-
-  return order;
+  return (await find({ _id: id }))[0];
 };
 
 const findByIdAndUpdate = async (id, update, options) => {
@@ -33,17 +34,13 @@ const findByIdAndUpdate = async (id, update, options) => {
 const findMyOrders = async (myId) => {
   if (!isValidObjectId(myId)) return;
 
-  const orders = await populateAndProject(Order.find({ buyer: myId }));
-
-  return orders;
+  return await find({ buyer: myId });
 };
 
 const findShopOrders = async (shopId) => {
   if (!isValidObjectId(shopId)) return;
 
-  const orders = await populateAndProject(Order.find({ shop: shopId }));
-
-  return orders;
+  return await find({ shop: shopId });
 };
 
 const getNewOrderMessage = (shopId, orderId) => `
@@ -62,6 +59,7 @@ const informOwner = async (shopId, orderId) => {
 };
 
 module.exports = {
+  find,
   findById,
   findByIdAndUpdate,
   findMyOrders,

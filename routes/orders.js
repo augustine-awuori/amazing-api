@@ -4,6 +4,7 @@ const { isValidObjectId } = require("mongoose");
 
 const { validateOrder, Order } = require("../models/order");
 const auth = require("../middleware/auth");
+const admin = require("../middleware/admin");
 const mapBuyer = require("../middleware/mapBuyer");
 const service = require("../services/order");
 const userService = require("../services/users");
@@ -40,6 +41,12 @@ router.get("/single/:id", async (req, res) => {
     return res.status(404).send({ error: "This order doesn't exist" });
 
   res.send(order);
+});
+
+router.get("/", [auth, admin], async (_req, res) => {
+  const orders = await service.find();
+
+  res.send(orders);
 });
 
 router.patch("/:id", auth, async (req, res) => {
