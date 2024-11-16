@@ -1,8 +1,5 @@
 const { create } = require("apisauce");
 
-const { getWhatsAppNumberFromUser } = require("./func");
-const userService = require("../services/users");
-
 const apiClient = create({ baseURL: "https://graph.facebook.com/v18.0" });
 
 const sendMessage = async (phone = "", message = "") =>
@@ -17,23 +14,6 @@ const sendMessage = async (phone = "", message = "") =>
     },
   });
 
-const sendMessageToAllExcept = async (exceptionUserId, message) =>
-  (await userService.getAll()).forEach((user) => {
-    if (!isTheException(user, exceptionUserId))
-      sendMessage(getWhatsAppNumberFromUser(user), addInfoTo(message));
-  });
-
-function isTheException(user, exceptionUserId) {
-  return user._id.toString() === exceptionUserId.toString();
-}
-
-function addInfoTo(message) {
-  return `${message}.
-  You can always control the type of messages to receive from your profile settings
-  `;
-}
-
 module.exports = {
   sendMessage,
-  sendMessageToAllExcept,
 };

@@ -1,12 +1,13 @@
 const { isValidObjectId } = require("mongoose");
 
-const { appBaseURL } = require("../utility/func");
 const { Product } = require("../models/product");
-const { sendMessageToAllExcept } = require("../utility/whatsapp");
 
 const populateAndProject = (query) =>
-  query.populate("author", "-password").populate("shop")
-    .populate("type").populate("views");
+  query
+    .populate("author", "-password")
+    .populate("shop")
+    .populate("type")
+    .populate("views");
 
 const createProductFrom = async (listing, shop) => {
   const { author, description, price, title, timestamp, images } = listing;
@@ -69,27 +70,6 @@ const findProductsOfShopAndDelete = async (shopId) => {
   return shopProducts;
 };
 
-const getNewProductMessage = (shopName, shopId, productId) => `
-Subject: 🆕 Discover the Latest Addition on ${shopName} shop!
-
-Hi,
-
-Guess what? A fantastic new product has just landed! 🎉 
-Explore it before it's gone!
-
-${appBaseURL}/${shopId.toString()}/${productId.toString()}
-
-Happy shopping!
-Campus Mart Team
-`;
-
-const informOthers = (product) => {
-  const shop = product.shop;
-  const message = getNewProductMessage(shop.name, shop._id, product._id);
-
-  sendMessageToAllExcept(shop.author, message);
-};
-
 module.exports = {
   createProductFrom,
   findAll,
@@ -98,5 +78,4 @@ module.exports = {
   findByIdAndUpdate,
   findProductsOf,
   findProductsOfShopAndDelete,
-  informOthers,
 };
