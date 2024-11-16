@@ -69,4 +69,10 @@ router.patch("/:id", auth, async (req, res) => {
   res.send(updatedOrder);
 });
 
+router.delete('/:orderId', [auth, admin], async (req, res) => {
+  const order = await service.findByIdAndDelete(req.params.orderId);
+
+  res.send(order);
+});
+
 module.exports = router;
