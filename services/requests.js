@@ -13,4 +13,4 @@ const findById = async (id) => {
   return request;
 };
 
-module.exports = { findById, informOthers, getAll };
+module.exports = { findById, getAll };
