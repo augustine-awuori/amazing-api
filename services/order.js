@@ -1,9 +1,6 @@
 const { isValidObjectId } = require("mongoose");
 
-const { getWhatsAppNumberFromUser } = require("../utility/func");
 const { Order } = require("../models/order");
-const { sendMessage } = require("../utility/whatsapp");
-const shopService = require("./shop");
 
 const populateAndProject = (query) =>
   query
@@ -51,21 +48,6 @@ const findShopOrders = async (shopId) => {
   return await find({ shop: shopId });
 };
 
-const getNewOrderMessage = (shopId, orderId) => `
-You've a new order. 
-
-Check it out at https://kisiiuniversemart.digital/orders/my-shops/${shopId}/${orderId}
-`;
-
-const informOwner = async (shopId, orderId) => {
-  const phone = getWhatsAppNumberFromUser(
-    await shopService.getShopOwner(shopId)
-  );
-  const message = getNewOrderMessage(shopId, orderId);
-
-  sendMessage(phone, message);
-};
-
 module.exports = {
   find,
   findById,
@@ -74,5 +56,4 @@ module.exports = {
   findMyOrders,
   findShopOrders,
   getNewOrderMessage,
-  informOwner,
 };
