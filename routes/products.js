@@ -57,17 +57,21 @@ router.get("/single/:productId", async (req, res) => {
   res.send(product);
 });
 
-router.patch('/views/:productId', auth, async (req, res) => {
-  const productId = req.params.productId;
+router.patch("/views/:productId", auth, async (req, res) => {
+  const { productId } = req.params;
   const userId = req.user._id;
 
+  if (!isValidObjectId(productId))
+    return res.status(400).send({ error: "Invalid product ID" });
+
   const product = await Product.findById(productId);
-  if (!product) return res
-    .status(404)
-    .send({ error: 'The product with the given ID does not exist in the database' });
+  if (!product)
+    return res.status(404).send({
+      error: "The product with the given ID does not exist in the database",
+    });
 
   let viewed = false;
-  product.views.forEach(view => {
+  product.views.forEach((view) => {
     if (!view) return;
 
     if (view.viewer?.toString() === userId?.toString()) {
@@ -82,7 +86,11 @@ router.patch('/views/:productId', auth, async (req, res) => {
   await view.save();
 
   const views = [...(product.views || []), view._id];
-  const updated = await service.findByIdAndUpdate(productId, { views }, { new: true });
+  const updated = await service.findByIdAndUpdate(
+    productId,
+    { views },
+    { new: true }
+  );
   res.send(updated);
 });
 
@@ -90,13 +98,17 @@ router.patch(
   "/:id",
   [auth, validateUser, validateProductId, validateProductAuthor],
   async (req, res) => {
-    const product = await service.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
+    try {
+      const product = await service.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+      });
 
-    product
-      ? res.send(product)
-      : res.status(404).send({ error: "This product doesn't exist" });
+      product
+        ? res.send(product)
+        : res.status(404).send({ error: "This product doesn't exist" });
+    } catch (error) {
+      res.status(400).send({ error: `Invalid product details` });
+    }
   }
 );
 

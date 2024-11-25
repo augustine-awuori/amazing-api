@@ -24,6 +24,7 @@ const schema = new mongoose.Schema({
     default: false
   },
   views: [{ type: mongoose.Types.ObjectId, ref: "View" }],
+  activityId: String,
   timestamp: {
     type: Number,
     default: function () {
@@ -37,6 +38,7 @@ const Product = mongoose.model("Product", schema);
 const validate = (product) =>
   Joi.object({
     author: Joi.string(),
+    activityId: Joi.string().optional(),
     description: Joi.string().max(200).allow(""),
     shop: Joi.string(),
     images: Joi.array().min(1).max(7),
