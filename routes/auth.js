@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 
-const { User } = require("../models/user");
+const { User, validate } = require("../models/user");
 const service = require("../services/users");
 const validator = require("../middleware/validate");
 
