@@ -31,7 +31,7 @@ function generateHTMLEmail({ message }) {
   });
 }
 
-export async function sendMail({ message, to, subject }) {
+async function sendMail({ message, to, subject }) {
   const htmlEmail = generateHTMLEmail({ message });
 
   return await transporter.sendMail({

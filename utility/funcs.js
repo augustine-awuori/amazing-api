@@ -1,10 +1,10 @@
 const { User } = require("../models/user");
 
-export function getAuthCode() {
+function getAuthCode() {
     return Math.floor(1000 + Math.random() * 9000);
 }
 
-export async function findUniqueUsername(name) {
+async function findUniqueUsername(name) {
     let username = generateUsername(name);
     let found = await User.findOne({ username });
 
@@ -24,3 +24,5 @@ function generateUsername(name) {
 function generateRandomNumber() {
     return Math.floor(Math.random() * 900) + 100;
 }
+
+module.exports = { findUniqueUsername, getAuthCode }
