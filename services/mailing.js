@@ -5,16 +5,14 @@ const logo =
   "https://firebasestorage.googleapis.com/v0/b/kisii-campus-mart-site.appspot.com/o/logo.png?alt=media&token=19e3f069-ae48-46bc-8f54-1ad5c7fdae2e";
 
 const transporter = nodemailer.createTransport({
-  host: "live.smtp.mailtrap.io",
-  port: 587,
-  secure: false,
+  service: "gmail",
   auth: {
-    user: "api",
+    user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
 });
 
-function generateHTMLEmail({ name, intro }) {
+function generateHTMLEmail({ message }) {
   const mailGenerator = new Mailgen({
     theme: "default",
     product: {
@@ -26,22 +24,22 @@ function generateHTMLEmail({ name, intro }) {
 
   return mailGenerator.generate({
     body: {
-      name,
-      intro,
-      outro: `Always give feedback on anything! 💬 From what you'd like to see next on Amazing E-commerce... Happy Shopping! 🛍️`,
+      name: "Amazer",
+      intro: message,
+      outro: "Shop with ease!",
     },
   });
 }
 
-async function sendMail({ name, intro, to, subject }) {
-  const generated = generateHTMLEmail({ name, intro });
+export async function sendMail({ message, to, subject }) {
+  const htmlEmail = generateHTMLEmail({ message });
 
   return await transporter.sendMail({
-    from: "Amazing@demomailtrap.com",
+    from: `"Sparkler" ${process.env.EMAIL_USER}`,
     to,
     subject,
-    text: generated ? "" : `Hello ${name}, ${intro}`,
-    html: generated || "",
+    text: htmlEmail ? "" : `Hello Amazer, ${message}`,
+    html: htmlEmail || "",
   });
 }
 

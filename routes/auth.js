@@ -2,10 +2,18 @@ const Joi = require("joi");
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
+const { StreamChat } = require("stream-chat");
 
+const { getAuthCode, findUniqueUsername } = require("../utility/funcs");
+const { sendMail } = require("../services/mailing");
 const { User } = require("../models/user");
 const service = require("../services/users");
 const validator = require("../middleware/validate");
+
+const serverClient = StreamChat.getInstance(
+  process.env.chatApiKey,
+  process.env.chatApiSecret
+);
 
 router.post("/", validator(validate), async (req, res) => {
   const { email, password } = req.body;
@@ -31,6 +39,38 @@ router.post("/", validator(validate), async (req, res) => {
 
   const token = user.generateAuthToken();
   res.send(token);
+});
+
+router.post("/code", async (req, res) => {
+  const { email } = req.body;
+
+  let user = await User.findOne({ email });
+  const authCode = getAuthCode();
+  const salt = await bcrypt.genSalt(10);
+  const hashedAuthCode = await bcrypt.hash(authCode.toString(), salt);
+
+  if (!user) {
+    const name = "Unknown";
+    const username = await findUniqueUsername(name);
+    user = new User({ email, name, username, invalid: true });
+    const token = serverClient.createToken(user._id.toString());
+    user.feedToken = token;
+    user.chatToken = token;
+  }
+  user.authCode = hashedAuthCode;
+  await user.save();
+
+  const { accepted } = await sendMail({
+    message: `Your one time authentication code is: ${authCode}`,
+    subject: "Amazing Auth Code",
+    to: email,
+  });
+
+  accepted
+    ? res.send({ message: "Code has been sent to the email provided" })
+    : res
+      .status(500)
+      .send({ error: "Something failed while sending the auth code" });
 });
 
 // TODO: Protect this route ASAP

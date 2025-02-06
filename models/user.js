@@ -28,6 +28,10 @@ const schema = new mongoose.Schema({
     maxlength: 50,
     required: true,
   },
+  invalid: {
+    type: Boolean,
+    default: false,
+  },
   isAdmin: { type: Boolean, default: false },
   isVerified: {
     type: Boolean,
@@ -35,12 +39,7 @@ const schema = new mongoose.Schema({
       return this.isAdmin;
     },
   },
-  password: {
-    type: String,
-    minlength: 6,
-    maxlength: 1024,
-    trim: true,
-  },
+  authCode: String,
   otherAccounts: Object,
   pushTokens: Object,
   cart: Object,
@@ -75,7 +74,7 @@ const validateUser = (user) =>
     avatar: Joi.string(),
     email: Joi.string().min(3).max(100).required(),
     name: Joi.string().min(3).max(50).required(),
-    password: Joi.string(),
+    authCode: Joi.string(),
   }).validate(user);
 
 exports.User = User;
