@@ -35,7 +35,7 @@ async function sendMail({ message, to, subject }) {
   const htmlEmail = generateHTMLEmail({ message });
 
   return await transporter.sendMail({
-    from: `"Sparkler" ${process.env.EMAIL_USER}`,
+    from: `"Amazing" ${process.env.EMAIL_USER}`,
     to,
     subject,
     text: htmlEmail ? "" : `Hello Amazer, ${message}`,
