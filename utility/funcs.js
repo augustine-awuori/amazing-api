@@ -1,4 +1,4 @@
-import { User } from "../models/user";
+const { User } = require("../models/user");
 
 export function getAuthCode() {
     return Math.floor(1000 + Math.random() * 9000);
