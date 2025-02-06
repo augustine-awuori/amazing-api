@@ -21,7 +21,7 @@ async function sendMailForSignUp(user) {
   });
 }
 
-router.post("/", validateUser(validateUser), async (req, res) => {
+router.post("/", validator(validateUser), async (req, res) => {
   const { email, name, authCode } = req.body;
 
   const user = await User.findOne({ email });
