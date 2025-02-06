@@ -6,7 +6,7 @@ const _ = require("lodash");
 
 const { findUniqueUsername } = require("../utility/funcs");
 const { sendMail } = require("../services/mailing");
-const { User, validate } = require("../models/user");
+const { User, validate: validateUser } = require("../models/user");
 const auth = require("../middleware/auth");
 const service = require("../services/users");
 const validator = require("../middleware/validate");
@@ -21,7 +21,7 @@ async function sendMailForSignUp(user) {
   });
 }
 
-router.post("/", validate(validate), async (req, res) => {
+router.post("/", validateUser(validateUser), async (req, res) => {
   const { email, name, authCode } = req.body;
 
   const user = await User.findOne({ email });
@@ -56,7 +56,7 @@ router.post("/", validate(validate), async (req, res) => {
     .send(authToken);
 });
 
-router.post("/quick", validator(validate), async (req, res) => {
+router.post("/quick", validator(validateUser), async (req, res) => {
   const { avatar, email, name } = req.body;
 
   let user = await service.findOne({ email });
