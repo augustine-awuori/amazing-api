@@ -15,30 +15,28 @@ const serverClient = StreamChat.getInstance(
   process.env.chatApiSecret
 );
 
-router.post("/", validator(validate), async (req, res) => {
-  const { email, password } = req.body;
+const validateDetails = (details) =>
+  Joi.object({
+    authCode: Joi.number().min(4).required(),
+    email: Joi.string().required(),
+  }).validate(details);
+
+router.post("/", validator(validateDetails), async (req, res) => {
+  const { email, authCode } = req.body;
+
   const user = await User.findOne({ email });
   if (!user) return res.status(404).send({ error: "Email isn't registered." });
+  const isValidAuthCode = await bcrypt.compare(authCode.toString(), user.authCode);
 
-  if (user.password) {
-    const isValidPassword = await bcrypt.compare(password, user.password);
-    if (!isValidPassword)
-      return res
-        .status(400)
-        .send({ error: "Invalid username and/or password." });
-  } else {
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
-    await user.save();
-  }
+  if (!isValidAuthCode)
+    return res
+      .status(400)
+      .send({ error: "Invalid username and/or auth code." });
 
-  if (!user.feedToken) {
-    const feedToken = service.getUserFeedToken(user._id);
-    await User.findByIdAndUpdate(user._id, { feedToken });
-  }
 
-  const token = user.generateAuthToken();
-  res.send(token);
+  user.authCode = "";
+  await user.save();
+  res.send(user.generateAuthToken());
 });
 
 router.post("/code", async (req, res) => {
