@@ -56,6 +56,15 @@ router.post("/", validator(validateUser), async (req, res) => {
     .send(authToken);
 });
 
+router.post('/delete', async (req, res) => {
+  const { email } = req.body;
+
+  const user = await User.find({ email });
+  if (user) await User.findByIdAndDelete(user._id);
+
+  res.status(201).send();
+});
+
 router.post("/quick", validator(validateUser), async (req, res) => {
   const { avatar, email, name } = req.body;
 
