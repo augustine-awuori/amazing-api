@@ -1,6 +1,7 @@
 const { isValidObjectId } = require("mongoose");
 
 const { Product } = require("../models/product");
+const { User } = require("../models/user");
 
 const populateAndProject = (query) =>
   query
@@ -24,6 +25,14 @@ const createProductFrom = async (listing, shop) => {
   product = await product.save();
 
   return await findById(product._id);
+};
+
+const findBySeller = async (email) => {
+  const user = await User.findOne({ email });
+
+  return user
+    ? await populateAndProject(Product.find({ author: user._id }))
+    : [];
 };
 
 const findAll = async () => {
@@ -78,4 +87,5 @@ module.exports = {
   findByIdAndUpdate,
   findProductsOf,
   findProductsOfShopAndDelete,
+  findBySeller
 };

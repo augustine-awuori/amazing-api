@@ -43,6 +43,10 @@ router.get("/:shopId", async (req, res) => {
   res.send(shopProducts);
 });
 
+router.get('/user/:email', async (req, res) => {
+  res.send(await service.findBySeller(req.params.email));
+});
+
 router.get("/", async (_req, res) => {
   const products = await service.findAll();
 
