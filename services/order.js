@@ -10,7 +10,7 @@ const populateAndProject = (query) =>
     .populate("status");
 
 const find = async (filter = {}) =>
-  await populateAndProject(Order.find(filter));
+  await populateAndProject(Order.find(filter).sort('_id'));
 
 const findById = async (id) => {
   if (!isValidObjectId(id)) return;
