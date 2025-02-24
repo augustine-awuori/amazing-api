@@ -18,7 +18,7 @@ const serverClient = StreamChat.getInstance(
 const validateDetails = (details) =>
   Joi.object({
     authCode: Joi.number().min(4).required(),
-    email: Joi.string().required(),
+    email: Joi.string().email().required(),
   }).validate(details);
 
 router.post("/", validator(validateDetails), async (req, res) => {
@@ -32,7 +32,6 @@ router.post("/", validator(validateDetails), async (req, res) => {
     return res
       .status(400)
       .send({ error: "Invalid username and/or auth code." });
-
 
   user.authCode = "";
   await user.save();

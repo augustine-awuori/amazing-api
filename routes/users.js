@@ -41,12 +41,9 @@ router.post("/", validator(validateUser), async (req, res) => {
     user.name = name;
     user.username = await findUniqueUsername(name);
     user.invalid = false;
-    user.authCode = "";
-    await user.save();
-  } else {
-    user.authCode = "";
-    await user.save();
   }
+  user.authCode = "";
+  await user.save();
 
   const authToken = user.generateAuthToken();
   res
