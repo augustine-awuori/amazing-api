@@ -73,6 +73,7 @@ router.patch("/:id", auth, async (req, res) => {
 
   const userId = req.user._id.toString();
   const isAuthorised =
+    req.user.isAdmin ||
     order.buyer._id.toString() === userId ||
     order.shop.author._id.toString() === userId;
   if (!isAuthorised)
