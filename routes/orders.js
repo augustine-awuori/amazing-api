@@ -2,10 +2,12 @@ const express = require("express");
 const router = express.Router();
 const { isValidObjectId } = require("mongoose");
 
+const { User } = require("../models/user");
 const { validateOrder, Order } = require("../models/order");
-const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
+const auth = require("../middleware/auth");
 const mapBuyer = require("../middleware/mapBuyer");
+const sendPushNotification = require("../utility/pushNotifications");
 const service = require("../services/order");
 const userService = require("../services/users");
 const validate = require("../middleware/validate");
@@ -15,10 +17,26 @@ router.post(
   [auth, mapBuyer, validate(validateOrder)],
   async (req, res) => {
     const order = new Order(req.body);
+    order.save();
 
-    await order.save();
+    const adminsTokens = (await User.find({ isAdmin: true }))
+      .map((user) => user.expoPushToken)
+      .filter((token) => typeof token === "string");
+    adminsTokens.forEach((token) => {
+      sendPushNotification(token, {
+        message: `${order.message || "Admin, check this new order"}`,
+        title: "New order",
+      });
+    });
 
-    res.send(await service.findById(order._id));
+    const populatedOrder = await service.findById(order._id);
+    if (populatedOrder?.buyer?.expoPushToken)
+      sendPushNotification(populatedOrder?.buyer?.expoPushToken, {
+        message: "Someone just ordered to your shop",
+        title: "New order",
+      });
+
+    res.send(populatedOrder);
   }
 );
 
@@ -69,7 +87,7 @@ router.patch("/:id", auth, async (req, res) => {
   res.send(updatedOrder);
 });
 
-router.delete('/:orderId', [auth, admin], async (req, res) => {
+router.delete("/:orderId", [auth, admin], async (req, res) => {
   const order = await service.findByIdAndDelete(req.params.orderId);
 
   res.send(order);
