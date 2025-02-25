@@ -7,6 +7,7 @@ const categories = require("../routes/categories");
 const chatToken = require("../routes/chatToken");
 const error = require("../middleware/error");
 const events = require("../routes/events");
+const expoPushNotifications = require("../routes/expoPushNotifications");
 const expoPushTokens = require("../routes/expoPushTokens");
 const feedToken = require("../routes/feedToken");
 const listings = require("../routes/listings");
@@ -50,6 +51,7 @@ module.exports = function (app) {
   app.use("/api/users", users);
   app.use("/api/chatToken", chatToken);
   app.use("/api/feedToken", feedToken);
+  app.use("/api/expoPushNotifications", expoPushNotifications);
   app.use("/api/expoPushTokens", expoPushTokens);
   app.use("/api/queries", queries);
   app.use(error);

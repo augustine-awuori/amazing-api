@@ -1,26 +1,25 @@
-const { Expo } = require("expo-server-sdk");
-const winston = require("winston");
+import { Expo } from "expo-server-sdk";
 
-const sendPushNotification = async (targetExpoPushToken, message) => {
-  const expo = new Expo();
-  const chunks = expo.chunkPushNotifications([
-    { to: targetExpoPushToken, sound: "default", body: message },
-  ]);
+const sendPushNotification = async (
+    targetExpoPushToken,
+    { message, title }
+) => {
+    const expo = new Expo();
+    const chunks = expo.chunkPushNotifications([
+        { to: targetExpoPushToken, sound: "default", body: message, title },
+    ]);
 
-  const sendChunks = async () => {
-    // This code runs synchronously. We're waiting for each chunk to be send.
-    // A better approach is to use Promise.all() and send multiple chunks in parallel.
-    chunks.forEach(async (chunk) => {
-      try {
-        const tickets = await expo.sendPushNotificationsAsync(chunk);
-        console.log("Tickets", tickets);
-      } catch (error) {
-        winston.error(`Error sending chunk: ${error}`);
-      }
-    });
-  };
+    const sendChunks = async () => {
+        chunks.forEach(async (chunk) => {
+            try {
+                await expo.sendPushNotificationsAsync(chunk);
+            } catch (error) {
+                console.error(`Error sending chunk...`, error);
+            }
+        });
+    };
 
-  await sendChunks();
+    await sendChunks();
 };
 
-module.exports = sendPushNotification;
+export default sendPushNotification;
