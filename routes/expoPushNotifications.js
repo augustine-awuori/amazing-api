@@ -24,7 +24,7 @@ router.post("/", auth, async (req, res) => {
     res.status(201).send();
 });
 
-export function sendPushNotificationTo(usersToken = [], { message, title }) {
+function sendPushNotificationTo(usersToken = [], { message, title }) {
     usersToken.forEach(async (token) => {
         if (Expo.isExpoPushToken(token))
             await sendPushNotification(token, { message, title });
@@ -32,3 +32,4 @@ export function sendPushNotificationTo(usersToken = [], { message, title }) {
 }
 
 module.exports = router;
+module.exports.sendPushNotificationTo = sendPushNotificationTo;
