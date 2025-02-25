@@ -14,7 +14,8 @@ module.exports.Order = mongoose.model(
     },
     products: Object,
     canceled: { type: Boolean, default: false },
-    seen: { type: Boolean, default: false },
+    seenBySeller: { type: Boolean, default: false },
+    seenByAdmin: { type: Boolean, default: false },
     timestamp: {
       type: Number,
       default: function () {
