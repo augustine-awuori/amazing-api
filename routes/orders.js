@@ -37,11 +37,22 @@ router.post(
     });
 
     const populatedOrder = await service.findById(order._id);
-    if (populatedOrder?.buyer?.expoPushToken)
-      sendPushNotification(populatedOrder?.buyer?.expoPushToken, {
-        message: "Someone just ordered to your shop",
-        title: "New order",
-      });
+    const sellerId = populatedOrder.shop?.author;
+    if (sellerId) {
+      const seller = await User.findById(sellerId);
+      if (seller?.expoPushToken)
+        sendPushNotification(seller.expoPushToken, {
+          message: "Someone just ordered to your shop",
+          title: "New order",
+        });
+
+      if (seller)
+        sendMail({
+          message: `Someone just ordered from your shop ${populatedOrder.shop?.name}`,
+          subject: "New Order",
+          to: seller.email,
+        });
+    }
 
     res.send(populatedOrder);
   }
