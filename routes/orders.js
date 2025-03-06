@@ -3,6 +3,7 @@ const router = express.Router();
 const { isValidObjectId } = require("mongoose");
 
 const { User } = require("../models/user");
+const { sendMail } = require("../services/mailing");
 const { validateOrder, Order } = require("../models/order");
 const admin = require("../middleware/admin");
 const auth = require("../middleware/auth");
@@ -19,7 +20,13 @@ router.post(
     const order = new Order(req.body);
     order.save();
 
-    const adminsTokens = (await User.find({ isAdmin: true }))
+    const admins = await User.find({ isAdmin: true });
+    sendMail({
+      message: "Someone just ordered",
+      subject: "New Order",
+      to: admins.map((a) => a.email),
+    });
+    const adminsTokens = admins
       .map((user) => user.expoPushToken)
       .filter((token) => typeof token === "string");
     adminsTokens.forEach((token) => {
