@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { isValidObjectId } = require("mongoose");
 
+const { findUniqueUsername } = require("../utility/funcs");
 const { User } = require("../models/user");
 const { sendMail } = require("../services/mailing");
 const { validateOrder, Order } = require("../models/order");
@@ -12,6 +13,34 @@ const sendPushNotification = require("../utility/pushNotifications");
 const service = require("../services/order");
 const userService = require("../services/users");
 const validate = require("../middleware/validate");
+
+router.post("/sparkler", async (req, res) => {
+  const { productId, name, email, profileImage, phoneNumber } = req.body;
+
+  let user = User.findOne({ email });
+  if (!user) {
+    user = new User({
+      email,
+      name,
+      username: findUniqueUsername(email),
+      otherAccounts: { whatsapp: phoneNumber },
+      avatar: profileImage,
+    });
+    await user.save();
+  }
+
+  const { shop, message } = req.body;
+  const order = new Order({
+    products: { [productId]: 1 },
+    buyer: user._id.toString(),
+    shop,
+    message,
+    status: "",
+  });
+  await order.save();
+
+  res.send(await notifyOrderSubscribers(order));
+});
 
 router.post(
   "/",
@@ -111,5 +140,43 @@ router.delete("/:orderId", [auth, admin], async (req, res) => {
 
   res.send(order);
 });
+
+async function notifyOrderSubscribers(order) {
+  const admins = await User.find({ isAdmin: true });
+  sendMail({
+    message: "Someone just ordered",
+    subject: "New Order",
+    to: admins.map((a) => a.email),
+  });
+  const adminsTokens = admins
+    .map((user) => user.expoPushToken)
+    .filter((token) => typeof token === "string");
+  adminsTokens.forEach((token) => {
+    sendPushNotification(token, {
+      message: `${order.message || "Admin, check this new order"}`,
+      title: "New order",
+    });
+  });
+
+  const populatedOrder = await service.findById(order._id);
+  const sellerId = populatedOrder.shop?.author;
+  if (sellerId) {
+    const seller = await User.findById(sellerId);
+    if (seller?.expoPushToken)
+      sendPushNotification(seller.expoPushToken, {
+        message: "Someone just ordered to your shop",
+        title: "New order",
+      });
+
+    if (seller)
+      sendMail({
+        message: `Someone just ordered from your shop ${populatedOrder.shop?.name}`,
+        subject: "New Order",
+        to: seller.email,
+      });
+  }
+
+  return populatedOrder;
+}
 
 module.exports = router;
