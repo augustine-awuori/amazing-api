@@ -5,7 +5,10 @@ const bcrypt = require("bcrypt");
 const _ = require("lodash");
 
 const { findUniqueUsername } = require("../utility/funcs");
+const { Listing } = require("../models/listing");
+const { Product } = require("../models/product");
 const { sendMail } = require("../services/mailing");
+const { Shop } = require("../models/shop");
 const { User, validate: validateUser } = require("../models/user");
 const auth = require("../middleware/auth");
 const service = require("../services/users");
@@ -53,7 +56,7 @@ router.post("/", validator(validateUser), async (req, res) => {
     .send(authToken);
 });
 
-router.post('/delete', async (req, res) => {
+router.post("/delete", async (req, res) => {
   const { email } = req.body;
 
   const user = await User.find({ email });
@@ -128,6 +131,33 @@ router.patch("/", [auth, validateUser], async (req, res) => {
     .header("x-auth-token", user.generateAuthToken())
     .header("access-control-expose-headers", "x-auth-token")
     .send(user);
+});
+
+router.delete("/", auth, async (req, res) => {
+  const author = req.user._id;
+  const { authCode } = req.body;
+
+  const user = await User.findById(author);
+  if (!user) return res.status(404).send({ error: "Email isn't registered." });
+  const isValidAuthCode = await bcrypt.compare(authCode.toString(), user.authCode);
+
+  if (!isValidAuthCode)
+    return res
+      .status(400)
+      .send({ error: "Invalid username and/or auth code." });
+
+  (await Shop.find({ author })).forEach((shop) =>
+    Shop.findByIdAndDelete(shop._id)
+  );
+  (await Product.find({ author })).forEach((product) =>
+    Product.findByIdAndDelete(product._id)
+  );
+  (await Listing.find({ author })).forEach((listing) =>
+    Product.findByIdAndDelete(listing._id)
+  );
+
+  const response = await User.findByIdAndDelete(author);
+  res.send(response);
 });
 
 module.exports = router;
